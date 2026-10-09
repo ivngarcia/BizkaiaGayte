@@ -804,7 +804,6 @@
                 <h3>📸 Galería de Fotos</h3>
                 <p style="font-size: 0.8rem; color: var(--text-light); margin-bottom: 0.8rem;">Momentos capturados en nuestras excursiones por Bizkaia.</p>
                 
-                <!-- Controles de subida visibles SOLAMENTE para el administrador -->
                 <div id="admin-gallery-controls" class="admin-gallery-controls">
                     <p style="font-size: 0.8rem; font-weight: bold; color: var(--primary-dark); margin-bottom: 0.4rem;">Panel Admin: Añadir Foto</p>
                     <div class="form-group" style="margin-bottom: 0.5rem;">
@@ -816,7 +815,7 @@
                         </select>
                     </div>
                     <div class="form-group" style="margin-bottom: 0.5rem;">
-                        <input type="url" id="gallery-photo-url" placeholder="URL de la imagen (Solo visible para Admin)" style="font-size: 0.85rem; padding: 0.4rem;">
+                        <input type="url" id="gallery-photo-url" placeholder="URL de la imagen" style="font-size: 0.85rem; padding: 0.4rem;">
                     </div>
                     <button class="btn btn-small" style="width: 100%; font-size: 0.8rem;" onclick="addGalleryPhoto()">Publicar Foto</button>
                 </div>
@@ -1125,6 +1124,7 @@
             return new Date(dateString).toLocaleDateString('es-ES', options);
         }
 
+        /* RENDER RUTAS PROGRAMADAS (VISITANTES: SIN SEGUROS VISIBLES) */
         function renderScheduledRoutes(list) {
             const container = document.getElementById('scheduled-routes-container');
             if (list.length === 0) {
@@ -1152,14 +1152,11 @@
                         <button class="btn" style="width: 100%; margin-bottom: 1rem;" onclick="openRegisterModal('${route.id}')">Inscribirse</button>
                         
                         <div class="participants-section">
-                            <h4>Inscritos (${route.participants.length})</h4>
+                            <h4>Asistentes inscritos (${route.participants.length})</h4>
                             ${route.participants.length === 0 ? '<p style="font-size: 0.85rem; color: var(--text-light);">Aún sin inscripciones.</p>' : 
                                 route.participants.map(p => {
                                     let statusClass = p.status === 'confirmed' ? 'confirmed' : (p.status === 'pending' ? 'pending' : 'denied');
                                     let statusText = p.status === 'confirmed' ? 'Plaza Confirmada' : (p.status === 'pending' ? 'Pendiente' : 'Denegada');
-                                    let insuranceBadge = p.insurance ? 
-                                        `<span class="badge badge-insurance-yes">Seguro SÍ</span>` : 
-                                        `<span class="badge badge-insurance-no">Seguro NO</span>`;
                                     
                                     return `
                                         <div class="participant-item ${statusClass}">
@@ -1167,7 +1164,6 @@
                                                 <strong>${p.name}</strong><br>
                                                 <small style="color: var(--text-light);">${statusText}</small>
                                             </div>
-                                            <div>${insuranceBadge}</div>
                                         </div>
                                     `;
                                 }).join('')
@@ -1178,6 +1174,7 @@
             `).join('');
         }
 
+        /* RENDER RUTAS REALIZADAS (VISITANTES: SIN SEGUROS VISIBLES) */
         function renderCompletedRoutes(list) {
             const container = document.getElementById('completed-routes-container');
             if (list.length === 0) {
@@ -1207,9 +1204,6 @@
                             route.participants.map(p => {
                                 let statusClass = p.status === 'confirmed' ? 'confirmed' : 'denied';
                                 let statusText = p.status === 'confirmed' ? 'Plaza Confirmada (Asistió)' : 'Denegada / No asistió';
-                                let insuranceBadge = p.insurance ? 
-                                    `<span class="badge badge-insurance-yes">Seguro SÍ</span>` : 
-                                    `<span class="badge badge-insurance-no">Seguro NO</span>`;
                                 
                                 return `
                                     <div class="participant-item ${statusClass}">
@@ -1217,7 +1211,6 @@
                                             <strong>${p.name}</strong><br>
                                             <small style="color: var(--text-light);">${statusText}</small>
                                         </div>
-                                        <div>${insuranceBadge}</div>
                                     </div>
                                 `;
                             }).join('')
@@ -1287,6 +1280,7 @@
             document.getElementById('admin-panel-content').style.display = 'none';
             document.getElementById('admin-gallery-controls').style.display = 'none';
             document.getElementById('admin-pass').value = '';
+            renderAll();
             renderGallery();
         }
 
@@ -1294,6 +1288,7 @@
             document.getElementById('admin-login-wrapper').style.display = 'none';
             document.getElementById('admin-panel-content').style.display = 'block';
             document.getElementById('admin-gallery-controls').style.display = 'block';
+            renderAll();
         }
 
         function saveRoute() {
@@ -1384,6 +1379,7 @@
             }
         }
 
+        /* VISTA DE ADMINISTRADOR: MUESTRA Y PERMITE EDITAR LOS SEGUROS DE CADA ASISTENTE */
         function renderAdminRoutesList() {
             const container = document.getElementById('admin-routes-list');
             if (routes.length === 0) {
@@ -1414,22 +1410,28 @@
                             <div style="display: flex; gap: 0.4rem; margin-bottom: 1rem; flex-wrap: wrap;">
                                 <button class="btn btn-small" onclick="editRoute('${route.id}')">Editar</button>
                                 <button class="btn btn-small btn-danger" onclick="deleteRoute('${route.id}')">Eliminar</button>
-                                <button class="btn btn-small btn-secondary" onclick="openAdminParticipantModal('${route.id}')">+ Participante</button>
+                                <button class="btn btn-small btn-secondary" onclick="openAdminParticipantModal('${route.id}')">+ Asistente</button>
                             </div>
 
                             <div class="participants-section">
-                                <h4>Participantes (${route.participants.length})</h4>
+                                <h4>Gestión de Asistentes (${route.participants.length})</h4>
                                 ${route.participants.length === 0 ? '<p style="font-size: 0.85rem; color: var(--text-light);">Sin participantes.</p>' : 
                                     route.participants.map(p => {
                                         let statusClass = p.status === 'confirmed' ? 'confirmed' : (p.status === 'pending' ? 'pending' : 'denied');
+                                        let insuranceBadge = p.insurance ? 
+                                            `<span class="badge badge-insurance-yes">Seguro SÍ</span>` : 
+                                            `<span class="badge badge-insurance-no">Seguro NO</span>`;
+                                        
                                         return `
                                             <div class="participant-item ${statusClass}" style="flex-direction: column; align-items: stretch; gap: 0.4rem; padding: 0.5rem;">
                                                 <div style="display: flex; justify-content: space-between; align-items: center;">
                                                     <strong>${p.name}</strong>
+                                                    <div>${insuranceBadge}</div>
                                                     <button class="btn btn-small btn-danger" style="padding: 0.1rem 0.3rem; font-size: 0.75rem;" onclick="removeParticipant('${route.id}', '${p.id}')">X</button>
                                                 </div>
                                                 <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; flex-wrap: wrap; gap: 0.3rem;">
                                                     <div>
+                                                        Plaza: 
                                                         <select onchange="changeParticipantStatus('${route.id}', '${p.id}', this.value)" style="padding: 0.2rem; font-size: 0.8rem;">
                                                             <option value="confirmed" ${p.status === 'confirmed' ? 'selected' : ''}>Confirmada</option>
                                                             <option value="pending" ${p.status === 'pending' ? 'selected' : ''}>Pendiente</option>
@@ -1438,7 +1440,7 @@
                                                     </div>
                                                     <div>
                                                         <label style="cursor: pointer; font-weight: normal;">
-                                                            <input type="checkbox" ${p.insurance ? 'checked' : ''} onchange="toggleParticipantInsurance('${route.id}', '${p.id}', this.checked)"> Seguro
+                                                            <input type="checkbox" ${p.insurance ? 'checked' : ''} onchange="toggleParticipantInsurance('${route.id}', '${p.id}', this.checked)"> Editar Seguro
                                                         </label>
                                                     </div>
                                                 </div>
@@ -1478,7 +1480,7 @@
         }
 
         function removeParticipant(routeId, participantId) {
-            if (confirm('¿Eliminar participante?')) {
+            if (confirm('¿Eliminar asistente?')) {
                 const route = routes.find(r => r.id === routeId);
                 if (route) {
                     route.participants = route.participants.filter(p => p.id !== participantId);
