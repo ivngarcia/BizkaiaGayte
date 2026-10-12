@@ -821,9 +821,15 @@
                                     <input type="text" id="route-elevation" placeholder="Solo número">
                                 </div>
                             </div>
+
                             <div class="form-group">
-                                <label for="route-meeting">Punto de Encuentro (Texto o Enlace Google Maps)</label>
-                                <input type="text" id="route-meeting" placeholder="Ej. Sopuerta o enlace de Google Maps">
+                                <label for="route-coffee">Café previo (Enlace o lugar Maps)</label>
+                                <input type="text" id="route-coffee" placeholder="Ej. Bar X o enlace de Google Maps">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="route-meeting">Punto de Encuentro (Inicio de Ruta)</label>
+                                <input type="text" id="route-meeting" placeholder="Ej. Merendero-Undakorta o enlace Maps">
                             </div>
 
                             <div class="form-group" style="background: #f1f8e9; padding: 0.8rem; border-radius: 6px; border: 1px dashed var(--primary);">
@@ -957,27 +963,23 @@
         let routes = JSON.parse(localStorage.getItem('club_routes')) || [
             {
                 id: 'route-1',
-                title: 'Ruta por los Montes de Sopuerta',
-                date: '2026-06-15T09:00',
+                title: 'Ruta de los Dólmenes de Oiz',
+                date: '2026-10-17T10:00',
                 difficulty: 'Media',
-                distance: '12',
-                elevation: '450',
-                meeting: 'Plaza del Ayuntamiento, Sopuerta',
-                weatherIcon: '⛅',
-                weatherTemp: '22',
-                wikiloc: 'https://es.wikiloc.com',
+                distance: '17.79',
+                elevation: '644',
+                coffee: 'Bar Uriarte (https://maps.app.goo.gl/ejemplo)',
+                meeting: 'Merendero-Undakorta (https://maps.app.goo.gl/TESfLoWCVXUwg58b6)',
+                weatherIcon: '⛅ 🌧️',
+                weatherTemp: '13',
+                wikiloc: 'https://es.wikiloc.com/rutas-senderismo/ruta-de-los-dolmenes-de-oiz-iturzurigana-zengotitagana-oiz-astokurzeteburu-ipinarrieta-65984900',
                 image: 'https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=600&q=80',
-                description: 'Bonita ruta por los cordales cercanos disfrutando de la naturaleza.',
-                participants: [
-                    { id: 'p1', name: 'Mikel Agirre', email: 'mikel@example.com', status: 'confirmed', insurance: true },
-                    { id: 'p2', name: 'Ane Fernandez', email: 'ane@example.com', status: 'pending', insurance: false }
-                ]
+                description: 'Magnífica ruta por los dólmenes de Oiz.',
+                participants: []
             }
         ];
 
-        let clubGallery = JSON.parse(localStorage.getItem('club_gallery')) || [
-            { id: 'g1', title: 'Cima del Gorbea', routeId: 'route-1', url: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=600&q=80' }
-        ];
+        let clubGallery = JSON.parse(localStorage.getItem('club_gallery')) || [];
 
         let isAdminLoggedIn = localStorage.getItem('admin_logged') === 'true';
         let isMobileViewForced = false;
@@ -1104,21 +1106,54 @@
             return t;
         }
 
-        /* COMPARTIR EN WHATSAPP CON NOMBRE DE RUTA AL INICIO Y AVISO EN ROJO Y NEGRITA */
-        function shareOnWhatsApp(routeId, title, dateStr, meeting, distance, elevation, weather, wikiloc) {
+        function formatMapField(fieldValue) {
+            if (!fieldValue) return '';
+            if (fieldValue.includes('http://') || fieldValue.includes('https://')) {
+                let urlMatch = fieldValue.match(/(https?:\/\/[^\s]+)/);
+                if (urlMatch) {
+                    let url = urlMatch[1];
+                    let textPart = fieldValue.replace(url, '').trim();
+                    if (textPart.endsWith('(-') || textPart.endsWith('(')) textPart = textPart.slice(0, -1).trim();
+                    return `${textPart ? textPart + '<br>' : ''}<a href="${url}" target="_blank" style="color:var(--primary); font-weight:bold;">📍 Ver ubicación en Google Maps</a>`;
+                }
+            }
+            return fieldValue;
+        }
+
+        /* COMPARTIR EN WHATSAPP CON CAFÉ PREVIO */
+        function shareOnWhatsApp(routeId, title, dateStr, coffee, meeting, distance, elevation, weather, wikiloc) {
             let baseUrl = window.location.href.split('?')[0];
             let routeUrl = `${baseUrl}?route=${routeId}`;
 
-            let text = `⛰️ *${title}* - Club Bizkaia Gayte 🏳️‍🌈\n\n` +
+            let coffeeText = coffee;
+            let coffeeLink = '';
+            if (coffee && (coffee.includes('http://') || coffee.includes('https://'))) {
+                let urlMatch = coffee.match(/(https?:\/\/[^\s]+)/);
+                if (urlMatch) {
+                    coffeeLink = urlMatch[1];
+                    coffeeText = coffee.replace(coffeeLink, '').trim();
+                    if (coffeeText.endsWith('(-') || coffeeText.endsWith('(')) coffeeText = coffeeText.slice(0, -1).trim();
+                }
+            }
+
+            let meetingText = meeting;
+            let mapsLink = '';
+            let urlMatch = meeting.match(/(https?:\/\/[^\s]+)/);
+            if (urlMatch) {
+                mapsLink = urlMatch[1];
+                meetingText = meeting.replace(mapsLink, '').trim();
+                if (meetingText.endsWith('(-') || meetingText.endsWith('(')) meetingText = meetingText.slice(0, -1).trim();
+            }
+
+            let text = `🌐 *Entra aquí para ver detalles y apuntarte:* ${routeUrl}\n\n` +
+                       `⛰️ *${title}* - Club Bizkaia Gayte 🏳️‍🌈\n\n` +
                        `📅 *Fecha:* ${formatDate(dateStr)}\n` +
-                       `📍 *Encuentro:* ${meeting}\n` +
+                       (coffee ? `☕ *Café previo:* ${coffeeText ? coffeeText + ' ' : ''}${coffeeLink ? coffeeLink : ''}\n` : '') +
+                       `📍 *Encuentro:* ${meetingText ? meetingText + ' ' : ''}${mapsLink ? mapsLink : ''}\n` +
                        (distance ? `📏 *Distancia:* ${formatDistance(distance)}\n` : '') +
                        (elevation ? `📈 *Desnivel:* ${formatElevation(elevation)}\n` : '') +
                        (weather ? `🌤️ *Tiempo:* ${weather}\n` : '') +
-                       (wikiloc ? `🔗 *Wikiloc:* ${wikiloc}\n` : '') +
-                       `\n🔴 *¡ES OBLIGATORIO APUNTARSE EN LA WEB!* 🔴\n` +
-                       `🌐 *Entra aquí para ver detalles y apuntarte:* ${routeUrl}\n\n` +
-                       `¡Anímate a participar!`;
+                       (wikiloc ? `🔗 *Wikiloc:* ${wikiloc}\n` : '');
 
             let encodedText = encodeURIComponent(text);
             window.open(`https://api.whatsapp.com/send?text=${encodedText}`, '_blank');
@@ -1292,10 +1327,8 @@
             }
 
             container.innerHTML = list.map(route => {
-                let meetingHtml = route.meeting;
-                if (route.meeting.startsWith('http://') || route.meeting.startsWith('https://')) {
-                    meetingHtml = `<a href="${route.meeting}" target="_blank" style="color:var(--primary); font-weight:bold;">📍 Ver ubicación en Google Maps</a>`;
-                }
+                let coffeeHtml = formatMapField(route.coffee);
+                let meetingHtml = formatMapField(route.meeting);
 
                 let weatherDisplay = '';
                 let icons = route.weatherIcon || '';
@@ -1316,6 +1349,7 @@
                                 <p><strong>Fecha:</strong> ${formatDate(route.date)}</p>
                                 ${route.distance ? `<span><strong>Distancia:</strong> ${formatDistance(route.distance)} </span>` : ''}
                                 ${route.elevation ? `<span> | <strong>Desnivel:</strong> ${formatElevation(route.elevation)}</span>` : ''}
+                                ${coffeeHtml ? `<p style="margin-top: 0.3rem;"><strong>Café previo:</strong> ${coffeeHtml}</p>` : ''}
                                 <p style="margin-top: 0.3rem;"><strong>Encuentro:</strong> ${meetingHtml}</p>
                                 ${weatherDisplay ? `<p><strong>Tiempo previsto:</strong> ${weatherDisplay}</p>` : ''}
                                 <p><strong>Descripción:</strong> ${route.description}</p>
@@ -1325,7 +1359,7 @@
 
                         <div>
                             <button class="btn" style="width: 100%; margin-bottom: 0.5rem;" onclick="openRegisterModal('${route.id}')">Inscribirse</button>
-                            <button class="btn btn-whatsapp" onclick="shareOnWhatsApp('${route.id}', '${route.title.replace(/'/g, "\\'")}', '${route.date}', '${route.meeting.replace(/'/g, "\\'")}', '${route.distance || ''}', '${route.elevation || ''}', '${weatherDisplay.replace(/'/g, "\\'")}', '${route.wikiloc || ''}')">
+                            <button class="btn btn-whatsapp" onclick="shareOnWhatsApp('${route.id}', '${route.title.replace(/'/g, "\\'")}', '${route.date}', '${(route.coffee || '').replace(/'/g, "\\'")}', '${route.meeting.replace(/'/g, "\\'")}', '${route.distance || ''}', '${route.elevation || ''}', '${weatherDisplay.replace(/'/g, "\\'")}', '${route.wikiloc || ''}')">
                                 💬 Compartir por WhatsApp
                             </button>
                             
@@ -1361,10 +1395,8 @@
             }
 
             container.innerHTML = list.map(route => {
-                let meetingHtml = route.meeting;
-                if (route.meeting.startsWith('http://') || route.meeting.startsWith('https://')) {
-                    meetingHtml = `<a href="${route.meeting}" target="_blank" style="color:var(--primary); font-weight:bold;">📍 Ver ubicación en Google Maps</a>`;
-                }
+                let coffeeHtml = formatMapField(route.coffee);
+                let meetingHtml = formatMapField(route.meeting);
 
                 let weatherDisplay = '';
                 let icons = route.weatherIcon || '';
@@ -1385,6 +1417,7 @@
                                 <p><strong>Fecha:</strong> ${formatDate(route.date)}</p>
                                 ${route.distance ? `<span><strong>Distancia:</strong> ${formatDistance(route.distance)} </span>` : ''}
                                 ${route.elevation ? `<span> | <strong>Desnivel:</strong> ${formatElevation(route.elevation)}</span>` : ''}
+                                ${coffeeHtml ? `<p style="margin-top: 0.3rem;"><strong>Café previo:</strong> ${coffeeHtml}</p>` : ''}
                                 <p style="margin-top: 0.3rem;"><strong>Encuentro:</strong> ${meetingHtml}</p>
                                 ${weatherDisplay ? `<p><strong>Tiempo que hizo:</strong> ${weatherDisplay}</p>` : ''}
                                 <p><strong>Descripción:</strong> ${route.description}</p>
@@ -1393,7 +1426,7 @@
                         </div>
 
                         <div>
-                            <button class="btn btn-whatsapp" style="margin-bottom: 0.5rem;" onclick="shareOnWhatsApp('${route.id}', '${route.title.replace(/'/g, "\\'")}', '${route.date}', '${route.meeting.replace(/'/g, "\\'")}', '${route.distance || ''}', '${route.elevation || ''}', '${weatherDisplay.replace(/'/g, "\\'")}', '${route.wikiloc || ''}')">
+                            <button class="btn btn-whatsapp" style="margin-bottom: 0.5rem;" onclick="shareOnWhatsApp('${route.id}', '${route.title.replace(/'/g, "\\'")}', '${route.date}', '${(route.coffee || '').replace(/'/g, "\\'")}', '${route.meeting.replace(/'/g, "\\'")}', '${route.distance || ''}', '${route.elevation || ''}', '${weatherDisplay.replace(/'/g, "\\'")}', '${route.wikiloc || ''}')">
                                 💬 Compartir por WhatsApp
                             </button>
 
@@ -1499,6 +1532,7 @@
             const difficulty = document.getElementById('route-difficulty').value;
             const distance = document.getElementById('route-distance').value.trim();
             const elevation = document.getElementById('route-elevation').value.trim();
+            const coffee = document.getElementById('route-coffee').value.trim();
             const meeting = document.getElementById('route-meeting').value.trim();
             const weatherIcon = document.getElementById('route-weather-icon').value;
             const weatherTemp = document.getElementById('route-weather-temp').value.trim();
@@ -1519,6 +1553,7 @@
                     route.difficulty = difficulty;
                     route.distance = distance;
                     route.elevation = elevation;
+                    route.coffee = coffee;
                     route.meeting = meeting;
                     route.weatherIcon = weatherIcon;
                     route.weatherTemp = weatherTemp;
@@ -1534,6 +1569,7 @@
                     difficulty,
                     distance,
                     elevation,
+                    coffee,
                     meeting,
                     weatherIcon,
                     weatherTemp,
@@ -1558,6 +1594,7 @@
             document.getElementById('route-difficulty').value = 'Fácil';
             document.getElementById('route-distance').value = '';
             document.getElementById('route-elevation').value = '';
+            document.getElementById('route-coffee').value = '';
             document.getElementById('route-meeting').value = '';
             setWeatherIconsFromString('');
             document.getElementById('route-weather-temp').value = '';
@@ -1579,6 +1616,7 @@
                 document.getElementById('route-difficulty').value = route.difficulty;
                 document.getElementById('route-distance').value = route.distance || '';
                 document.getElementById('route-elevation').value = route.elevation || '';
+                document.getElementById('route-coffee').value = route.coffee || '';
                 document.getElementById('route-meeting').value = route.meeting;
                 setWeatherIconsFromString(route.weatherIcon || '');
                 document.getElementById('route-weather-temp').value = route.weatherTemp || '';
