@@ -12,94 +12,539 @@
             --danger: #d32f2f; --warning: #f57c00; --success: #388e3c;
             --whatsapp: #25d366; --whatsapp-dark: #128c7e;
         }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Comic Sans MS', 'Chalkboard SE', cursive, sans-serif !important; }
-        body { background-color: var(--bg-color); color: var(--text-color); line-height: 1.6; }
-        
+
+        /* COMIC SANS COMO FUENTE ÚNICA EN TODA LA WEB */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Comic Sans MS', 'Chalkboard SE', 'Comic Neue', cursive, sans-serif !important;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        /* CABECERA CON IMAGEN DE FONDO */
         header {
             position: relative;
-            background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.55)), url('https://i.imgur.com/ybDAKiY.jpg') no-repeat center center;
-            background-size: cover; color: white; padding: 4rem 1rem; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.25); overflow: hidden;
+            background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.55)), 
+                        url('https://i.imgur.com/ybDAKiY.jpg') no-repeat center center;
+            background-size: cover;
+            color: white;
+            padding: 4rem 1rem;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+            overflow: hidden;
         }
+
+        /* MARCO RECTANGULAR DIFUMINADO (SIMBOLOGÍA GAY) */
         header::after {
-            content: ''; position: absolute; top: 15px; left: 15px; right: 15px; bottom: 15px;
-            border: 12px solid transparent; border-image: linear-gradient(135deg, #FF0018, #FFA52C, #FFFF41, #008018, #0000F9, #86007D) 1;
-            filter: blur(8px); opacity: 0.85; pointer-events: none; z-index: 1;
+            content: '';
+            position: absolute;
+            top: 15px; left: 15px; right: 15px; bottom: 15px;
+            border: 12px solid transparent;
+            border-image: linear-gradient(135deg, #FF0018, #FFA52C, #FFFF41, #008018, #0000F9, #86007D) 1;
+            filter: blur(8px);
+            opacity: 0.85;
+            pointer-events: none;
+            z-index: 1;
         }
+
+        /* LÍNEA NÍTIDA INTERIOR PARA DEFINIR EL MARCO */
         header::before {
-            content: ''; position: absolute; top: 15px; left: 15px; right: 15px; bottom: 15px;
-            border: 2px solid rgba(255, 255, 255, 0.6); pointer-events: none; z-index: 2;
+            content: '';
+            position: absolute;
+            top: 15px; left: 15px; right: 15px; bottom: 15px;
+            border: 2px solid rgba(255, 255, 255, 0.6);
+            pointer-events: none;
+            z-index: 2;
         }
-        header h1, header p.friendly-desc, header p.club-info, .view-switcher { position: relative; z-index: 3; }
-        header h1 { font-size: 4.2rem; font-style: italic; font-weight: bold; margin-bottom: 0.4rem; letter-spacing: 1px; text-shadow: 0 3px 8px rgba(0,0,0,0.8); }
-        header p.friendly-desc { font-size: 1.4rem; font-weight: bold; letter-spacing: 0.5px; margin-bottom: 0.2rem; text-shadow: 0 2px 5px rgba(0,0,0,0.8); }
-        header p.club-info { font-size: 1.15rem; font-weight: bold; text-shadow: 0 1px 3px rgba(0,0,0,0.8); }
-        
+
+        header h1, header p.friendly-desc, header p.club-info, .view-switcher {
+            position: relative;
+            z-index: 3;
+        }
+
+        header h1 {
+            font-size: 4.2rem;
+            font-style: italic;
+            font-weight: bold;
+            margin-bottom: 0.4rem;
+            letter-spacing: 1px;
+            text-shadow: 0 3px 8px rgba(0,0,0,0.8);
+        }
+
+        header p.friendly-desc {
+            font-size: 1.4rem;
+            opacity: 1;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.8);
+            font-weight: bold;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.2rem;
+        }
+
+        header p.club-info {
+            font-size: 1.15rem;
+            opacity: 0.95;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+            font-weight: bold;
+        }
+
+        /* Botón flotante para alternar vista */
         .view-switcher {
-            position: absolute; top: 2rem; right: 2rem; background: rgba(255, 255, 255, 0.25);
-            border: 1px solid rgba(255, 255, 255, 0.5); color: white; padding: 0.4rem 0.8rem;
-            border-radius: 20px; font-size: 0.8rem; cursor: pointer; display: flex; align-items: center; gap: 0.4rem; backdrop-filter: blur(4px);
+            position: absolute;
+            top: 2rem;
+            right: 2rem;
+            background: rgba(255, 255, 255, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            color: white;
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            transition: background 0.2s;
+            backdrop-filter: blur(4px);
         }
-        nav { background-color: white; display: flex; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; overflow-x: auto; }
-        nav button { background: none; border: none; padding: 0.9rem 1.2rem; font-size: 0.95rem; font-weight: bold; cursor: pointer; color: var(--text-light); border-bottom: 3px solid transparent; white-space: nowrap; }
-        nav button.active { color: var(--primary); border-bottom-color: var(--primary); }
-        
-        main { max-width: 1450px; margin: 1.5rem auto; padding: 0 1rem; }
-        .app-layout { display: grid; grid-template-columns: 280px 1fr 300px; gap: 1.5rem; align-items: start; }
-        
-        @media (max-width: 1100px) { .app-layout { grid-template-columns: 280px 1fr; } .gallery-sidebar { grid-column: 1 / -1; } }
-        @media (max-width: 900px) { .app-layout { grid-template-columns: 1fr; } .view-switcher { top: 1.5rem; right: 1.5rem; } }
-        
-        .sidebar-container { display: flex; flex-direction: column; gap: 1.2rem; }
-        .calendar-card { background: white; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); padding: 1rem; border-top: 4px solid var(--primary); }
-        .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; font-weight: bold; font-size: 1.1rem; color: var(--primary-dark); }
-        .calendar-header button { background: var(--primary); color: white; border: none; border-radius: 4px; width: 30px; height: 30px; cursor: pointer; font-weight: bold; }
-        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; text-align: center; }
-        .calendar-day-name { font-size: 0.75rem; font-weight: bold; color: var(--text-light); padding-bottom: 0.4rem; }
-        .calendar-day { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; border-radius: 50%; cursor: pointer; background: #f9f9f9; }
-        .calendar-day.empty { background: transparent; cursor: default; }
-        .calendar-day.has-scheduled { background-color: #c8e6c9; color: #1b5e20; font-weight: bold; border: 2px solid var(--primary); }
-        .calendar-day.has-completed { background-color: #cfd8dc; color: #37474f; font-weight: bold; border: 2px solid #78909c; }
-        
-        .insurance-info-card { background: linear-gradient(135deg, #e8f5e9, #f1f8e9); border-radius: 8px; padding: 1.2rem; border-left: 4px solid var(--success); }
-        .insurance-info-card h3 { font-size: 1rem; color: var(--primary-dark); margin-bottom: 0.5rem; }
-        .insurance-info-card p { font-size: 0.82rem; color: var(--text-light); margin-bottom: 0.6rem; }
-        .insurance-link-btn { display: block; background-color: var(--primary); color: white; text-align: center; padding: 0.5rem; border-radius: 4px; text-decoration: none; font-size: 0.8rem; font-weight: bold; }
-        
-        .gallery-sidebar { background: white; border-radius: 8px; padding: 1.2rem; border-top: 4px solid var(--accent); }
-        .gallery-item { margin-bottom: 1rem; background: #fafafa; padding: 0.5rem; border-radius: 6px; border: 1px solid var(--border-color); }
-        .gallery-item img { width: 100%; height: 130px; object-fit: cover; border-radius: 4px; margin-bottom: 0.4rem; cursor: pointer; }
-        .gallery-route-tag { font-size: 0.75rem; background: #e8f5e9; color: var(--primary-dark); padding: 0.15rem 0.4rem; border-radius: 4px; display: inline-block; margin-bottom: 0.2rem; font-weight: bold; }
-        .admin-gallery-controls { display: none; background: #f1f8e9; padding: 0.8rem; border-radius: 6px; margin-bottom: 1rem; border: 1px dashed var(--primary); }
-        
-        .lightbox-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; z-index: 2000; padding: 1.5rem; }
-        .lightbox-modal.open { display: flex; }
-        .lightbox-content { position: relative; max-width: 90%; max-height: 90vh; text-align: center; }
-        .lightbox-content img { max-width: 100%; max-height: 80vh; border-radius: 8px; }
-        .lightbox-caption { color: white; font-size: 1.1rem; margin-top: 0.8rem; }
-        .lightbox-close { position: absolute; top: -40px; right: 0; background: none; border: none; color: white; font-size: 2rem; cursor: pointer; }
-        
-        .section-content { display: none; }
-        .section-content.active { display: block; }
-        h2 { font-size: 1.5rem; color: var(--primary-dark); margin-bottom: 1.2rem; border-bottom: 2px solid var(--border-color); padding-bottom: 0.4rem; }
-        
-        .grid-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.2rem; }
-        .card { background-color: var(--card-bg); border-radius: 8px; padding: 1.2rem; display: flex; flex-direction: column; justify-content: space-between; border-top: 4px solid var(--primary); box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        .card-image { width: 100%; height: 160px; border-radius: 6px; object-fit: cover; margin-bottom: 0.8rem; cursor: pointer; }
-        .card h3 { font-size: 1.2rem; margin-bottom: 0.4rem; color: var(--primary-dark); }
-        .card-info { font-size: 0.9rem; color: var(--text-light); }
-        .card-info p { margin-bottom: 0.3rem; }
-        .card-info strong { color: var(--text-color); }
-        
-        .badge { display: inline-block; padding: 0.2rem 0.5rem; font-size: 0.75rem; font-weight: bold; border-radius: 12px; text-transform: uppercase; }
-        .badge-easy { background-color: #e8f5e9; color: #2e7d32; } .badge-medium { background-color: #fff3e0; color: #ef6c00; } .badge-hard { background-color: #ffebee; color: #c62828; }
-        .badge-insurance-yes { background-color: #e0f2f1; color: #00695c; } .badge-insurance-no { background-color: #fbe9e7; color: #d84315; }
-        
-        .btn { background-color: var(--primary); color: white; border: none; padding: 0.6rem 1rem; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 0.95rem; text-align: center; text-decoration: none; display: inline-block; }
-        .btn:hover { background-color: var(--primary-dark); }
-        .btn-secondary { background-color: #78909c; }
-        .btn-danger { background-color: var(--danger); }
-        .btn-small { padding: 0.3rem 0.6rem; font-size: 0.8rem; }
-        
+
+        .view-switcher:hover {
+            background: rgba(255, 255, 255, 0.4);
+        }
+
+        nav {
+            background-color: white;
+            display: flex;
+            justify-content: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            overflow-x: auto;
+        }
+
+        nav button {
+            background: none;
+            border: none;
+            padding: 0.9rem 1.2rem;
+            font-size: 0.95rem;
+            font-weight: bold;
+            cursor: pointer;
+            color: var(--text-light);
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        nav button.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        nav button:hover {
+            color: var(--primary);
+        }
+
+        main {
+            max-width: 1450px;
+            margin: 1.5rem auto;
+            padding: 0 1rem;
+        }
+
+        /* LAYOUT DE 3 COLUMNAS */
+        .app-layout {
+            display: grid;
+            grid-template-columns: 280px 1fr 300px;
+            gap: 1.5rem;
+            align-items: start;
+        }
+
+        @media (max-width: 1100px) {
+            .app-layout {
+                grid-template-columns: 280px 1fr;
+            }
+            .gallery-sidebar {
+                grid-column: 1 / -1;
+            }
+        }
+
+        @media (max-width: 900px) {
+            .app-layout {
+                grid-template-columns: 1fr;
+            }
+            .view-switcher {
+                top: 1.5rem;
+                right: 1.5rem;
+            }
+        }
+
+        .sidebar-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+        }
+
+        /* WIDGET DE CALENDARIO */
+        .calendar-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            padding: 1rem;
+            border-top: 4px solid var(--primary);
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            font-weight: bold;
+            font-size: 1.1rem;
+            color: var(--primary-dark);
+        }
+
+        .calendar-header button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+            text-align: center;
+        }
+
+        .calendar-day-name {
+            font-size: 0.75rem;
+            font-weight: bold;
+            color: var(--text-light);
+            padding-bottom: 0.4rem;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            border-radius: 50%;
+            cursor: pointer;
+            background: #f9f9f9;
+            transition: background 0.2s;
+            position: relative;
+        }
+
+        .calendar-day:hover {
+            background: #e0e0e0;
+        }
+
+        .calendar-day.empty {
+            background: transparent;
+            cursor: default;
+        }
+
+        .calendar-day.has-scheduled {
+            background-color: #c8e6c9;
+            color: #1b5e20;
+            font-weight: bold;
+            border: 2px solid var(--primary);
+        }
+
+        .calendar-day.has-completed {
+            background-color: #cfd8dc;
+            color: #37474f;
+            font-weight: bold;
+            border: 2px solid #78909c;
+        }
+
+        /* TARJETA INFORMATIVA DE SEGURO */
+        .insurance-info-card {
+            background: linear-gradient(135deg, #e8f5e9, #f1f8e9);
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            padding: 1.2rem;
+            border-left: 4px solid var(--success);
+        }
+
+        .insurance-info-card h3 {
+            font-size: 1rem;
+            color: var(--primary-dark);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .insurance-info-card p {
+            font-size: 0.82rem;
+            color: var(--text-light);
+            line-height: 1.4;
+            margin-bottom: 0.6rem;
+        }
+
+        .insurance-link-btn {
+            display: block;
+            background-color: var(--primary);
+            color: white;
+            text-align: center;
+            padding: 0.5rem;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: bold;
+            transition: background 0.2s;
+            margin-top: 0.4rem;
+        }
+
+        .insurance-link-btn:hover {
+            background-color: var(--primary-dark);
+        }
+
+        /* GALERÍA DERECHA */
+        .gallery-sidebar {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            padding: 1.2rem;
+            border-top: 4px solid var(--accent);
+        }
+
+        .gallery-sidebar h3 {
+            font-size: 1.1rem;
+            color: var(--primary-dark);
+            margin-bottom: 0.8rem;
+        }
+
+        .gallery-item {
+            margin-bottom: 1rem;
+            background: #fafafa;
+            padding: 0.5rem;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 130px;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-bottom: 0.4rem;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .gallery-item img:hover {
+            transform: scale(1.02);
+        }
+
+        .gallery-route-tag {
+            font-size: 0.75rem;
+            background: #e8f5e9;
+            color: var(--primary-dark);
+            padding: 0.15rem 0.4rem;
+            border-radius: 4px;
+            display: inline-block;
+            margin-bottom: 0.2rem;
+            font-weight: bold;
+        }
+
+        .gallery-item p {
+            font-size: 0.85rem;
+            font-weight: bold;
+            margin-bottom: 0.3rem;
+            color: var(--text-color);
+        }
+
+        .admin-gallery-controls {
+            display: none;
+            background: #f1f8e9;
+            padding: 0.8rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            border: 1px dashed var(--primary);
+        }
+
+        /* MODAL LIGHTBOX PARA FOTOS */
+        .lightbox-modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            padding: 1.5rem;
+        }
+
+        .lightbox-modal.open {
+            display: flex;
+        }
+
+        .lightbox-content {
+            position: relative;
+            max-width: 90%;
+            max-height: 90vh;
+            text-align: center;
+        }
+
+        .lightbox-content img {
+            max-width: 100%;
+            max-height: 80vh;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            object-fit: contain;
+        }
+
+        .lightbox-caption {
+            color: white;
+            font-size: 1.1rem;
+            margin-top: 0.8rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+        }
+
+        .lightbox-close {
+            position: absolute;
+            top: -40px;
+            right: 0;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 2rem;
+            cursor: pointer;
+        }
+
+        .section-content {
+            display: none;
+        }
+
+        .section-content.active {
+            display: block;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            color: var(--primary-dark);
+            margin-bottom: 1.2rem;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 0.4rem;
+        }
+
+        .grid-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.2rem;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            padding: 1.2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            border-top: 4px solid var(--primary);
+        }
+
+        .card-image {
+            width: 100%;
+            height: 160px;
+            border-radius: 6px;
+            object-fit: cover;
+            margin-bottom: 0.8rem;
+            background: #e0e0e0;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .card-image:hover {
+            transform: scale(1.02);
+        }
+
+        .card h3 {
+            font-size: 1.2rem;
+            margin-bottom: 0.4rem;
+            color: var(--primary-dark);
+        }
+
+        .card-info {
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+
+        .card-info p {
+            margin-bottom: 0.3rem;
+        }
+
+        .card-info strong {
+            color: var(--text-color);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.2rem 0.5rem;
+            font-size: 0.75rem;
+            font-weight: bold;
+            border-radius: 12px;
+            text-transform: uppercase;
+        }
+
+        .badge-easy { background-color: #e8f5e9; color: #2e7d32; }
+        .badge-medium { background-color: #fff3e0; color: #ef6c00; }
+        .badge-hard { background-color: #ffebee; color: #c62828; }
+        .badge-insurance-yes { background-color: #e0f2f1; color: #00695c; }
+        .badge-insurance-no { background-color: #fbe9e7; color: #d84315; }
+
+        .btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.6rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            transition: background 0.2s;
+            font-size: 0.95rem;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .btn-secondary {
+            background-color: #78909c;
+        }
+        .btn-secondary:hover {
+            background-color: #546e7a;
+        }
+
+        .btn-danger {
+            background-color: var(--danger);
+        }
+        .btn-danger:hover {
+            background-color: #b71c1c;
+        }
+
+        .btn-small {
+            padding: 0.3rem 0.6rem;
+            font-size: 0.8rem;
+        }
+
         /* BOTÓN DE WHATSAPP */
         .btn-whatsapp {
             background-color: var(--whatsapp);
@@ -114,15 +559,55 @@
         .btn-whatsapp:hover {
             background-color: var(--whatsapp-dark);
         }
-        
-        .participants-section { margin-top: 1rem; border-top: 1px solid var(--border-color); padding-top: 0.8rem; font-size: 0.85rem; }
-        .participant-item { display: flex; justify-content: space-between; align-items: center; background: #fafafa; padding: 0.4rem 0.6rem; border-radius: 4px; margin-bottom: 0.3rem; border-left: 3px solid var(--border-color); }
-        .participant-item.confirmed { border-left-color: var(--success); } .participant-item.pending { border-left-color: var(--warning); } .participant-item.denied { border-left-color: var(--danger); }
-        
-        .form-group { margin-bottom: 1rem; }
-        .form-group label { display: block; margin-bottom: 0.3rem; font-weight: bold; font-size: 0.9rem; }
-        .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 0.7rem; border: 1px solid var(--border-color); border-radius: 4px; font-size: 1rem; }
-        
+
+        .participants-section {
+            margin-top: 1rem;
+            border-top: 1px solid var(--border-color);
+            padding-top: 0.8rem;
+            font-size: 0.85rem;
+        }
+
+        .participants-section h4 {
+            font-size: 0.9rem;
+            color: var(--text-color);
+            margin-bottom: 0.4rem;
+        }
+
+        .participant-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #fafafa;
+            padding: 0.4rem 0.6rem;
+            border-radius: 4px;
+            margin-bottom: 0.3rem;
+            border-left: 3px solid var(--border-color);
+        }
+
+        .participant-item.confirmed { border-left-color: var(--success); }
+        .participant-item.pending { border-left-color: var(--warning); }
+        .participant-item.denied { border-left-color: var(--danger); }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.3rem;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 0.7rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        /* ALINEACIÓN PERFECTA DE SEGUROS */
         .checkbox-label {
             display: flex;
             align-items: center;
@@ -139,26 +624,83 @@
             margin: 0;
         }
 
+        /* SELECTOR MÚLTIPLE DE TIEMPO */
         .weather-selector { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.5rem; }
         .weather-option { font-size: 1.5rem; padding: 0.3rem 0.6rem; border: 2px solid var(--border-color); border-radius: 6px; background: white; cursor: pointer; transition: all 0.2s; }
         .weather-option.selected { border-color: var(--primary); background: #e8f5e9; transform: scale(1.1); }
 
-        .admin-box { background: white; padding: 1.5rem; border-radius: 8px; max-width: 600px; margin: 0 auto; }
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; padding: 1rem; }
-        .modal.open { display: flex; }
-        .modal-content { background: white; padding: 1.5rem; border-radius: 8px; width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; }
-        .close-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-light); }
-        .alert { padding: 0.8rem; border-radius: 4px; margin-bottom: 1rem; font-size: 0.9rem; }
+        .admin-box {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 1rem;
+        }
+
+        .modal.open {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-light);
+        }
+
+        .alert {
+            padding: 0.8rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
         .alert-error { background-color: #ffebee; color: var(--danger); border: 1px solid #ffcdd2; }
         .alert-success { background-color: #e8f5e9; color: var(--success); border: 1px solid #c8e6c9; }
-        body.force-mobile { max-width: 480px; margin: 0 auto; border-left: 1px solid #ccc; border-right: 1px solid #ccc; box-shadow: 0 0 20px rgba(0,0,0,0.1); }
-        body.force-mobile .app-layout { grid-template-columns: 1fr !important; }
-        body.force-mobile .grid-cards { grid-template-columns: 1fr !important; }
+
+        body.force-mobile {
+            max-width: 480px;
+            margin: 0 auto;
+            border-left: 1px solid #ccc;
+            border-right: 1px solid #ccc;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+
+        body.force-mobile .app-layout {
+            grid-template-columns: 1fr !important;
+        }
+
+        body.force-mobile .grid-cards {
+            grid-template-columns: 1fr !important;
+        }
     </style>
 </head>
 <body id="app-body">
 
-    <header>
+    <header id="main-header">
         <button class="view-switcher" id="view-switch-btn" onclick="toggleViewMode()">📱 Cambiar a Móvil</button>
         <h1>Rutas Bizkaia Gayte</h1>
         <p class="friendly-desc">¡Únete a nuestras aventuras!</p>
@@ -173,6 +715,7 @@
 
     <main>
         <div class="app-layout">
+            <!-- COLUMNA IZQUIERDA: CALENDARIO E INFORMACIÓN DE SEGURO -->
             <aside class="sidebar-container">
                 <div class="calendar-card">
                     <div class="calendar-header">
@@ -181,8 +724,13 @@
                         <button onclick="changeMonth(1)">&gt;</button>
                     </div>
                     <div class="calendar-grid" id="calendar-days-header">
-                        <div class="calendar-day-name">L</div><div class="calendar-day-name">M</div><div class="calendar-day-name">X</div>
-                        <div class="calendar-day-name">J</div><div class="calendar-day-name">V</div><div class="calendar-day-name">S</div><div class="calendar-day-name">D</div>
+                        <div class="calendar-day-name">L</div>
+                        <div class="calendar-day-name">M</div>
+                        <div class="calendar-day-name">X</div>
+                        <div class="calendar-day-name">J</div>
+                        <div class="calendar-day-name">V</div>
+                        <div class="calendar-day-name">S</div>
+                        <div class="calendar-day-name">D</div>
                     </div>
                     <div class="calendar-grid" id="calendar-days-container"></div>
                 </div>
@@ -190,68 +738,81 @@
                 <div class="insurance-info-card">
                     <h3>🛡️ Importancia del Seguro</h3>
                     <p>Recomendamos contar con seguro de aventura: <strong>Modalidad A</strong> o <strong>Anual</strong>. La Responsabilidad Civil es a elección personal.</p>
-                    <a href="https://seguros.rocalbsub.com/contratar/aventura" target="_blank" class="insurance-link-btn">🔗 Contratar Seguro</a>
+                    <a href="https://seguros.rocalbsub.com/contratar/aventura" target="_blank" class="insurance-link-btn">🔗 Contratar Seguro Rocalsub</a>
                 </div>
             </aside>
 
+            <!-- COLUMNA CENTRAL: CONTENIDO PRINCIPAL -->
             <section>
+                <!-- SECCIÓN: RUTAS PROGRAMADAS -->
                 <div id="section-scheduled" class="section-content active">
                     <h2>Rutas Programadas</h2>
                     <div id="scheduled-routes-container" class="grid-cards"></div>
                 </div>
 
+                <!-- SECCIÓN: RUTAS REALIZADAS -->
                 <div id="section-completed" class="section-content">
                     <h2>Rutas Realizadas (Histórico)</h2>
                     <div id="completed-routes-container" class="grid-cards"></div>
                 </div>
 
+                <!-- SECCIÓN: PANEL DE ADMINISTRACIÓN -->
                 <div id="section-admin" class="section-content">
                     <div id="admin-login-wrapper" class="admin-box">
                         <h2>Acceso Administrador</h2>
-                        <p style="margin-bottom: 1rem; color: var(--text-light);">Contraseña para gestionar rutas y asistentes.</p>
+                        <p style="margin-bottom: 1rem; color: var(--text-light);">Introduce la contraseña para gestionar las rutas y asistentes.</p>
                         <div id="login-alert"></div>
-                        <div class="form-group"><input type="password" id="admin-pass" placeholder="Contraseña de admin (admin123)"></div>
+                        <div class="form-group">
+                            <label for="admin-pass">Contraseña</label>
+                            <input type="password" id="admin-pass" placeholder="Contraseña de admin (admin123)">
+                        </div>
                         <button class="btn" style="width: 100%;" onclick="loginAdmin()">Entrar</button>
                     </div>
 
                     <div id="admin-panel-content" style="display: none;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem; flex-wrap: wrap; gap: 0.5rem;">
                             <h2>Panel de Control</h2>
                             <button class="btn btn-secondary btn-small" onclick="logoutAdmin()">Cerrar Sesión</button>
                         </div>
 
-                        <div style="background: white; padding: 1.2rem; border-radius: 8px; margin-bottom: 2rem;">
+                        <div style="background: white; padding: 1.2rem; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 2rem;">
                             <h3 id="form-title" style="margin-bottom: 1rem; color: var(--primary-dark);">Programar Nueva Ruta</h3>
                             <div id="route-form-alert"></div>
                             <input type="hidden" id="edit-route-id">
                             
                             <div class="form-group">
-                                <label>Título</label><input type="text" id="route-title" placeholder="Ej. Ascensión al Eretza">
+                                <label for="route-title">Título de la Ruta</label>
+                                <input type="text" id="route-title" placeholder="Ej. Ascensión al Eretza">
                             </div>
                             <div class="form-group">
-                                <label>Fecha y Hora</label><input type="datetime-local" id="route-date">
+                                <label for="route-date">Fecha y Hora</label>
+                                <input type="datetime-local" id="route-date">
                             </div>
                             <div class="form-group">
-                                <label>Dificultad</label>
+                                <label for="route-difficulty">Dificultad</label>
                                 <select id="route-difficulty">
-                                    <option value="Fácil">Fácil</option><option value="Media">Media</option><option value="Difícil">Difícil</option>
+                                    <option value="Fácil">Fácil</option>
+                                    <option value="Media">Media</option>
+                                    <option value="Difícil">Difícil</option>
                                 </select>
                             </div>
                             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                                 <div class="form-group">
-                                    <label>Distancia (Ej. 12.5)</label><input type="text" id="route-distance" placeholder="Solo número">
+                                    <label for="route-distance">Distancia (Ej. 12.5)</label>
+                                    <input type="text" id="route-distance" placeholder="Solo número">
                                 </div>
                                 <div class="form-group">
-                                    <label>Desnivel (Ej. 450)</label><input type="text" id="route-elevation" placeholder="Solo número">
+                                    <label for="route-elevation">Desnivel (Ej. 450)</label>
+                                    <input type="text" id="route-elevation" placeholder="Solo número">
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label>Punto de Encuentro (Texto o Enlace de Google Maps)</label>
+                                <label for="route-meeting">Punto de Encuentro (Texto o Enlace Google Maps)</label>
                                 <input type="text" id="route-meeting" placeholder="Ej. Sopuerta o enlace de Google Maps">
                             </div>
 
                             <div class="form-group" style="background: #f1f8e9; padding: 0.8rem; border-radius: 6px; border: 1px dashed var(--primary);">
-                                <label>Selecciona los Iconos de Tiempo (puedes marcar varios)</label>
+                                <label>Selecciona los Iconos de Tiempo (múltiples)</label>
                                 <div class="weather-selector">
                                     <button type="button" class="weather-option" onclick="toggleWeatherIcon('☀️', this)">☀️</button>
                                     <button type="button" class="weather-option" onclick="toggleWeatherIcon('⛅', this)">⛅</button>
@@ -260,64 +821,85 @@
                                     <button type="button" class="weather-option" onclick="toggleWeatherIcon('⛈️', this)">⛈️</button>
                                     <button type="button" class="weather-option" onclick="toggleWeatherIcon('❄️', this)">❄️</button>
                                 </div>
-                                <input type="hidden" id="route-weather-icon" value="☀️">
-                                <label style="margin-top: 0.5rem;">Temperatura (Se añadirá ºC automáticamente)</label>
+                                <input type="hidden" id="route-weather-icon" value="">
+                                <label style="margin-top: 0.5rem;" for="route-weather-temp">Temperatura (Añadirá ºC automáticamente)</label>
                                 <input type="text" id="route-weather-temp" placeholder="Ej. 22 o 15 a 22">
                             </div>
 
                             <div class="form-group">
-                                <label>Enlace Wikiloc</label><input type="url" id="route-wikiloc" placeholder="https://es.wikiloc.com/...">
+                                <label for="route-wikiloc">Enlace Wikiloc</label>
+                                <input type="url" id="route-wikiloc" placeholder="https://es.wikiloc.com/...">
                             </div>
                             <div class="form-group">
-                                <label>Foto de Ruta (Directa)</label><input type="url" id="route-image" placeholder="Debe terminar en .jpg o .png">
+                                <label for="route-image">Foto para esta Ruta (URL Directa)</label>
+                                <input type="url" id="route-image" placeholder="Debe terminar en .jpg o .png">
                             </div>
                             <div class="form-group">
-                                <label>Descripción</label><textarea id="route-description" rows="3" placeholder="Detalles de la ruta..."></textarea>
+                                <label for="route-description">Descripción</label>
+                                <textarea id="route-description" rows="3" placeholder="Detalles de la ruta..."></textarea>
                             </div>
                             <button class="btn" id="save-route-btn" style="width: 100%; margin-bottom: 0.5rem;" onclick="saveRoute()">Guardar Ruta</button>
                             <button class="btn btn-secondary" id="cancel-edit-btn" style="width: 100%; display:none;" onclick="resetRouteForm()">Cancelar</button>
                         </div>
 
-                        <h3 style="margin-bottom: 1rem; color: var(--primary-dark);">Gestión de Rutas</h3>
+                        <h3 style="margin-bottom: 1rem; color: var(--primary-dark);">Gestión Completa de Rutas</h3>
                         <div id="admin-routes-list" class="grid-cards"></div>
                     </div>
                 </div>
             </section>
 
+            <!-- COLUMNA DERECHA: GALERÍA DE FOTOS -->
             <aside class="gallery-sidebar">
                 <h3>📸 Galería de Fotos</h3>
-                <p style="font-size: 0.8rem; color: var(--text-light); margin-bottom: 0.8rem;">Momentos en Bizkaia.</p>
+                <p style="font-size: 0.8rem; color: var(--text-light); margin-bottom: 0.8rem;">Momentos en nuestras excursiones por Bizkaia.</p>
+                
                 <div id="admin-gallery-controls" class="admin-gallery-controls">
-                    <p style="font-size: 0.8rem; font-weight: bold; margin-bottom: 0.4rem;">Panel Admin: Añadir Foto</p>
-                    <div class="form-group" style="margin-bottom: 0.5rem;"><input type="text" id="gallery-photo-title" placeholder="Título"></div>
-                    <div class="form-group" style="margin-bottom: 0.5rem;"><select id="gallery-route-select"><option value="">-- Ruta --</option></select></div>
-                    <div class="form-group" style="margin-bottom: 0.5rem;"><input type="url" id="gallery-photo-url" placeholder="URL (.jpg)"></div>
-                    <button class="btn btn-small" style="width: 100%;" onclick="addGalleryPhoto()">Publicar</button>
+                    <p style="font-size: 0.8rem; font-weight: bold; color: var(--primary-dark); margin-bottom: 0.4rem;">Panel Admin: Añadir Foto</p>
+                    <div class="form-group" style="margin-bottom: 0.5rem;">
+                        <input type="text" id="gallery-photo-title" placeholder="Título de la foto" style="font-size: 0.85rem; padding: 0.4rem;">
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0.5rem;">
+                        <select id="gallery-route-select" style="font-size: 0.85rem; padding: 0.4rem;">
+                            <option value="">-- Seleccionar Ruta Asociada --</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0.5rem;">
+                        <input type="url" id="gallery-photo-url" placeholder="URL de la imagen (.jpg)" style="font-size: 0.85rem; padding: 0.4rem;">
+                    </div>
+                    <button class="btn btn-small" style="width: 100%; font-size: 0.8rem;" onclick="addGalleryPhoto()">Publicar Foto</button>
                 </div>
+
                 <div id="public-gallery-list"></div>
             </aside>
         </div>
     </main>
 
-    <!-- MODALES -->
+    <!-- MODAL LIGHTBOX -->
     <div id="lightbox-modal" class="lightbox-modal" onclick="closeLightbox()">
         <div class="lightbox-content" onclick="event.stopPropagation()">
             <button class="lightbox-close" onclick="closeLightbox()">&times;</button>
-            <img id="lightbox-img" src="" alt="Foto">
+            <img id="lightbox-img" src="" alt="Foto ampliada">
             <div id="lightbox-caption" class="lightbox-caption"></div>
         </div>
     </div>
 
-    <!-- MODAL DE INSCRIPCIÓN CON SEGURO ALINEADO -->
+    <!-- MODAL DE INSCRIPCIÓN -->
     <div id="register-modal" class="modal">
         <div class="modal-content">
-            <div style="display: flex; justify-content: space-between; margin-bottom: 1rem;">
-                <h3>Inscribirse</h3><button class="close-btn" onclick="closeRegisterModal()">&times;</button>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h3>Inscribirse a la Ruta</h3>
+                <button class="close-btn" onclick="closeRegisterModal()">&times;</button>
             </div>
             <div id="modal-alert"></div>
             <input type="hidden" id="register-route-id">
-            <div class="form-group"><label>Nombre y Apellidos</label><input type="text" id="participant-name"></div>
-            <div class="form-group"><label>Correo Electrónico</label><input type="email" id="participant-email"></div>
+            <div class="form-group">
+                <label for="participant-name">Nombre y Apellidos</label>
+                <input type="text" id="participant-name" placeholder="Tu nombre completo">
+            </div>
+            <div class="form-group">
+                <label for="participant-email">Correo Electrónico</label>
+                <input type="email" id="participant-email" placeholder="correo@ejemplo.com">
+            </div>
             <div class="form-group">
                 <label class="checkbox-label">
                     <input type="checkbox" id="participant-insurance"> ¿Dispone de seguro de montaña?
@@ -327,16 +909,25 @@
         </div>
     </div>
 
-    <!-- MODAL DE ADMIN CON SEGURO ALINEADO -->
+    <!-- MODAL PARA AÑADIR PARTICIPANTE DESDE ADMIN -->
     <div id="admin-add-participant-modal" class="modal">
         <div class="modal-content">
-            <div style="display: flex; justify-content: space-between; margin-bottom: 1rem;">
-                <h3>Añadir Participante</h3><button class="close-btn" onclick="closeAdminParticipantModal()">&times;</button>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h3>Añadir Participante</h3>
+                <button class="close-btn" onclick="closeAdminParticipantModal()">&times;</button>
             </div>
             <input type="hidden" id="admin-target-route-id">
-            <div class="form-group"><label>Nombre</label><input type="text" id="admin-part-name"></div>
-            <div class="form-group"><label>Estado</label>
-                <select id="admin-part-status"><option value="confirmed">Confirmada</option><option value="pending">Pendiente</option><option value="denied">Denegada</option></select>
+            <div class="form-group">
+                <label for="admin-part-name">Nombre y Apellidos</label>
+                <input type="text" id="admin-part-name" placeholder="Nombre completo">
+            </div>
+            <div class="form-group">
+                <label for="admin-part-status">Estado de Plaza</label>
+                <select id="admin-part-status">
+                    <option value="confirmed">Confirmada</option>
+                    <option value="pending">Pendiente</option>
+                    <option value="denied">Denegada</option>
+                </select>
             </div>
             <div class="form-group">
                 <label class="checkbox-label">
@@ -350,40 +941,78 @@
     <script>
         let routes = JSON.parse(localStorage.getItem('club_routes')) || [
             {
-                id: 'route-1', title: 'Ruta por los Montes de Sopuerta', date: '2026-06-15T09:00', difficulty: 'Media',
-                distance: '12', elevation: '450', meeting: 'Plaza del Ayuntamiento, Sopuerta', weatherIcon: '⛅', weatherTemp: '22',
-                wikiloc: 'https://es.wikiloc.com', image: 'https://i.imgur.com/ybDAKiY.jpg', description: 'Ruta inicial.',
-                participants: []
+                id: 'route-1',
+                title: 'Ruta por los Montes de Sopuerta',
+                date: '2026-06-15T09:00',
+                difficulty: 'Media',
+                distance: '12',
+                elevation: '450',
+                meeting: 'Plaza del Ayuntamiento, Sopuerta',
+                weatherIcon: '⛅',
+                weatherTemp: '22',
+                wikiloc: 'https://es.wikiloc.com',
+                image: 'https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=600&q=80',
+                description: 'Bonita ruta por los cordales cercanos disfrutando de la naturaleza.',
+                participants: [
+                    { id: 'p1', name: 'Mikel Agirre', email: 'mikel@example.com', status: 'confirmed', insurance: true },
+                    { id: 'p2', name: 'Ane Fernandez', email: 'ane@example.com', status: 'pending', insurance: false }
+                ]
             }
         ];
-        let clubGallery = JSON.parse(localStorage.getItem('club_gallery')) || [];
+
+        let clubGallery = JSON.parse(localStorage.getItem('club_gallery')) || [
+            { id: 'g1', title: 'Cima del Gorbea', routeId: 'route-1', url: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=600&q=80' }
+        ];
+
         let isAdminLoggedIn = localStorage.getItem('admin_logged') === 'true';
         let isMobileViewForced = false;
         let currentCalendarDate = new Date();
 
         window.addEventListener('DOMContentLoaded', () => {
-            renderAll(); renderCalendar(); renderGallery(); updateRouteSelectOptions();
-            if (isAdminLoggedIn) showAdminPanelContent();
+            renderAll();
+            renderCalendar();
+            renderGallery();
+            updateRouteSelectOptions();
+            if (isAdminLoggedIn) {
+                showAdminPanelContent();
+            }
         });
 
         function toggleViewMode() {
             isMobileViewForced = !isMobileViewForced;
-            document.getElementById('app-body').classList.toggle('force-mobile');
-            document.getElementById('view-switch-btn').innerHTML = isMobileViewForced ? '💻 Modo PC' : '📱 Modo Móvil';
+            const body = document.getElementById('app-body');
+            const btn = document.getElementById('view-switch-btn');
+            if (isMobileViewForced) {
+                body.classList.add('force-mobile');
+                btn.innerHTML = '💻 Cambiar a Ordenador';
+            } else {
+                body.classList.remove('force-mobile');
+                btn.innerHTML = '📱 Cambiar a Móvil';
+            }
         }
 
         function saveData() {
             localStorage.setItem('club_routes', JSON.stringify(routes));
             localStorage.setItem('club_gallery', JSON.stringify(clubGallery));
-            renderCalendar(); renderGallery(); updateRouteSelectOptions();
+            renderCalendar();
+            renderGallery();
+            updateRouteSelectOptions();
         }
 
         function switchTab(tabId) {
-            document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
-            document.querySelectorAll('.section-content').forEach(s => s.classList.remove('active'));
-            if (tabId === 'scheduled') { document.querySelectorAll('nav button')[0].classList.add('active'); document.getElementById('section-scheduled').classList.add('active'); }
-            if (tabId === 'completed') { document.querySelectorAll('nav button')[1].classList.add('active'); document.getElementById('section-completed').classList.add('active'); }
-            if (tabId === 'admin') { document.querySelectorAll('nav button')[2].classList.add('active'); document.getElementById('section-admin').classList.add('active'); }
+            document.querySelectorAll('nav button').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.section-content').forEach(sec => sec.classList.remove('active'));
+
+            if (tabId === 'scheduled') {
+                document.querySelector('nav button:nth-child(1)').classList.add('active');
+                document.getElementById('section-scheduled').classList.add('active');
+            } else if (tabId === 'completed') {
+                document.querySelector('nav button:nth-child(2)').classList.add('active');
+                document.getElementById('section-completed').classList.add('active');
+            } else if (tabId === 'admin') {
+                document.querySelector('nav button:nth-child(3)').classList.add('active');
+                document.getElementById('section-admin').classList.add('active');
+            }
             renderAll();
         }
 
@@ -418,11 +1047,13 @@
             let d = dist.replace(/km/i, '').trim().replace('.', ',');
             return d + ' km';
         }
+
         function formatElevation(elev) {
             if (!elev) return '';
             let e = elev.replace(/\+/g, '').replace(/m/i, '').trim();
             return '+' + e + ' m';
         }
+
         function formatTemperature(temp) {
             if (!temp) return '';
             let t = temp.trim();
@@ -432,7 +1063,6 @@
             return t;
         }
 
-        /* COMPARTIR EN WHATSAPP */
         function shareOnWhatsApp(title, dateStr, meeting, distance, elevation, weather, wikiloc) {
             let text = `⛰️ *Ruta Club Bizkaia Gayte* 🏳️‍🌈\n\n` +
                        `📌 *${title}*\n` +
@@ -452,17 +1082,167 @@
             const now = new Date();
             const scheduled = routes.filter(r => new Date(r.date) >= now);
             const completed = routes.filter(r => new Date(r.date) < now);
-            renderRoutes(scheduled, 'scheduled-routes-container', false);
-            renderRoutes(completed, 'completed-routes-container', true);
-            if (isAdminLoggedIn) renderAdminRoutesList();
+
+            renderScheduledRoutes(scheduled);
+            renderCompletedRoutes(completed);
+            if (isAdminLoggedIn) {
+                renderAdminRoutesList();
+            }
         }
 
-        function getBadgeClass(diff) { return diff === 'Fácil' ? 'badge-easy' : (diff === 'Media' ? 'badge-medium' : 'badge-hard'); }
-        function formatDate(ds) { return new Date(ds).toLocaleDateString('es-ES', { year:'numeric', month:'long', day:'numeric', hour:'2-digit', minute:'2-digit' }); }
+        function openLightbox(url, caption) {
+            document.getElementById('lightbox-img').src = url;
+            document.getElementById('lightbox-caption').innerText = caption;
+            document.getElementById('lightbox-modal').classList.add('open');
+        }
 
-        function renderRoutes(list, containerId, isPast) {
-            const container = document.getElementById(containerId);
-            if (list.length === 0) { container.innerHTML = `<p style="font-size:0.9rem; color:var(--text-light);">No hay rutas.</p>`; return; }
+        function closeLightbox() {
+            document.getElementById('lightbox-modal').classList.remove('open');
+        }
+
+        function changeMonth(direction) {
+            currentCalendarDate.setMonth(currentCalendarDate.getMonth() + direction);
+            renderCalendar();
+        }
+
+        function renderCalendar() {
+            const year = currentCalendarDate.getFullYear();
+            const month = currentCalendarDate.getMonth();
+
+            const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+            document.getElementById('calendar-month-year').innerText = `${monthNames[month]} ${year}`;
+
+            const container = document.getElementById('calendar-days-container');
+            container.innerHTML = '';
+
+            const firstDayIndex = (new Date(year, month, 1).getDay() + 6) % 7;
+            const totalDays = new Date(year, month + 1, 0).getDate();
+            const now = new Date();
+
+            const routeMap = {};
+            routes.forEach(r => {
+                const rDate = new Date(r.date);
+                const dateKey = `${rDate.getFullYear()}-${String(rDate.getMonth() + 1).padStart(2, '0')}-${String(rDate.getDate()).padStart(2, '0')}`;
+                routeMap[dateKey] = {
+                    title: r.title,
+                    isPast: rDate < now
+                };
+            });
+
+            for (let i = 0; i < firstDayIndex; i++) {
+                const emptyCell = document.createElement('div');
+                emptyCell.className = 'calendar-day empty';
+                container.appendChild(emptyCell);
+            }
+
+            for (let day = 1; day <= totalDays; day++) {
+                const cell = document.createElement('div');
+                cell.className = 'calendar-day';
+                cell.innerText = day;
+
+                const formattedMonth = String(month + 1).padStart(2, '0');
+                const formattedDay = String(day).padStart(2, '0');
+                const dateKey = `${year}-${formattedMonth}-${formattedDay}`;
+
+                if (routeMap[dateKey]) {
+                    const routeInfo = routeMap[dateKey];
+                    if (routeInfo.isPast) {
+                        cell.classList.add('has-completed');
+                        cell.title = `Realizada: ${routeInfo.title}`;
+                    } else {
+                        cell.classList.add('has-scheduled');
+                        cell.title = `Programada: ${routeInfo.title}`;
+                    }
+                    cell.onclick = () => {
+                        if (routeInfo.isPast) {
+                            switchTab('completed');
+                        } else {
+                            switchTab('scheduled');
+                        }
+                    };
+                }
+
+                container.appendChild(cell);
+            }
+        }
+
+        function updateRouteSelectOptions() {
+            const select = document.getElementById('gallery-route-select');
+            if (!select) return;
+            select.innerHTML = `<option value="">-- Seleccionar Ruta Asociada --</option>` + 
+                routes.map(r => `<option value="${r.id}">${r.title}</option>`).join('');
+        }
+
+        function renderGallery() {
+            const container = document.getElementById('public-gallery-list');
+            if (!container) return;
+
+            if (clubGallery.length === 0) {
+                container.innerHTML = `<p style="font-size: 0.8rem; color: var(--text-light);">No hay fotos publicadas todavía.</p>`;
+                return;
+            }
+
+            container.innerHTML = clubGallery.map(photo => {
+                const routeObj = routes.find(r => r.id === photo.routeId);
+                const routeName = routeObj ? routeObj.title : 'Ruta general';
+
+                return `
+                    <div class="gallery-item">
+                        <img src="${photo.url}" alt="Foto galería" onerror="this.style.display='none'" onclick="openLightbox('${photo.url}', '${photo.title} (${routeName})')">
+                        <span class="gallery-route-tag">📍 ${routeName}</span>
+                        <p>${photo.title}</p>
+                        ${isAdminLoggedIn ? `<button class="btn btn-small btn-danger" style="width: 100%; font-size: 0.7rem; padding: 0.2rem;" onclick="deleteGalleryPhoto('${photo.id}')">Eliminar Foto</button>` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function addGalleryPhoto() {
+            const title = document.getElementById('gallery-photo-title').value.trim();
+            const routeId = document.getElementById('gallery-route-select').value;
+            const url = document.getElementById('gallery-photo-url').value.trim();
+
+            if (!title || !url) {
+                alert('Introduce el título y la URL de la foto.');
+                return;
+            }
+
+            clubGallery.push({
+                id: 'photo_' + Date.now(),
+                title,
+                routeId,
+                url
+            });
+
+            document.getElementById('gallery-photo-title').value = '';
+            document.getElementById('gallery-photo-url').value = '';
+            saveData();
+        }
+
+        function deleteGalleryPhoto(id) {
+            if (confirm('¿Eliminar esta foto de la galería?')) {
+                clubGallery = clubGallery.filter(p => p.id !== id);
+                saveData();
+            }
+        }
+
+        function getBadgeClass(diff) {
+            if (diff === 'Fácil') return 'badge-easy';
+            if (diff === 'Media') return 'badge-medium';
+            return 'badge-hard';
+        }
+
+        function formatDate(dateString) {
+            const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+            return new Date(dateString).toLocaleDateString('es-ES', options);
+        }
+
+        function renderScheduledRoutes(list) {
+            const container = document.getElementById('scheduled-routes-container');
+            if (list.length === 0) {
+                container.innerHTML = `<p style="font-size: 0.9rem; color: var(--text-light);">No hay rutas programadas próximamente.</p>`;
+                return;
+            }
 
             container.innerHTML = list.map(route => {
                 let meetingHtml = route.meeting;
@@ -478,38 +1258,45 @@
                 }
 
                 return `
-                    <div class="card" ${isPast ? 'style="border-top-color: #78909c;"' : ''}>
+                    <div class="card">
                         <div>
-                            ${route.image ? `<img src="${route.image}" class="card-image" onerror="this.style.display='none'" onclick="openLightbox('${route.image}', '${route.title}')">` : ''}
-                            <div style="display:flex; justify-content:space-between; margin-bottom:0.5rem;">
+                            ${route.image ? `<img src="${route.image}" class="card-image" alt="Foto de ruta" onerror="this.style.display='none'" onclick="openLightbox('${route.image}', '${route.title}')">` : ''}
+                            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem; gap: 0.5rem;">
                                 <h3>${route.title}</h3>
-                                <span class="badge ${isPast ? '' : getBadgeClass(route.difficulty)}" ${isPast ? 'style="background:#eceff1;color:#455a64;"' : ''}>
-                                    ${isPast ? 'Realizada' : route.difficulty}
-                                </span>
+                                <span class="badge ${getBadgeClass(route.difficulty)}">${route.difficulty}</span>
                             </div>
                             <div class="card-info">
                                 <p><strong>Fecha:</strong> ${formatDate(route.date)}</p>
                                 ${route.distance ? `<span><strong>Distancia:</strong> ${formatDistance(route.distance)} </span>` : ''}
                                 ${route.elevation ? `<span> | <strong>Desnivel:</strong> ${formatElevation(route.elevation)}</span>` : ''}
                                 <p style="margin-top: 0.3rem;"><strong>Encuentro:</strong> ${meetingHtml}</p>
-                                ${weatherDisplay ? `<p><strong>${isPast ? 'Tiempo que hizo' : 'Tiempo previsto'}:</strong> ${weatherDisplay}</p>` : ''}
+                                ${weatherDisplay ? `<p><strong>Tiempo previsto:</strong> ${weatherDisplay}</p>` : ''}
                                 <p><strong>Descripción:</strong> ${route.description}</p>
-                                ${route.wikiloc ? `<p><strong>Wikiloc:</strong> <a href="${route.wikiloc}" target="_blank" style="color:var(--primary);">Ver track</a></p>` : ''}
+                                ${route.wikiloc ? `<p><strong>Wikiloc:</strong> <a href="${route.wikiloc}" target="_blank" style="color: var(--primary);">Ver track oficial</a></p>` : ''}
                             </div>
                         </div>
+
                         <div>
-                            ${!isPast ? `<button class="btn" style="width:100%; margin-bottom:0.5rem;" onclick="openRegisterModal('${route.id}')">Inscribirse</button>` : ''}
-                            <button class="btn btn-whatsapp" onclick="shareOnWhatsApp('${route.title.replace(/'/q, "\\'")}', '${route.date}', '${route.meeting.replace(/'/q, "\\'")}', '${route.distance || ''}', '${route.elevation || ''}', '${weatherDisplay.replace(/'/q, "\\'")}', '${route.wikiloc || ''}')">
+                            <button class="btn" style="width: 100%; margin-bottom: 0.5rem;" onclick="openRegisterModal('${route.id}')">Inscribirse</button>
+                            <button class="btn btn-whatsapp" onclick="shareOnWhatsApp('${route.title.replace(/'/g, "\\'")}', '${route.date}', '${route.meeting.replace(/'/g, "\\'")}', '${route.distance || ''}', '${route.elevation || ''}', '${weatherDisplay.replace(/'/g, "\\'")}', '${route.wikiloc || ''}')">
                                 💬 Compartir por WhatsApp
                             </button>
                             
                             <div class="participants-section">
-                                <h4>Asistentes (${isPast ? route.participants.filter(p=>p.status==='confirmed').length + ' confirmados' : route.participants.length})</h4>
-                                ${route.participants.length === 0 ? '<p style="font-size:0.85rem; color:var(--text-light);">Sin registros.</p>' : 
+                                <h4>Asistentes inscritos (${route.participants.length})</h4>
+                                ${route.participants.length === 0 ? '<p style="font-size: 0.85rem; color: var(--text-light);">Aún sin inscripciones.</p>' : 
                                     route.participants.map(p => {
-                                        let cls = p.status==='confirmed'?'confirmed':(p.status==='pending'?'pending':'denied');
-                                        let txt = p.status==='confirmed'?'Confirmada':(p.status==='pending'?'Pendiente':'Denegada');
-                                        return `<div class="participant-item ${cls}"><div><strong>${p.name}</strong><br><small>${txt}</small></div></div>`;
+                                        let statusClass = p.status === 'confirmed' ? 'confirmed' : (p.status === 'pending' ? 'pending' : 'denied');
+                                        let statusText = p.status === 'confirmed' ? 'Plaza Confirmada' : (p.status === 'pending' ? 'Pendiente' : 'Denegada');
+                                        
+                                        return `
+                                            <div class="participant-item ${statusClass}">
+                                                <div>
+                                                    <strong>${p.name}</strong><br>
+                                                    <small style="color: var(--text-light);">${statusText}</small>
+                                                </div>
+                                            </div>
+                                        `;
                                     }).join('')
                                 }
                             </div>
@@ -519,185 +1306,402 @@
             }).join('');
         }
 
-        /* FUNCIONES DE ADMINISTRADOR */
-        function loginAdmin() {
-            if (document.getElementById('admin-pass').value === 'admin123') {
-                isAdminLoggedIn = true; localStorage.setItem('admin_logged', 'true');
-                showAdminPanelContent(); renderAdminRoutesList(); renderGallery();
-            } else { document.getElementById('login-alert').innerHTML = `<div class="alert alert-error">Contraseña incorrecta.</div>`; }
+        function renderCompletedRoutes(list) {
+            const container = document.getElementById('completed-routes-container');
+            if (list.length === 0) {
+                container.innerHTML = `<p style="font-size: 0.9rem; color: var(--text-light);">No hay rutas en el histórico.</p>`;
+                return;
+            }
+
+            container.innerHTML = list.map(route => {
+                let meetingHtml = route.meeting;
+                if (route.meeting.startsWith('http://') || route.meeting.startsWith('https://')) {
+                    meetingHtml = `<a href="${route.meeting}" target="_blank" style="color:var(--primary); font-weight:bold;">📍 Ver ubicación en Google Maps</a>`;
+                }
+
+                let weatherDisplay = '';
+                let icons = route.weatherIcon || '';
+                let tempFormatted = formatTemperature(route.weatherTemp);
+                if (icons || tempFormatted) {
+                    weatherDisplay = `${icons} ${tempFormatted}`.trim();
+                }
+
+                return `
+                    <div class="card" style="border-top-color: #78909c;">
+                        <div>
+                            ${route.image ? `<img src="${route.image}" class="card-image" alt="Foto de ruta" onerror="this.style.display='none'" onclick="openLightbox('${route.image}', '${route.title}')">` : ''}
+                            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem; gap: 0.5rem;">
+                                <h3>${route.title}</h3>
+                                <span class="badge" style="background-color: #eceff1; color: #455a64;">Realizada</span>
+                            </div>
+                            <div class="card-info">
+                                <p><strong>Fecha:</strong> ${formatDate(route.date)}</p>
+                                ${route.distance ? `<span><strong>Distancia:</strong> ${formatDistance(route.distance)} </span>` : ''}
+                                ${route.elevation ? `<span> | <strong>Desnivel:</strong> ${formatElevation(route.elevation)}</span>` : ''}
+                                <p style="margin-top: 0.3rem;"><strong>Encuentro:</strong> ${meetingHtml}</p>
+                                ${weatherDisplay ? `<p><strong>Tiempo que hizo:</strong> ${weatherDisplay}</p>` : ''}
+                                <p><strong>Descripción:</strong> ${route.description}</p>
+                                ${route.wikiloc ? `<p><strong>Wikiloc:</strong> <a href="${route.wikiloc}" target="_blank" style="color: var(--primary);">Ver track completado</a></p>` : ''}
+                            </div>
+                        </div>
+
+                        <div>
+                            <button class="btn btn-whatsapp" style="margin-bottom: 0.5rem;" onclick="shareOnWhatsApp('${route.title.replace(/'/g, "\\'")}', '${route.date}', '${route.meeting.replace(/'/g, "\\'")}', '${route.distance || ''}', '${route.elevation || ''}', '${weatherDisplay.replace(/'/g, "\\'")}', '${route.wikiloc || ''}')">
+                                💬 Compartir por WhatsApp
+                            </button>
+
+                            <div class="participants-section">
+                                <h4>Asistentes (${route.participants.filter(p => p.status === 'confirmed').length} confirmados)</h4>
+                                ${route.participants.length === 0 ? '<p style="font-size: 0.85rem; color: var(--text-light);">Sin registros.</p>' : 
+                                    route.participants.map(p => {
+                                        let statusClass = p.status === 'confirmed' ? 'confirmed' : 'denied';
+                                        let statusText = p.status === 'confirmed' ? 'Plaza Confirmada (Asistió)' : 'Denegada / No asistió';
+                                        
+                                        return `
+                                            <div class="participant-item ${statusClass}">
+                                                <div>
+                                                    <strong>${p.name}</strong><br>
+                                                    <small style="color: var(--text-light);">${statusText}</small>
+                                                </div>
+                                            </div>
+                                        `;
+                                    }).join('')
+                                }
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
         }
+
+        function openRegisterModal(routeId) {
+            document.getElementById('register-route-id').value = routeId;
+            document.getElementById('participant-name').value = '';
+            document.getElementById('participant-email').value = '';
+            document.getElementById('participant-insurance').checked = false;
+            document.getElementById('modal-alert').innerHTML = '';
+            document.getElementById('register-modal').classList.add('open');
+        }
+
+        function closeRegisterModal() {
+            document.getElementById('register-modal').classList.remove('open');
+        }
+
+        function submitRegistration() {
+            const routeId = document.getElementById('register-route-id').value;
+            const name = document.getElementById('participant-name').value.trim();
+            const email = document.getElementById('participant-email').value.trim();
+            const insurance = document.getElementById('participant-insurance').checked;
+
+            if (!name || !email) {
+                document.getElementById('modal-alert').innerHTML = `<div class="alert alert-error">Introduce nombre y correo.</div>`;
+                return;
+            }
+
+            const route = routes.find(r => r.id === routeId);
+            if (route) {
+                route.participants.push({
+                    id: 'p_' + Date.now(),
+                    name,
+                    email,
+                    status: 'pending',
+                    insurance
+                });
+                saveData();
+                renderAll();
+                closeRegisterModal();
+                alert('¡Inscripción enviada correctamente! Queda pendiente de confirmación.');
+            }
+        }
+
+        function loginAdmin() {
+            const pass = document.getElementById('admin-pass').value;
+            if (pass === 'admin123') {
+                isAdminLoggedIn = true;
+                localStorage.setItem('admin_logged', 'true');
+                showAdminPanelContent();
+                renderAdminRoutesList();
+                renderGallery();
+            } else {
+                document.getElementById('login-alert').innerHTML = `<div class="alert alert-error">Contraseña incorrecta (admin123).</div>`;
+            }
+        }
+
         function logoutAdmin() {
-            isAdminLoggedIn = false; localStorage.setItem('admin_logged', 'false');
+            isAdminLoggedIn = false;
+            localStorage.setItem('admin_logged', 'false');
             document.getElementById('admin-login-wrapper').style.display = 'block';
             document.getElementById('admin-panel-content').style.display = 'none';
             document.getElementById('admin-gallery-controls').style.display = 'none';
-            document.getElementById('admin-pass').value = ''; renderAll(); renderGallery();
+            document.getElementById('admin-pass').value = '';
+            renderAll();
+            renderGallery();
         }
+
         function showAdminPanelContent() {
             document.getElementById('admin-login-wrapper').style.display = 'none';
             document.getElementById('admin-panel-content').style.display = 'block';
             document.getElementById('admin-gallery-controls').style.display = 'block';
+            renderAll();
         }
 
         function saveRoute() {
-            const id = document.getElementById('edit-route-id').value;
-            const r = {
-                title: document.getElementById('route-title').value.trim(),
-                date: document.getElementById('route-date').value,
-                difficulty: document.getElementById('route-difficulty').value,
-                distance: document.getElementById('route-distance').value.trim(),
-                elevation: document.getElementById('route-elevation').value.trim(),
-                meeting: document.getElementById('route-meeting').value.trim(),
-                weatherIcon: document.getElementById('route-weather-icon').value,
-                weatherTemp: document.getElementById('route-weather-temp').value.trim(),
-                wikiloc: document.getElementById('route-wikiloc').value.trim(),
-                image: document.getElementById('route-image').value.trim(),
-                description: document.getElementById('route-description').value.trim()
-            };
-            if (!r.title || !r.date || !r.meeting) { document.getElementById('route-form-alert').innerHTML = `<div class="alert alert-error">Rellena Título, Fecha y Encuentro.</div>`; return; }
+            const editId = document.getElementById('edit-route-id').value;
+            const title = document.getElementById('route-title').value.trim();
+            const date = document.getElementById('route-date').value;
+            const difficulty = document.getElementById('route-difficulty').value;
+            const distance = document.getElementById('route-distance').value.trim();
+            const elevation = document.getElementById('route-elevation').value.trim();
+            const meeting = document.getElementById('route-meeting').value.trim();
+            const weatherIcon = document.getElementById('route-weather-icon').value;
+            const weatherTemp = document.getElementById('route-weather-temp').value.trim();
+            const wikiloc = document.getElementById('route-wikiloc').value.trim();
+            const image = document.getElementById('route-image').value.trim();
+            const description = document.getElementById('route-description').value.trim();
 
-            if (id) { Object.assign(routes.find(x => x.id === id), r); } 
-            else { r.id = 'route_' + Date.now(); r.participants = []; routes.push(r); }
-            saveData(); resetRouteForm(); renderAll();
+            if (!title || !date || !meeting) {
+                document.getElementById('route-form-alert').innerHTML = `<div class="alert alert-error">Rellena Título, Fecha y Encuentro.</div>`;
+                return;
+            }
+
+            if (editId) {
+                const route = routes.find(r => r.id === editId);
+                if (route) {
+                    route.title = title;
+                    route.date = date;
+                    route.difficulty = difficulty;
+                    route.distance = distance;
+                    route.elevation = elevation;
+                    route.meeting = meeting;
+                    route.weatherIcon = weatherIcon;
+                    route.weatherTemp = weatherTemp;
+                    route.wikiloc = wikiloc;
+                    route.image = image;
+                    route.description = description;
+                }
+            } else {
+                const newRoute = {
+                    id: 'route_' + Date.now(),
+                    title,
+                    date,
+                    difficulty,
+                    distance,
+                    elevation,
+                    meeting,
+                    weatherIcon,
+                    weatherTemp,
+                    wikiloc,
+                    image,
+                    description,
+                    participants: []
+                };
+                routes.push(newRoute);
+            }
+
+            saveData();
+            resetRouteForm();
+            renderAll();
             document.getElementById('route-form-alert').innerHTML = `<div class="alert alert-success">Ruta guardada con éxito.</div>`;
         }
 
         function resetRouteForm() {
-            document.querySelectorAll('#admin-panel-content input, #admin-panel-content textarea').forEach(el => el.value = '');
+            document.getElementById('edit-route-id').value = '';
+            document.getElementById('route-title').value = '';
+            document.getElementById('route-date').value = '';
             document.getElementById('route-difficulty').value = 'Fácil';
+            document.getElementById('route-distance').value = '';
+            document.getElementById('route-elevation').value = '';
+            document.getElementById('route-meeting').value = '';
             setWeatherIconsFromString('');
+            document.getElementById('route-weather-temp').value = '';
+            document.getElementById('route-wikiloc').value = '';
+            document.getElementById('route-image').value = '';
+            document.getElementById('route-description').value = '';
             document.getElementById('form-title').innerText = 'Programar Nueva Ruta';
             document.getElementById('save-route-btn').innerText = 'Guardar Ruta';
             document.getElementById('cancel-edit-btn').style.display = 'none';
+            document.getElementById('route-form-alert').innerHTML = '';
         }
 
         function editRoute(id) {
-            const r = routes.find(x => x.id === id);
-            if (r) {
-                document.getElementById('edit-route-id').value = r.id;
-                document.getElementById('route-title').value = r.title;
-                document.getElementById('route-date').value = r.date;
-                document.getElementById('route-difficulty').value = r.difficulty;
-                document.getElementById('route-distance').value = r.distance || '';
-                document.getElementById('route-elevation').value = r.elevation || '';
-                document.getElementById('route-meeting').value = r.meeting;
-                document.getElementById('route-weather-temp').value = r.weatherTemp || '';
+            const route = routes.find(r => r.id === id);
+            if (route) {
+                document.getElementById('edit-route-id').value = route.id;
+                document.getElementById('route-title').value = route.title;
+                document.getElementById('route-date').value = route.date;
+                document.getElementById('route-difficulty').value = route.difficulty;
+                document.getElementById('route-distance').value = route.distance || '';
+                document.getElementById('route-elevation').value = route.elevation || '';
+                document.getElementById('route-meeting').value = route.meeting;
+                setWeatherIconsFromString(route.weatherIcon || '');
+                document.getElementById('route-weather-temp').value = route.weatherTemp || '';
+                document.getElementById('route-wikiloc').value = route.wikiloc || '';
+                document.getElementById('route-image').value = route.image || '';
+                document.getElementById('route-description').value = route.description || '';
                 
-                setWeatherIconsFromString(r.weatherIcon || '');
-
-                document.getElementById('route-wikiloc').value = r.wikiloc || '';
-                document.getElementById('route-image').value = r.image || '';
-                document.getElementById('route-description').value = r.description || '';
                 document.getElementById('form-title').innerText = 'Editar Ruta';
+                document.getElementById('save-route-btn').innerText = 'Actualizar Ruta';
                 document.getElementById('cancel-edit-btn').style.display = 'block';
                 window.scrollTo({ top: 200, behavior: 'smooth' });
             }
         }
-        function deleteRoute(id) { if (confirm('¿Eliminar ruta?')) { routes = routes.filter(r => r.id !== id); saveData(); renderAll(); } }
+
+        function deleteRoute(id) {
+            if (confirm('¿Eliminar esta ruta?')) {
+                routes = routes.filter(r => r.id !== id);
+                saveData();
+                renderAll();
+            }
+        }
 
         function renderAdminRoutesList() {
             const container = document.getElementById('admin-routes-list');
-            if (routes.length === 0) { container.innerHTML = `<p style="font-size:0.9rem;">No hay rutas.</p>`; return; }
-            container.innerHTML = routes.map(r => {
-                let isPast = new Date(r.date) < new Date();
+            if (routes.length === 0) {
+                container.innerHTML = `<p style="font-size: 0.9rem; color: var(--text-light);">No hay rutas.</p>`;
+                return;
+            }
+
+            const now = new Date();
+
+            container.innerHTML = routes.map(route => {
+                let isPast = new Date(route.date) < now;
                 return `
-                    <div class="card" ${isPast ? 'style="border-top-color:#78909c;"' : ''}>
-                        <div style="margin-bottom: 1rem;">
-                            <strong>${r.title}</strong> (${formatDate(r.date)})<br>
-                            <span style="font-size:0.8rem; color:#555;">Dist: ${formatDistance(r.distance)} | Desn: ${formatElevation(r.elevation)} | Clima: ${r.weatherIcon||''} ${formatTemperature(r.weatherTemp)}</span>
+                    <div class="card" style="border-top-color: ${isPast ? '#78909c' : 'var(--primary)'};">
+                        <div>
+                            ${route.image ? `<img src="${route.image}" class="card-image" alt="Foto de ruta" onerror="this.style.display='none'" onclick="openLightbox('${route.image}', '${route.title}')">` : ''}
+                            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem; gap: 0.5rem;">
+                                <h3>${route.title}</h3>
+                                <span class="badge ${isPast ? '' : getBadgeClass(route.difficulty)}" style="${isPast ? 'background:#eceff1;color:#455a64;' : ''}">
+                                    ${isPast ? 'Realizada' : route.difficulty}
+                                </span>
+                            </div>
+                            <div class="card-info">
+                                <p><strong>Fecha:</strong> ${formatDate(route.date)}</p>
+                                <span style="font-size:0.8rem; color:#555;">Dist: ${formatDistance(route.distance)} | Desn: ${formatElevation(route.elevation)}</span>
+                            </div>
                         </div>
-                        <div style="display:flex; gap:0.4rem; flex-wrap:wrap; margin-bottom:1rem;">
-                            <button class="btn btn-small" onclick="editRoute('${r.id}')">Editar</button>
-                            <button class="btn btn-small btn-danger" onclick="deleteRoute('${r.id}')">Borrar</button>
-                            <button class="btn btn-small btn-secondary" onclick="openAdminParticipantModal('${r.id}')">+ Asistente</button>
+
+                        <div>
+                            <div style="display: flex; gap: 0.4rem; margin-bottom: 1rem; flex-wrap: wrap;">
+                                <button class="btn btn-small" onclick="editRoute('${route.id}')">Editar</button>
+                                <button class="btn btn-small btn-danger" onclick="deleteRoute('${route.id}')">Eliminar</button>
+                                <button class="btn btn-small btn-secondary" onclick="openAdminParticipantModal('${route.id}')">+ Asistente</button>
+                            </div>
+
+                            <div class="participants-section">
+                                <h4>Gestión de Asistentes (${route.participants.length})</h4>
+                                ${route.participants.length === 0 ? '<p style="font-size: 0.85rem; color: var(--text-light);">Sin participantes.</p>' : 
+                                    route.participants.map(p => {
+                                        let statusClass = p.status === 'confirmed' ? 'confirmed' : (p.status === 'pending' ? 'pending' : 'denied');
+                                        let insuranceBadge = p.insurance ? 
+                                            `<span class="badge badge-insurance-yes">Seguro SÍ</span>` : 
+                                            `<span class="badge badge-insurance-no">Seguro NO</span>`;
+                                        
+                                        return `
+                                            <div class="participant-item ${statusClass}" style="flex-direction: column; align-items: stretch; gap: 0.4rem; padding: 0.5rem;">
+                                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                                    <strong>${p.name}</strong>
+                                                    <div>${insuranceBadge}</div>
+                                                    <button class="btn btn-small btn-danger" style="padding: 0.1rem 0.3rem; font-size: 0.75rem;" onclick="removeParticipant('${route.id}', '${p.id}')">X</button>
+                                                </div>
+                                                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; flex-wrap: wrap; gap: 0.3rem;">
+                                                    <div>
+                                                        Plaza: 
+                                                        <select onchange="changeParticipantStatus('${route.id}', '${p.id}', this.value)" style="padding: 0.2rem; font-size: 0.8rem;">
+                                                            <option value="confirmed" ${p.status === 'confirmed' ? 'selected' : ''}>Confirmada</option>
+                                                            <option value="pending" ${p.status === 'pending' ? 'selected' : ''}>Pendiente</option>
+                                                            <option value="denied" ${p.status === 'denied' ? 'selected' : ''}>Denegada</option>
+                                                        </select>
+                                                    </div>
+                                                    <div>
+                                                        <label class="checkbox-label" style="font-size: 0.8rem;">
+                                                            <input type="checkbox" ${p.insurance ? 'checked' : ''} onchange="toggleParticipantInsurance('${route.id}', '${p.id}', this.checked)"> Seguro
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        `;
+                                    }).join('')
+                                }
+                            </div>
                         </div>
-                        <div class="participants-section">
-                            <h4>Asistentes (${r.participants.length})</h4>
-                            ${r.participants.map(p => `
-                                <div class="participant-item ${p.status==='confirmed'?'confirmed':(p.status==='pending'?'pending':'denied')}" style="flex-direction:column; gap:0.4rem;">
-                                    <div style="display:flex; justify-content:space-between; width:100%;">
-                                        <strong>${p.name}</strong> 
-                                        <span>${p.insurance?'<span class="badge badge-insurance-yes">Seguro SÍ</span>':'<span class="badge badge-insurance-no">Seguro NO</span>'}</span>
-                                        <button class="btn btn-small btn-danger" onclick="removeParticipant('${r.id}', '${p.id}')">X</button>
-                                    </div>
-                                    <div style="display:flex; justify-content:space-between; width:100%; font-size:0.8rem; align-items:center;">
-                                        <select onchange="changeParticipantStatus('${r.id}', '${p.id}', this.value)">
-                                            <option value="confirmed" ${p.status==='confirmed'?'selected':''}>Confirmada</option>
-                                            <option value="pending" ${p.status==='pending'?'selected':''}>Pendiente</option>
-                                            <option value="denied" ${p.status==='denied'?'selected':''}>Denegada</option>
-                                        </select>
-                                        <label class="checkbox-label" style="font-size:0.8rem;">
-                                            <input type="checkbox" ${p.insurance?'checked':''} onchange="toggleParticipantInsurance('${r.id}', '${p.id}', this.checked)"> Seguro
-                                        </label>
-                                    </div>
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>`;
+                    </div>
+                `;
             }).join('');
         }
 
-        function renderCalendar() {
-            const year = currentCalendarDate.getFullYear(); const month = currentCalendarDate.getMonth();
-            const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
-            document.getElementById('calendar-month-year').innerText = `${monthNames[month]} ${year}`;
-            const container = document.getElementById('calendar-days-container'); container.innerHTML = '';
-            const firstDayIndex = (new Date(year, month, 1).getDay() + 6) % 7;
-            const totalDays = new Date(year, month + 1, 0).getDate();
-            const now = new Date();
-            const routeMap = {};
-            routes.forEach(r => { const d = new Date(r.date); routeMap[`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`] = { title: r.title, isPast: d < now }; });
-            for (let i = 0; i < firstDayIndex; i++) container.innerHTML += `<div class="calendar-day empty"></div>`;
-            for (let day = 1; day <= totalDays; day++) {
-                const key = `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
-                let cls = 'calendar-day'; let title = ''; let onclick = '';
-                if (routeMap[key]) {
-                    cls += routeMap[key].isPast ? ' has-completed' : ' has-scheduled';
-                    title = `title="${routeMap[key].title}"`;
-                    onclick = `onclick="switchTab('${routeMap[key].isPast ? 'completed' : 'scheduled'}')"`;
+        function changeParticipantStatus(routeId, participantId, newStatus) {
+            const route = routes.find(r => r.id === routeId);
+            if (route) {
+                const part = route.participants.find(p => p.id === participantId);
+                if (part) {
+                    part.status = newStatus;
+                    saveData();
+                    renderAll();
                 }
-                container.innerHTML += `<div class="${cls}" ${title} ${onclick}>${day}</div>`;
             }
         }
-        function changeMonth(dir) { currentCalendarDate.setMonth(currentCalendarDate.getMonth() + dir); renderCalendar(); }
-        function openLightbox(url, cap) { document.getElementById('lightbox-img').src = url; document.getElementById('lightbox-caption').innerText = cap; document.getElementById('lightbox-modal').classList.add('open'); }
-        function closeLightbox() { document.getElementById('lightbox-modal').classList.remove('open'); }
-        function renderGallery() {
-            const container = document.getElementById('public-gallery-list'); if (!container) return;
-            container.innerHTML = clubGallery.length === 0 ? `<p style="font-size:0.8rem;">Sin fotos.</p>` : clubGallery.map(photo => {
-                const rName = routes.find(r => r.id === photo.routeId)?.title || 'General';
-                return `<div class="gallery-item"><img src="${photo.url}" onerror="this.style.display='none'" onclick="openLightbox('${photo.url}', '${photo.title}')"><span class="gallery-route-tag">📍 ${rName}</span><p>${photo.title}</p>
-                ${isAdminLoggedIn ? `<button class="btn btn-small btn-danger" style="width:100%;" onclick="deleteGalleryPhoto('${photo.id}')">Eliminar</button>` : ''}</div>`;
-            }).join('');
-        }
-        function updateRouteSelectOptions() { const s = document.getElementById('gallery-route-select'); if(s) s.innerHTML = `<option value="">-- Ruta --</option>` + routes.map(r => `<option value="${r.id}">${r.title}</option>`).join(''); }
-        function addGalleryPhoto() {
-            const t = document.getElementById('gallery-photo-title').value; const rid = document.getElementById('gallery-route-select').value; const u = document.getElementById('gallery-photo-url').value;
-            if(!t || !u) return alert('Rellena título y URL');
-            clubGallery.push({id: 'photo_'+Date.now(), title: t, routeId: rid, url: u}); document.getElementById('gallery-photo-title').value = ''; document.getElementById('gallery-photo-url').value = ''; saveData();
-        }
-        function deleteGalleryPhoto(id) { if (confirm('¿Borrar?')) { clubGallery = clubGallery.filter(p => p.id !== id); saveData(); } }
 
-        function openRegisterModal(id) { document.getElementById('register-route-id').value = id; document.getElementById('participant-name').value = ''; document.getElementById('participant-email').value = ''; document.getElementById('participant-insurance').checked = false; document.getElementById('register-modal').classList.add('open'); }
-        function closeRegisterModal() { document.getElementById('register-modal').classList.remove('open'); }
-        function submitRegistration() {
-            const rId = document.getElementById('register-route-id').value; const n = document.getElementById('participant-name').value; const e = document.getElementById('participant-email').value; const ins = document.getElementById('participant-insurance').checked;
-            if(!n || !e) return alert('Nombre y correo obligatorios');
-            const r = routes.find(x => x.id === rId);
-            if(r) { r.participants.push({id: 'p_'+Date.now(), name: n, email: e, status: 'pending', insurance: ins}); saveData(); closeRegisterModal(); alert('¡Inscripción enviada!'); renderAll(); }
+        function toggleParticipantInsurance(routeId, participantId, hasInsurance) {
+            const route = routes.find(r => r.id === routeId);
+            if (route) {
+                const part = route.participants.find(p => p.id === participantId);
+                if (part) {
+                    part.insurance = hasInsurance;
+                    saveData();
+                    renderAll();
+                }
+            }
         }
 
-        function openAdminParticipantModal(id) { document.getElementById('admin-target-route-id').value = id; document.getElementById('admin-add-participant-modal').classList.add('open'); }
-        function closeAdminParticipantModal() { document.getElementById('admin-add-participant-modal').classList.remove('open'); }
+        function removeParticipant(routeId, participantId) {
+            if (confirm('¿Eliminar asistente?')) {
+                const route = routes.find(r => r.id === routeId);
+                if (route) {
+                    route.participants = route.participants.filter(p => p.id !== participantId);
+                    saveData();
+                    renderAll();
+                }
+            }
+        }
+
+        function openAdminParticipantModal(routeId) {
+            document.getElementById('admin-target-route-id').value = routeId;
+            document.getElementById('admin-part-name').value = '';
+            document.getElementById('admin-part-status').value = 'confirmed';
+            document.getElementById('admin-part-insurance').checked = false;
+            document.getElementById('admin-add-participant-modal').classList.add('open');
+        }
+
+        function closeAdminParticipantModal() {
+            document.getElementById('admin-add-participant-modal').classList.remove('open');
+        }
+
         function adminSaveParticipant() {
-            const rId = document.getElementById('admin-target-route-id').value; const n = document.getElementById('admin-part-name').value;
-            if(!n) return;
-            const r = routes.find(x => x.id === rId);
-            if(r) { r.participants.push({id: 'p_'+Date.now(), name: n, email: 'admin', status: document.getElementById('admin-part-status').value, insurance: document.getElementById('admin-part-insurance').checked}); saveData(); closeAdminParticipantModal(); renderAll(); }
+            const routeId = document.getElementById('admin-target-route-id').value;
+            const name = document.getElementById('admin-part-name').value.trim();
+            const status = document.getElementById('admin-part-status').value;
+            const insurance = document.getElementById('admin-part-insurance').checked;
+
+            if (!name) {
+                alert('Introduce el nombre.');
+                return;
+            }
+
+            const route = routes.find(r => r.id === routeId);
+            if (route) {
+                route.participants.push({
+                    id: 'p_' + Date.now(),
+                    name,
+                    email: 'admin@gayte.com',
+                    status,
+                    insurance
+                });
+                saveData();
+                renderAll();
+                closeAdminParticipantModal();
+            }
         }
-        function changeParticipantStatus(rId, pId, val) { let p = routes.find(r=>r.id===rId)?.participants.find(x=>x.id===pId); if(p) { p.status = val; saveData(); renderAll(); } }
-        function toggleParticipantInsurance(rId, pId, val) { let p = routes.find(r=>r.id===rId)?.participants.find(x=>x.id===pId); if(p) { p.insurance = val; saveData(); renderAll(); } }
-        function removeParticipant(rId, pId) { if(confirm('¿Eliminar?')) { let r = routes.find(x=>x.id===rId); if(r) { r.participants = r.participants.filter(x=>x.id!==pId); saveData(); renderAll(); } } }
     </script>
 </body>
 </html>
