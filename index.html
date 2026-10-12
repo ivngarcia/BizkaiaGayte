@@ -95,7 +95,6 @@
         
         .btn { background-color: var(--primary); color: white; border: none; padding: 0.6rem 1rem; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 0.95rem; }
         .btn-secondary { background-color: #78909c; } .btn-danger { background-color: var(--danger); }
-        .btn-weather { background-color: #0288d1; color: white; width: 100%; margin-top: 0.5rem; font-size: 0.85rem;}
         .btn-small { padding: 0.3rem 0.6rem; font-size: 0.8rem; }
         
         .participants-section { margin-top: 1rem; border-top: 1px solid var(--border-color); padding-top: 0.8rem; font-size: 0.85rem; }
@@ -106,6 +105,27 @@
         .form-group label { display: block; margin-bottom: 0.3rem; font-weight: bold; font-size: 0.9rem; }
         .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 0.7rem; border: 1px solid var(--border-color); border-radius: 4px; font-size: 1rem; }
         
+        /* ALINEACIÓN PERFECTA PARA LAS CASILLAS DE SEGURO */
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        .checkbox-label input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--primary);
+            cursor: pointer;
+            margin: 0;
+        }
+
+        .weather-selector { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.5rem; }
+        .weather-option { font-size: 1.5rem; padding: 0.3rem 0.6rem; border: 2px solid var(--border-color); border-radius: 6px; background: white; cursor: pointer; transition: all 0.2s; }
+        .weather-option.selected { border-color: var(--primary); background: #e8f5e9; transform: scale(1.1); }
+
         .admin-box { background: white; padding: 1.5rem; border-radius: 8px; max-width: 600px; margin: 0 auto; }
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; padding: 1rem; }
         .modal.open { display: flex; }
@@ -125,7 +145,7 @@
         <button class="view-switcher" id="view-switch-btn" onclick="toggleViewMode()">📱 Cambiar a Móvil</button>
         <h1>Rutas Bizkaia Gayte</h1>
         <p class="friendly-desc">¡Únete a nuestras aventuras!</p>
-        <p class="club-info">Rutas de montaña, amigos y naturaleza en Bizkaia. <span style="opacity: 0.8;">🏳️‍🌈</span></p>
+        <p class="club-info">Rutas de montaña, amigos y naturaleza en Bizkaia.</p>
     </header>
 
     <nav>
@@ -212,11 +232,22 @@
                                 <label>Punto de Encuentro (Texto o Enlace de Google Maps)</label>
                                 <input type="text" id="route-meeting" placeholder="Ej. Sopuerta o enlace de Google Maps">
                             </div>
+
                             <div class="form-group" style="background: #f1f8e9; padding: 0.8rem; border-radius: 6px; border: 1px dashed var(--primary);">
-                                <label>Tiempo Previsto / Clima</label>
-                                <input type="text" id="route-weather" placeholder="⛅ Soleado, 22ºC (o búscalo abajo automático)">
-                                <button class="btn btn-weather" onclick="autoFetchWeather()">☁️ Detectar Municipio y Obtener Tiempo Automático</button>
+                                <label>Selecciona el Tiempo Previsto</label>
+                                <div class="weather-selector">
+                                    <button type="button" class="weather-option" onclick="selectWeatherIcon('☀️', this)" title="Soleado">☀️</button>
+                                    <button type="button" class="weather-option" onclick="selectWeatherIcon('⛅', this)" title="Nubes y sol">⛅</button>
+                                    <button type="button" class="weather-option" onclick="selectWeatherIcon('☁️', this)" title="Nublado">☁️</button>
+                                    <button type="button" class="weather-option" onclick="selectWeatherIcon('🌧️', this)" title="Lluvia">🌧️</button>
+                                    <button type="button" class="weather-option" onclick="selectWeatherIcon('⛈️', this)" title="Tormenta">⛈️</button>
+                                    <button type="button" class="weather-option" onclick="selectWeatherIcon('❄️', this)" title="Nieve">❄️</button>
+                                </div>
+                                <input type="hidden" id="route-weather-icon" value="☀️">
+                                <label style="margin-top: 0.5rem;">Temperatura (°C)</label>
+                                <input type="text" id="route-weather-temp" placeholder="Ej. 22 ºC o 15ºC a 22ºC">
                             </div>
+
                             <div class="form-group">
                                 <label>Enlace Wikiloc</label><input type="url" id="route-wikiloc" placeholder="https://es.wikiloc.com/...">
                             </div>
@@ -260,6 +291,7 @@
         </div>
     </div>
 
+    <!-- MODAL DE INSCRIPCIÓN CON SEGURO ALINEADO -->
     <div id="register-modal" class="modal">
         <div class="modal-content">
             <div style="display: flex; justify-content: space-between; margin-bottom: 1rem;">
@@ -269,11 +301,16 @@
             <input type="hidden" id="register-route-id">
             <div class="form-group"><label>Nombre y Apellidos</label><input type="text" id="participant-name"></div>
             <div class="form-group"><label>Correo Electrónico</label><input type="email" id="participant-email"></div>
-            <div class="form-group"><label><input type="checkbox" id="participant-insurance"> ¿Dispone de seguro?</label></div>
+            <div class="form-group">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="participant-insurance"> ¿Dispone de seguro de montaña?
+                </label>
+            </div>
             <button class="btn" style="width: 100%;" onclick="submitRegistration()">Enviar Inscripción</button>
         </div>
     </div>
 
+    <!-- MODAL DE ADMIN CON SEGURO ALINEADO -->
     <div id="admin-add-participant-modal" class="modal">
         <div class="modal-content">
             <div style="display: flex; justify-content: space-between; margin-bottom: 1rem;">
@@ -284,7 +321,11 @@
             <div class="form-group"><label>Estado</label>
                 <select id="admin-part-status"><option value="confirmed">Confirmada</option><option value="pending">Pendiente</option><option value="denied">Denegada</option></select>
             </div>
-            <div class="form-group"><label><input type="checkbox" id="admin-part-insurance"> Tiene Seguro</label></div>
+            <div class="form-group">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="admin-part-insurance"> Tiene seguro de montaña
+                </label>
+            </div>
             <button class="btn" style="width: 100%;" onclick="adminSaveParticipant()">Guardar Participante</button>
         </div>
     </div>
@@ -293,7 +334,7 @@
         let routes = JSON.parse(localStorage.getItem('club_routes')) || [
             {
                 id: 'route-1', title: 'Ruta por los Montes de Sopuerta', date: '2026-06-15T09:00', difficulty: 'Media',
-                distance: '12', elevation: '450', meeting: 'Plaza del Ayuntamiento, Sopuerta', weather: '⛅ Soleado, 22ºC',
+                distance: '12', elevation: '450', meeting: 'Plaza del Ayuntamiento, Sopuerta', weatherIcon: '⛅', weatherTemp: '22ºC',
                 wikiloc: 'https://es.wikiloc.com', image: 'https://i.imgur.com/ybDAKiY.jpg', description: 'Ruta inicial.',
                 participants: []
             }
@@ -306,6 +347,7 @@
         window.addEventListener('DOMContentLoaded', () => {
             renderAll(); renderCalendar(); renderGallery(); updateRouteSelectOptions();
             if (isAdminLoggedIn) showAdminPanelContent();
+            selectWeatherIcon('☀️', document.querySelector('.weather-option'));
         });
 
         function toggleViewMode() {
@@ -329,7 +371,12 @@
             renderAll();
         }
 
-        /* FORMATOS AUTOMÁTICOS */
+        function selectWeatherIcon(icon, element) {
+            document.getElementById('route-weather-icon').value = icon;
+            document.querySelectorAll('.weather-option').forEach(btn => btn.classList.remove('selected'));
+            if (element) element.classList.add('selected');
+        }
+
         function formatDistance(dist) {
             if (!dist) return '';
             let d = dist.replace(/km/i, '').trim().replace('.', ',');
@@ -339,93 +386,6 @@
             if (!elev) return '';
             let e = elev.replace(/\+/g, '').replace(/m/i, '').trim();
             return '+' + e + ' m';
-        }
-
-        /* EXTRACCIÓN INTELIGENTE DE MUNICIPIO DESDE MAPS O TEXTO */
-        async function resolveLocation(meetingText) {
-            let query = meetingText.trim();
-
-            // Si es un enlace de Google Maps largo o corto
-            if (query.includes('google.com/maps') || query.includes('goo.gl') || query.includes('maps.app.goo.gl')) {
-                // 1. Buscar coordenadas @lat,lon
-                let coordMatch = query.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);
-                if (coordMatch) {
-                    return { lat: coordMatch[1], lon: coordMatch[2] };
-                }
-                // 2. Buscar si el enlace contiene texto de búsqueda tipo /search/Municipio o q=Municipio
-                let searchMatch = query.match(/[?&]q=([^&]+)/) || query.match(/\/search\/([^\/@]+)/);
-                if (searchMatch) {
-                    query = decodeURIComponent(searchMatch[1].replace(/\+/g, ' '));
-                } else {
-                    // Si es un enlace acortado que no expone coordenadas, intentamos derivar municipio por defecto en Bizkaia
-                    query = "Sopuerta, Bizkaia";
-                }
-            }
-
-            // Consultar geocodificador para extraer el municipio exacto
-            let geoRes = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query + (query.toLowerCase().includes('bizkaia') ? '' : ', Bizkaia'))}&format=json&addressdetails=1&limit=1`);
-            let geoData = await geoRes.json();
-
-            if (!geoData || geoData.length === 0) {
-                geoRes = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&addressdetails=1&limit=1`);
-                geoData = await geoRes.json();
-            }
-
-            if (geoData && geoData.length > 0) {
-                let addr = geoData[0].address;
-                // Extraer el municipio de forma inteligente (ciudad, pueblo, municipio o ayuntamiento)
-                let municipality = addr.city || addr.town || addr.village || addr.municipality || query;
-                return { lat: geoData[0].lat, lon: geoData[0].lon, municipality: municipality };
-            }
-            return null;
-        }
-
-        /* OBTENCIÓN AUTOMÁTICA DEL TIEMPO SEGÚN MUNICIPIO */
-        async function autoFetchWeather() {
-            const meeting = document.getElementById('route-meeting').value;
-            const dateVal = document.getElementById('route-date').value;
-            const weatherInput = document.getElementById('route-weather');
-
-            if (!meeting) { alert("Primero escribe un Punto de Encuentro o un enlace de Google Maps."); return; }
-            if (!dateVal) { alert("Primero selecciona una Fecha."); return; }
-
-            weatherInput.value = "Detectando municipio y consultando tiempo...";
-
-            try {
-                let locationInfo = await resolveLocation(meeting);
-                if (!locationInfo) {
-                    weatherInput.value = "No se pudo localizar el municipio.";
-                    return;
-                }
-
-                let weatherRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${locationInfo.lat}&longitude=${locationInfo.lon}&daily=weathercode,temperature_2m_max,temperature_2m_min&timezone=Europe/Madrid`);
-                let weatherData = await weatherRes.json();
-
-                let targetDate = dateVal.split('T')[0];
-                let dailyDates = weatherData.daily.time;
-                let index = dailyDates.indexOf(targetDate);
-
-                if (index === -1) {
-                    weatherInput.value = `(${locationInfo.municipality}): Fecha lejana (Máx 7 días).`;
-                } else {
-                    let code = weatherData.daily.weathercode[index];
-                    let maxTemp = Math.round(weatherData.daily.temperature_2m_max[index]);
-                    let minTemp = Math.round(weatherData.daily.temperature_2m_min[index]);
-                    let icon = '🌤️';
-                    
-                    if (code === 0) icon = '☀️ Despejado';
-                    else if (code <= 3) icon = '⛅ Nuboso';
-                    else if (code <= 48) icon = '🌫️ Niebla';
-                    else if (code <= 67) icon = '🌧️ Lluvia';
-                    else if (code <= 77) icon = '❄️ Nieve';
-                    else if (code <= 82) icon = '🌦️ Chubascos';
-                    else if (code >= 95) icon = '⛈️ Tormentas';
-
-                    weatherInput.value = `${locationInfo.municipality}: ${icon}, ${minTemp}ºC a ${maxTemp}ºC`;
-                }
-            } catch (e) {
-                weatherInput.value = "Error conectando al servicio meteorológico.";
-            }
         }
 
         function renderAll() {
@@ -450,6 +410,11 @@
                     meetingHtml = `<a href="${route.meeting}" target="_blank" style="color:var(--primary); font-weight:bold;">📍 Ver ubicación en Google Maps</a>`;
                 }
 
+                let weatherDisplay = '';
+                if (route.weatherIcon || route.weatherTemp) {
+                    weatherDisplay = `${route.weatherIcon || ''} ${route.weatherTemp || ''}`.trim();
+                }
+
                 return `
                     <div class="card" ${isPast ? 'style="border-top-color: #78909c;"' : ''}>
                         <div>
@@ -465,7 +430,7 @@
                                 ${route.distance ? `<span><strong>Distancia:</strong> ${formatDistance(route.distance)} </span>` : ''}
                                 ${route.elevation ? `<span> | <strong>Desnivel:</strong> ${formatElevation(route.elevation)}</span>` : ''}
                                 <p style="margin-top: 0.3rem;"><strong>Encuentro:</strong> ${meetingHtml}</p>
-                                ${route.weather ? `<p><strong>${isPast ? 'Tiempo que hizo' : 'Tiempo previsto'}:</strong> ${route.weather}</p>` : ''}
+                                ${weatherDisplay ? `<p><strong>${isPast ? 'Tiempo que hizo' : 'Tiempo previsto'}:</strong> ${weatherDisplay}</p>` : ''}
                                 <p><strong>Descripción:</strong> ${route.description}</p>
                                 ${route.wikiloc ? `<p><strong>Wikiloc:</strong> <a href="${route.wikiloc}" target="_blank" style="color:var(--primary);">Ver track</a></p>` : ''}
                             </div>
@@ -517,7 +482,8 @@
                 distance: document.getElementById('route-distance').value.trim(),
                 elevation: document.getElementById('route-elevation').value.trim(),
                 meeting: document.getElementById('route-meeting').value.trim(),
-                weather: document.getElementById('route-weather').value.trim(),
+                weatherIcon: document.getElementById('route-weather-icon').value,
+                weatherTemp: document.getElementById('route-weather-temp').value.trim(),
                 wikiloc: document.getElementById('route-wikiloc').value.trim(),
                 image: document.getElementById('route-image').value.trim(),
                 description: document.getElementById('route-description').value.trim()
@@ -533,6 +499,7 @@
         function resetRouteForm() {
             document.querySelectorAll('#admin-panel-content input, #admin-panel-content textarea').forEach(el => el.value = '');
             document.getElementById('route-difficulty').value = 'Fácil';
+            selectWeatherIcon('☀️', document.querySelector('.weather-option'));
             document.getElementById('form-title').innerText = 'Programar Nueva Ruta';
             document.getElementById('save-route-btn').innerText = 'Guardar Ruta';
             document.getElementById('cancel-edit-btn').style.display = 'none';
@@ -548,7 +515,15 @@
                 document.getElementById('route-distance').value = r.distance || '';
                 document.getElementById('route-elevation').value = r.elevation || '';
                 document.getElementById('route-meeting').value = r.meeting;
-                document.getElementById('route-weather').value = r.weather || '';
+                document.getElementById('route-weather-temp').value = r.weatherTemp || '';
+                
+                let iconToSelect = r.weatherIcon || '☀️';
+                document.getElementById('route-weather-icon').value = iconToSelect;
+                document.querySelectorAll('.weather-option').forEach(btn => {
+                    if (btn.innerText === iconToSelect) btn.classList.add('selected');
+                    else btn.classList.remove('selected');
+                });
+
                 document.getElementById('route-wikiloc').value = r.wikiloc || '';
                 document.getElementById('route-image').value = r.image || '';
                 document.getElementById('route-description').value = r.description || '';
@@ -568,7 +543,7 @@
                     <div class="card" ${isPast ? 'style="border-top-color:#78909c;"' : ''}>
                         <div style="margin-bottom: 1rem;">
                             <strong>${r.title}</strong> (${formatDate(r.date)})<br>
-                            <span style="font-size:0.8rem; color:#555;">Dist: ${formatDistance(r.distance)} | Desn: ${formatElevation(r.elevation)}</span>
+                            <span style="font-size:0.8rem; color:#555;">Dist: ${formatDistance(r.distance)} | Desn: ${formatElevation(r.elevation)} | Clima: ${r.weatherIcon||''} ${r.weatherTemp||''}</span>
                         </div>
                         <div style="display:flex; gap:0.4rem; flex-wrap:wrap; margin-bottom:1rem;">
                             <button class="btn btn-small" onclick="editRoute('${r.id}')">Editar</button>
@@ -584,13 +559,15 @@
                                         <span>${p.insurance?'<span class="badge badge-insurance-yes">Seguro SÍ</span>':'<span class="badge badge-insurance-no">Seguro NO</span>'}</span>
                                         <button class="btn btn-small btn-danger" onclick="removeParticipant('${r.id}', '${p.id}')">X</button>
                                     </div>
-                                    <div style="display:flex; justify-content:space-between; width:100%; font-size:0.8rem;">
+                                    <div style="display:flex; justify-content:space-between; width:100%; font-size:0.8rem; align-items:center;">
                                         <select onchange="changeParticipantStatus('${r.id}', '${p.id}', this.value)">
                                             <option value="confirmed" ${p.status==='confirmed'?'selected':''}>Confirmada</option>
                                             <option value="pending" ${p.status==='pending'?'selected':''}>Pendiente</option>
                                             <option value="denied" ${p.status==='denied'?'selected':''}>Denegada</option>
                                         </select>
-                                        <label><input type="checkbox" ${p.insurance?'checked':''} onchange="toggleParticipantInsurance('${r.id}', '${p.id}', this.checked)"> Editar Seguro</label>
+                                        <label class="checkbox-label" style="font-size:0.8rem;">
+                                            <input type="checkbox" ${p.insurance?'checked':''} onchange="toggleParticipantInsurance('${r.id}', '${p.id}', this.checked)"> Seguro
+                                        </label>
                                     </div>
                                 </div>
                             `).join('')}
