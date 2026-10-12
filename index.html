@@ -33,11 +33,11 @@
             line-height: 1.6;
         }
 
-        /* CABECERA CON IMAGEN DE FONDO */
+        /* CABECERA CON IMAGEN DE FONDO (URL ACTUALIZADA A IMGUR DIRECTO) */
         header {
             position: relative;
             background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.55)), 
-                        url('IMG_20230610_132443.jpg') no-repeat center center;
+                        url('https://i.imgur.com/ybDAKiY.jpg') no-repeat center center;
             background-size: cover;
             color: white;
             padding: 4rem 1rem;
@@ -1411,7 +1411,7 @@
         function renderAdminRoutesList() {
             const container = document.getElementById('admin-routes-list');
             if (routes.length === 0) {
-                container.innerHTML = `<p style="color: var(--text-light);">No hay rutas.</p>`;
+                container.innerHTML = `<p style="font-size: 0.9rem; color: var(--text-light);">No hay rutas.</p>`;
                 return;
             }
 
