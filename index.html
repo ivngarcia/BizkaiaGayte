@@ -1063,7 +1063,11 @@
             return t;
         }
 
+        /* COMPARTIR EN WHATSAPP CON ENLACE DIRECTO A LA WEB */
         function shareOnWhatsApp(title, dateStr, meeting, distance, elevation, weather, wikiloc) {
+            // Utiliza la dirección actual de la página (o puedes cambiarla por tu URL fija de GitHub Pages)
+            let websiteUrl = window.location.href;
+
             let text = `⛰️ *Ruta Club Bizkaia Gayte* 🏳️‍🌈\n\n` +
                        `📌 *${title}*\n` +
                        `📅 *Fecha:* ${formatDate(dateStr)}\n` +
@@ -1072,7 +1076,9 @@
                        (elevation ? `📈 *Desnivel:* ${formatElevation(elevation)}\n` : '') +
                        (weather ? `🌤️ *Tiempo:* ${weather}\n` : '') +
                        (wikiloc ? `🔗 *Wikiloc:* ${wikiloc}\n` : '') +
-                       `\n¡Anímate a participar! Consulta más detalles en nuestra web.`;
+                       `\n🌐 *Accede a la web oficial:* ${websiteUrl}\n` +
+                       `*(La web se adapta automáticamente a tu móvil o PC)*\n\n` +
+                       `¡Anímate a participar!`;
 
             let encodedText = encodeURIComponent(text);
             window.open(`https://api.whatsapp.com/send?text=${encodedText}`, '_blank');
