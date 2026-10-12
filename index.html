@@ -813,7 +813,8 @@
                             </div>
                             <div class="form-group">
                                 <label for="route-image">Foto para esta Ruta (URL)</label>
-                                <input type="url" id="route-image" placeholder="https://ejemplo.com/foto.jpg">
+                                <!-- ¡Texto de ayuda actualizado para evitar confusiones! -->
+                                <input type="url" id="route-image" placeholder="Debe terminar en .jpg o .png (Ej: https://i.imgur.com/foto.jpg)">
                             </div>
                             <div class="form-group">
                                 <label for="route-description">Descripción</label>
@@ -845,7 +846,7 @@
                         </select>
                     </div>
                     <div class="form-group" style="margin-bottom: 0.5rem;">
-                        <input type="url" id="gallery-photo-url" placeholder="URL de la imagen (Solo visible Admin)" style="font-size: 0.85rem; padding: 0.4rem;">
+                        <input type="url" id="gallery-photo-url" placeholder="URL de la imagen (Terminada en .jpg)" style="font-size: 0.85rem; padding: 0.4rem;">
                     </div>
                     <button class="btn btn-small" style="width: 100%; font-size: 0.8rem;" onclick="addGalleryPhoto()">Publicar Foto</button>
                 </div>
@@ -1105,7 +1106,7 @@
 
                 return `
                     <div class="gallery-item">
-                        <img src="${photo.url}" alt="${photo.title}" onclick="openLightbox('${photo.url}', '${photo.title} (${routeName})')">
+                        <img src="${photo.url}" alt="Foto galería" onerror="this.style.display='none'" onclick="openLightbox('${photo.url}', '${photo.title} (${routeName})')">
                         <span class="gallery-route-tag">📍 ${routeName}</span>
                         <p>${photo.title}</p>
                         ${isAdminLoggedIn ? `<button class="btn btn-small btn-danger" style="width: 100%; font-size: 0.7rem; padding: 0.2rem;" onclick="deleteGalleryPhoto('${photo.id}')">Eliminar Foto</button>` : ''}
@@ -1154,6 +1155,8 @@
             return new Date(dateString).toLocaleDateString('es-ES', options);
         }
 
+        /* --- PREVENCIÓN DE ERROR VISUAL AL CARGAR IMÁGENES --- */
+        /* Si el enlace de la imagen falla (ej. no es un .jpg directo), se oculta (onerror="this.style.display='none'") */
         function renderScheduledRoutes(list) {
             const container = document.getElementById('scheduled-routes-container');
             if (list.length === 0) {
@@ -1164,7 +1167,7 @@
             container.innerHTML = list.map(route => `
                 <div class="card">
                     <div>
-                        ${route.image ? `<img src="${route.image}" class="card-image" alt="${route.title}" onclick="openLightbox('${route.image}', '${route.title}')">` : ''}
+                        ${route.image ? `<img src="${route.image}" class="card-image" alt="Foto de ruta" onerror="this.style.display='none'" onclick="openLightbox('${route.image}', '${route.title}')">` : ''}
                         <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem; gap: 0.5rem;">
                             <h3>${route.title}</h3>
                             <span class="badge ${getBadgeClass(route.difficulty)}">${route.difficulty}</span>
@@ -1213,7 +1216,7 @@
             container.innerHTML = list.map(route => `
                 <div class="card" style="border-top-color: #78909c;">
                     <div>
-                        ${route.image ? `<img src="${route.image}" class="card-image" alt="${route.title}" onclick="openLightbox('${route.image}', '${route.title}')">` : ''}
+                        ${route.image ? `<img src="${route.image}" class="card-image" alt="Foto de ruta" onerror="this.style.display='none'" onclick="openLightbox('${route.image}', '${route.title}')">` : ''}
                         <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem; gap: 0.5rem;">
                             <h3>${route.title}</h3>
                             <span class="badge" style="background-color: #eceff1; color: #455a64;">Realizada</span>
@@ -1422,7 +1425,7 @@
                 return `
                     <div class="card" style="border-top-color: ${isPast ? '#78909c' : 'var(--primary)'};">
                         <div>
-                            ${route.image ? `<img src="${route.image}" class="card-image" alt="${route.title}" onclick="openLightbox('${route.image}', '${route.title}')">` : ''}
+                            ${route.image ? `<img src="${route.image}" class="card-image" alt="Foto de ruta" onerror="this.style.display='none'" onclick="openLightbox('${route.image}', '${route.title}')">` : ''}
                             <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem; gap: 0.5rem;">
                                 <h3>${route.title}</h3>
                                 <span class="badge ${isPast ? '' : getBadgeClass(route.difficulty)}" style="${isPast ? 'background:#eceff1;color:#455a64;' : ''}">
