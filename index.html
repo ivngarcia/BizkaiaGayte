@@ -105,7 +105,6 @@
         .form-group label { display: block; margin-bottom: 0.3rem; font-weight: bold; font-size: 0.9rem; }
         .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 0.7rem; border: 1px solid var(--border-color); border-radius: 4px; font-size: 1rem; }
         
-        /* ALINEACIÓN PERFECTA PARA LAS CASILLAS DE SEGURO */
         .checkbox-label {
             display: flex;
             align-items: center;
@@ -122,6 +121,7 @@
             margin: 0;
         }
 
+        /* SELECTOR MÚLTIPLE DE ICONOS DE TIEMPO */
         .weather-selector { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.5rem; }
         .weather-option { font-size: 1.5rem; padding: 0.3rem 0.6rem; border: 2px solid var(--border-color); border-radius: 6px; background: white; cursor: pointer; transition: all 0.2s; }
         .weather-option.selected { border-color: var(--primary); background: #e8f5e9; transform: scale(1.1); }
@@ -234,18 +234,18 @@
                             </div>
 
                             <div class="form-group" style="background: #f1f8e9; padding: 0.8rem; border-radius: 6px; border: 1px dashed var(--primary);">
-                                <label>Selecciona el Tiempo Previsto</label>
+                                <label>Selecciona los Iconos de Tiempo (puedes marcar varios)</label>
                                 <div class="weather-selector">
-                                    <button type="button" class="weather-option" onclick="selectWeatherIcon('☀️', this)" title="Soleado">☀️</button>
-                                    <button type="button" class="weather-option" onclick="selectWeatherIcon('⛅', this)" title="Nubes y sol">⛅</button>
-                                    <button type="button" class="weather-option" onclick="selectWeatherIcon('☁️', this)" title="Nublado">☁️</button>
-                                    <button type="button" class="weather-option" onclick="selectWeatherIcon('🌧️', this)" title="Lluvia">🌧️</button>
-                                    <button type="button" class="weather-option" onclick="selectWeatherIcon('⛈️', this)" title="Tormenta">⛈️</button>
-                                    <button type="button" class="weather-option" onclick="selectWeatherIcon('❄️', this)" title="Nieve">❄️</button>
+                                    <button type="button" class="weather-option" onclick="toggleWeatherIcon('☀️', this)">☀️</button>
+                                    <button type="button" class="weather-option" onclick="toggleWeatherIcon('⛅', this)">⛅</button>
+                                    <button type="button" class="weather-option" onclick="toggleWeatherIcon('☁️', this)">☁️</button>
+                                    <button type="button" class="weather-option" onclick="toggleWeatherIcon('🌧️', this)">🌧️</button>
+                                    <button type="button" class="weather-option" onclick="toggleWeatherIcon('⛈️', this)">⛈️</button>
+                                    <button type="button" class="weather-option" onclick="toggleWeatherIcon('❄️', this)">❄️</button>
                                 </div>
                                 <input type="hidden" id="route-weather-icon" value="☀️">
-                                <label style="margin-top: 0.5rem;">Temperatura (°C)</label>
-                                <input type="text" id="route-weather-temp" placeholder="Ej. 22 ºC o 15ºC a 22ºC">
+                                <label style="margin-top: 0.5rem;">Temperatura (Se añadirá ºC automáticamente si no lo pones)</label>
+                                <input type="text" id="route-weather-temp" placeholder="Ej. 22 o 15 a 22">
                             </div>
 
                             <div class="form-group">
@@ -334,7 +334,7 @@
         let routes = JSON.parse(localStorage.getItem('club_routes')) || [
             {
                 id: 'route-1', title: 'Ruta por los Montes de Sopuerta', date: '2026-06-15T09:00', difficulty: 'Media',
-                distance: '12', elevation: '450', meeting: 'Plaza del Ayuntamiento, Sopuerta', weatherIcon: '⛅', weatherTemp: '22ºC',
+                distance: '12', elevation: '450', meeting: 'Plaza del Ayuntamiento, Sopuerta', weatherIcon: '⛅', weatherTemp: '22',
                 wikiloc: 'https://es.wikiloc.com', image: 'https://i.imgur.com/ybDAKiY.jpg', description: 'Ruta inicial.',
                 participants: []
             }
@@ -347,7 +347,6 @@
         window.addEventListener('DOMContentLoaded', () => {
             renderAll(); renderCalendar(); renderGallery(); updateRouteSelectOptions();
             if (isAdminLoggedIn) showAdminPanelContent();
-            selectWeatherIcon('☀️', document.querySelector('.weather-option'));
         });
 
         function toggleViewMode() {
@@ -371,10 +370,31 @@
             renderAll();
         }
 
-        function selectWeatherIcon(icon, element) {
-            document.getElementById('route-weather-icon').value = icon;
-            document.querySelectorAll('.weather-option').forEach(btn => btn.classList.remove('selected'));
-            if (element) element.classList.add('selected');
+        /* SELECCIÓN MÚLTIPLE DE ICONOS DE TIEMPO */
+        function toggleWeatherIcon(icon, element) {
+            let input = document.getElementById('route-weather-icon');
+            let currentIcons = input.value ? input.value.split(' ') : [];
+            
+            if (element.classList.contains('selected')) {
+                element.classList.remove('selected');
+                currentIcons = currentIcons.filter(i => i !== icon);
+            } else {
+                element.classList.add('selected');
+                currentIcons.push(icon);
+            }
+            input.value = currentIcons.join(' ');
+        }
+
+        function setWeatherIconsFromString(iconStr) {
+            let input = document.getElementById('route-weather-icon');
+            input.value = iconStr || '';
+            document.querySelectorAll('.weather-option').forEach(btn => {
+                if (iconStr && iconStr.includes(btn.innerText)) {
+                    btn.classList.add('selected');
+                } else {
+                    btn.classList.remove('selected');
+                }
+            });
         }
 
         function formatDistance(dist) {
@@ -386,6 +406,14 @@
             if (!elev) return '';
             let e = elev.replace(/\+/g, '').replace(/m/i, '').trim();
             return '+' + e + ' m';
+        }
+        function formatTemperature(temp) {
+            if (!temp) return '';
+            let t = temp.trim();
+            if (!t.toLowerCase().includes('c')) {
+                t += ' ºC';
+            }
+            return t;
         }
 
         function renderAll() {
@@ -411,8 +439,10 @@
                 }
 
                 let weatherDisplay = '';
-                if (route.weatherIcon || route.weatherTemp) {
-                    weatherDisplay = `${route.weatherIcon || ''} ${route.weatherTemp || ''}`.trim();
+                let icons = route.weatherIcon || '';
+                let tempFormatted = formatTemperature(route.weatherTemp);
+                if (icons || tempFormatted) {
+                    weatherDisplay = `${icons} ${tempFormatted}`.trim();
                 }
 
                 return `
@@ -499,7 +529,7 @@
         function resetRouteForm() {
             document.querySelectorAll('#admin-panel-content input, #admin-panel-content textarea').forEach(el => el.value = '');
             document.getElementById('route-difficulty').value = 'Fácil';
-            selectWeatherIcon('☀️', document.querySelector('.weather-option'));
+            setWeatherIconsFromString('');
             document.getElementById('form-title').innerText = 'Programar Nueva Ruta';
             document.getElementById('save-route-btn').innerText = 'Guardar Ruta';
             document.getElementById('cancel-edit-btn').style.display = 'none';
@@ -517,12 +547,7 @@
                 document.getElementById('route-meeting').value = r.meeting;
                 document.getElementById('route-weather-temp').value = r.weatherTemp || '';
                 
-                let iconToSelect = r.weatherIcon || '☀️';
-                document.getElementById('route-weather-icon').value = iconToSelect;
-                document.querySelectorAll('.weather-option').forEach(btn => {
-                    if (btn.innerText === iconToSelect) btn.classList.add('selected');
-                    else btn.classList.remove('selected');
-                });
+                setWeatherIconsFromString(r.weatherIcon || '');
 
                 document.getElementById('route-wikiloc').value = r.wikiloc || '';
                 document.getElementById('route-image').value = r.image || '';
@@ -543,7 +568,7 @@
                     <div class="card" ${isPast ? 'style="border-top-color:#78909c;"' : ''}>
                         <div style="margin-bottom: 1rem;">
                             <strong>${r.title}</strong> (${formatDate(r.date)})<br>
-                            <span style="font-size:0.8rem; color:#555;">Dist: ${formatDistance(r.distance)} | Desn: ${formatElevation(r.elevation)} | Clima: ${r.weatherIcon||''} ${r.weatherTemp||''}</span>
+                            <span style="font-size:0.8rem; color:#555;">Dist: ${formatDistance(r.distance)} | Desn: ${formatElevation(r.elevation)} | Clima: ${r.weatherIcon||''} ${formatTemperature(r.weatherTemp)}</span>
                         </div>
                         <div style="display:flex; gap:0.4rem; flex-wrap:wrap; margin-bottom:1rem;">
                             <button class="btn btn-small" onclick="editRoute('${r.id}')">Editar</button>
