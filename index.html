@@ -3,7 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rutas Bizkaia Gayte - Club de Montaña</title>
+    <title id="meta-title">Rutas Bizkaia Gayte - Club de Montaña</title>
+    
+    <!-- METAETIQUETAS OPEN GRAPH PARA PREVISUALIZACIÓN EN WHATSAPP -->
+    <meta property="og:title" id="meta-og-title" content="Rutas Bizkaia Gayte - Club de Montaña">
+    <meta property="og:description" id="meta-og-desc" content="Rutas de montaña, amigos y naturaleza en Bizkaia. ¡Únete a nuestras aventuras!">
+    <meta property="og:image" id="meta-og-image" content="https://i.imgur.com/ybDAKiY.jpg">
+    <meta property="og:type" content="website">
+
     <style>
         :root {
             --primary: #2e7d32; --primary-dark: #1b5e20; --accent: #4caf50;
@@ -455,6 +462,14 @@
             flex-direction: column;
             justify-content: space-between;
             border-top: 4px solid var(--primary);
+            transition: all 0.3s ease;
+        }
+
+        /* ESTILO DESTACADO CUANDO SE ABRE UNA RUTA ESPECÍFICA DESDE WHATSAPP */
+        .card.highlighted {
+            border: 3px solid var(--primary);
+            box-shadow: 0 0 20px rgba(46, 125, 50, 0.4);
+            transform: scale(1.02);
         }
 
         .card-image {
@@ -969,12 +984,41 @@
         let currentCalendarDate = new Date();
 
         window.addEventListener('DOMContentLoaded', () => {
+            // Comprobar si se ha abierto la web mediante un enlace directo de ruta compartida (?route=ID)
+            const urlParams = new URLSearchParams(window.location.search);
+            const targetRouteId = urlParams.get('route');
+
+            if (targetRouteId) {
+                const targetRoute = routes.find(r => r.id === targetRouteId);
+                if (targetRoute) {
+                    // Actualizar dinámicamente las etiquetas OpenGraph para la previsualización de WhatsApp
+                    document.getElementById('meta-title').innerText = `${targetRoute.title} - Rutas Bizkaia Gayte`;
+                    document.getElementById('meta-og-title').setAttribute('content', targetRoute.title);
+                    document.getElementById('meta-og-desc').setAttribute('content', `Fecha: ${formatDate(targetRoute.date)} | Encuentro: ${targetRoute.meeting} | ¡Entra para apuntarte!`);
+                    if (targetRoute.image) {
+                        document.getElementById('meta-og-image').setAttribute('content', targetRoute.image);
+                    }
+                }
+            }
+
             renderAll();
             renderCalendar();
             renderGallery();
             updateRouteSelectOptions();
+
             if (isAdminLoggedIn) {
                 showAdminPanelContent();
+            }
+
+            // Si venía un parámetro de ruta, hacer scroll automático y resaltarla
+            if (targetRouteId) {
+                setTimeout(() => {
+                    const cardElement = document.getElementById(`card-${targetRouteId}`);
+                    if (cardElement) {
+                        cardElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        cardElement.classList.add('highlighted');
+                    }
+                }, 300);
             }
         });
 
@@ -1063,10 +1107,10 @@
             return t;
         }
 
-        /* COMPARTIR EN WHATSAPP CON ENLACE DIRECTO A LA WEB */
-        function shareOnWhatsApp(title, dateStr, meeting, distance, elevation, weather, wikiloc) {
-            // Utiliza la dirección actual de la página (o puedes cambiarla por tu URL fija de GitHub Pages)
-            let websiteUrl = window.location.href;
+        /* COMPARTIR EN WHATSAPP CON ENLACE DIRECTO A LA RUTA ESPECÍFICA */
+        function shareOnWhatsApp(routeId, title, dateStr, meeting, distance, elevation, weather, wikiloc) {
+            let baseUrl = window.location.href.split('?')[0];
+            let routeUrl = `${baseUrl}?route=${routeId}`;
 
             let text = `⛰️ *Ruta Club Bizkaia Gayte* 🏳️‍🌈\n\n` +
                        `📌 *${title}*\n` +
@@ -1076,8 +1120,7 @@
                        (elevation ? `📈 *Desnivel:* ${formatElevation(elevation)}\n` : '') +
                        (weather ? `🌤️ *Tiempo:* ${weather}\n` : '') +
                        (wikiloc ? `🔗 *Wikiloc:* ${wikiloc}\n` : '') +
-                       `\n🌐 *Accede a la web oficial:* ${websiteUrl}\n` +
-                       `*(La web se adapta automáticamente a tu móvil o PC)*\n\n` +
+                       `\n🌐 *Entra aquí para ver detalles y apuntarte:* ${routeUrl}\n\n` +
                        `¡Anímate a participar!`;
 
             let encodedText = encodeURIComponent(text);
@@ -1130,6 +1173,7 @@
                 const rDate = new Date(r.date);
                 const dateKey = `${rDate.getFullYear()}-${String(rDate.getMonth() + 1).padStart(2, '0')}-${String(rDate.getDate()).padStart(2, '0')}`;
                 routeMap[dateKey] = {
+                    id: r.id,
                     title: r.title,
                     isPast: rDate < now
                 };
@@ -1264,7 +1308,7 @@
                 }
 
                 return `
-                    <div class="card">
+                    <div class="card" id="card-${route.id}">
                         <div>
                             ${route.image ? `<img src="${route.image}" class="card-image" alt="Foto de ruta" onerror="this.style.display='none'" onclick="openLightbox('${route.image}', '${route.title}')">` : ''}
                             <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem; gap: 0.5rem;">
@@ -1284,7 +1328,7 @@
 
                         <div>
                             <button class="btn" style="width: 100%; margin-bottom: 0.5rem;" onclick="openRegisterModal('${route.id}')">Inscribirse</button>
-                            <button class="btn btn-whatsapp" onclick="shareOnWhatsApp('${route.title.replace(/'/g, "\\'")}', '${route.date}', '${route.meeting.replace(/'/g, "\\'")}', '${route.distance || ''}', '${route.elevation || ''}', '${weatherDisplay.replace(/'/g, "\\'")}', '${route.wikiloc || ''}')">
+                            <button class="btn btn-whatsapp" onclick="shareOnWhatsApp('${route.id}', '${route.title.replace(/'/g, "\\'")}', '${route.date}', '${route.meeting.replace(/'/g, "\\'")}', '${route.distance || ''}', '${route.elevation || ''}', '${weatherDisplay.replace(/'/g, "\\'")}', '${route.wikiloc || ''}')">
                                 💬 Compartir por WhatsApp
                             </button>
                             
@@ -1333,7 +1377,7 @@
                 }
 
                 return `
-                    <div class="card" style="border-top-color: #78909c;">
+                    <div class="card" id="card-${route.id}" style="border-top-color: #78909c;">
                         <div>
                             ${route.image ? `<img src="${route.image}" class="card-image" alt="Foto de ruta" onerror="this.style.display='none'" onclick="openLightbox('${route.image}', '${route.title}')">` : ''}
                             <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem; gap: 0.5rem;">
@@ -1352,7 +1396,7 @@
                         </div>
 
                         <div>
-                            <button class="btn btn-whatsapp" style="margin-bottom: 0.5rem;" onclick="shareOnWhatsApp('${route.title.replace(/'/g, "\\'")}', '${route.date}', '${route.meeting.replace(/'/g, "\\'")}', '${route.distance || ''}', '${route.elevation || ''}', '${weatherDisplay.replace(/'/g, "\\'")}', '${route.wikiloc || ''}')">
+                            <button class="btn btn-whatsapp" style="margin-bottom: 0.5rem;" onclick="shareOnWhatsApp('${route.id}', '${route.title.replace(/'/g, "\\'")}', '${route.date}', '${route.meeting.replace(/'/g, "\\'")}', '${route.distance || ''}', '${route.elevation || ''}', '${weatherDisplay.replace(/'/g, "\\'")}', '${route.wikiloc || ''}')">
                                 💬 Compartir por WhatsApp
                             </button>
 
