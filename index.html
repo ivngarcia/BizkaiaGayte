@@ -100,22 +100,6 @@
             font-weight: bold;
         }
 
-        /* BANDERA VISTOSA Y ONDULADA */
-        .pride-flag-icon {
-            display: inline-block;
-            font-size: 1.8rem; /* Un poco más grande */
-            vertical-align: middle;
-            margin-left: 6px;
-            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.6)); /* Sombra para que sea más vistosa */
-            animation: wave-flag 2.5s ease-in-out infinite; /* Animación ondulada */
-            transform-origin: bottom center;
-        }
-
-        @keyframes wave-flag {
-            0%, 100% { transform: rotate(-8deg) skewX(5deg); }
-            50% { transform: rotate(8deg) skewX(-5deg); }
-        }
-
         /* Botón flotante para alternar vista */
         .view-switcher {
             position: absolute;
@@ -718,7 +702,7 @@
         <button class="view-switcher" id="view-switch-btn" onclick="toggleViewMode()">📱 Cambiar a Móvil</button>
         <h1>Rutas Bizkaia Gayte</h1>
         <p class="friendly-desc">¡Únete a nuestras aventuras!</p>
-        <p class="club-info">Rutas de montaña, amigos y naturaleza en Bizkaia. <span class="pride-flag-icon">🏳️‍🌈</span></p>
+        <p class="club-info">Rutas de montaña, amigos y naturaleza en Bizkaia.</p>
     </header>
 
     <nav>
@@ -1427,7 +1411,7 @@
         function renderAdminRoutesList() {
             const container = document.getElementById('admin-routes-list');
             if (routes.length === 0) {
-                container.innerHTML = `<p style="font-size: 0.9rem; color: var(--text-light);">No hay rutas.</p>`;
+                container.innerHTML = `<p style="color: var(--text-light);">No hay rutas.</p>`;
                 return;
             }
 
