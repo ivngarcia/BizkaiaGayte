@@ -984,14 +984,12 @@
         let currentCalendarDate = new Date();
 
         window.addEventListener('DOMContentLoaded', () => {
-            // Comprobar si se ha abierto la web mediante un enlace directo de ruta compartida (?route=ID)
             const urlParams = new URLSearchParams(window.location.search);
             const targetRouteId = urlParams.get('route');
 
             if (targetRouteId) {
                 const targetRoute = routes.find(r => r.id === targetRouteId);
                 if (targetRoute) {
-                    // Actualizar dinámicamente las etiquetas OpenGraph para la previsualización de WhatsApp
                     document.getElementById('meta-title').innerText = `${targetRoute.title} - Rutas Bizkaia Gayte`;
                     document.getElementById('meta-og-title').setAttribute('content', targetRoute.title);
                     document.getElementById('meta-og-desc').setAttribute('content', `Fecha: ${formatDate(targetRoute.date)} | Encuentro: ${targetRoute.meeting} | ¡Entra para apuntarte!`);
@@ -1010,7 +1008,6 @@
                 showAdminPanelContent();
             }
 
-            // Si venía un parámetro de ruta, hacer scroll automático y resaltarla
             if (targetRouteId) {
                 setTimeout(() => {
                     const cardElement = document.getElementById(`card-${targetRouteId}`);
@@ -1107,20 +1104,20 @@
             return t;
         }
 
-        /* COMPARTIR EN WHATSAPP CON ENLACE DIRECTO A LA RUTA ESPECÍFICA */
+        /* COMPARTIR EN WHATSAPP CON NOMBRE DE RUTA AL INICIO Y AVISO EN ROJO Y NEGRITA */
         function shareOnWhatsApp(routeId, title, dateStr, meeting, distance, elevation, weather, wikiloc) {
             let baseUrl = window.location.href.split('?')[0];
             let routeUrl = `${baseUrl}?route=${routeId}`;
 
-            let text = `⛰️ *Ruta Club Bizkaia Gayte* 🏳️‍🌈\n\n` +
-                       `📌 *${title}*\n` +
+            let text = `⛰️ *${title}* - Club Bizkaia Gayte 🏳️‍🌈\n\n` +
                        `📅 *Fecha:* ${formatDate(dateStr)}\n` +
                        `📍 *Encuentro:* ${meeting}\n` +
                        (distance ? `📏 *Distancia:* ${formatDistance(distance)}\n` : '') +
                        (elevation ? `📈 *Desnivel:* ${formatElevation(elevation)}\n` : '') +
                        (weather ? `🌤️ *Tiempo:* ${weather}\n` : '') +
                        (wikiloc ? `🔗 *Wikiloc:* ${wikiloc}\n` : '') +
-                       `\n🌐 *Entra aquí para ver detalles y apuntarte:* ${routeUrl}\n\n` +
+                       `\n🔴 *¡ES OBLIGATORIO APUNTARSE EN LA WEB!* 🔴\n` +
+                       `🌐 *Entra aquí para ver detalles y apuntarte:* ${routeUrl}\n\n` +
                        `¡Anímate a participar!`;
 
             let encodedText = encodeURIComponent(text);
