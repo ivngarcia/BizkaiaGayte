@@ -702,7 +702,7 @@
         <button class="view-switcher" id="view-switch-btn" onclick="toggleViewMode()">📱 Cambiar a Móvil</button>
         <h1>Rutas Bizkaia Gayte</h1>
         <p class="friendly-desc">¡Únete a nuestras aventuras!</p>
-        <p class="club-info">Rutas de montaña, amigos y naturaleza en Bizkaia.</p>
+        <p class="club-info">Rutas de montaña, amigos y naturaleza en Bizkaia. <span style="opacity: 0.8;">🏳️‍🌈</span></p>
     </header>
 
     <nav>
@@ -803,9 +803,24 @@
                                     <option value="Difícil">Difícil</option>
                                 </select>
                             </div>
+                            <!-- NUEVOS CAMPOS: DISTANCIA Y DESNIVEL -->
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                                <div class="form-group">
+                                    <label for="route-distance">Distancia</label>
+                                    <input type="text" id="route-distance" placeholder="Ej. 12 km">
+                                </div>
+                                <div class="form-group">
+                                    <label for="route-elevation">Desnivel</label>
+                                    <input type="text" id="route-elevation" placeholder="Ej. 500 m">
+                                </div>
+                            </div>
                             <div class="form-group">
                                 <label for="route-meeting">Punto de Encuentro</label>
                                 <input type="text" id="route-meeting" placeholder="Ej. Plaza de Sopuerta">
+                            </div>
+                            <div class="form-group">
+                                <label for="route-weather">Tiempo Previsto / Clima</label>
+                                <input type="text" id="route-weather" placeholder="Ej. ⛅ Soleado, 22ºC / 🌧️ Lluvia débil">
                             </div>
                             <div class="form-group">
                                 <label for="route-wikiloc">Enlace Wikiloc</label>
@@ -813,7 +828,6 @@
                             </div>
                             <div class="form-group">
                                 <label for="route-image">Foto para esta Ruta (URL)</label>
-                                <!-- ¡Texto de ayuda actualizado para evitar confusiones! -->
                                 <input type="url" id="route-image" placeholder="Debe terminar en .jpg o .png (Ej: https://i.imgur.com/foto.jpg)">
                             </div>
                             <div class="form-group">
@@ -846,7 +860,7 @@
                         </select>
                     </div>
                     <div class="form-group" style="margin-bottom: 0.5rem;">
-                        <input type="url" id="gallery-photo-url" placeholder="URL de la imagen (Terminada en .jpg)" style="font-size: 0.85rem; padding: 0.4rem;">
+                        <input type="url" id="gallery-photo-url" placeholder="URL de la imagen (Solo visible Admin)" style="font-size: 0.85rem; padding: 0.4rem;">
                     </div>
                     <button class="btn btn-small" style="width: 100%; font-size: 0.8rem;" onclick="addGalleryPhoto()">Publicar Foto</button>
                 </div>
@@ -929,7 +943,10 @@
                 title: 'Ruta por los Montes de Sopuerta',
                 date: '2026-06-15T09:00',
                 difficulty: 'Media',
+                distance: '12 km',
+                elevation: '450 m',
                 meeting: 'Plaza del Ayuntamiento',
+                weather: '⛅ Soleado, 22ºC',
                 wikiloc: 'https://es.wikiloc.com',
                 image: 'https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=600&q=80',
                 description: 'Bonita ruta por los cordales cercanos disfrutando de la naturaleza.',
@@ -1155,8 +1172,7 @@
             return new Date(dateString).toLocaleDateString('es-ES', options);
         }
 
-        /* --- PREVENCIÓN DE ERROR VISUAL AL CARGAR IMÁGENES --- */
-        /* Si el enlace de la imagen falla (ej. no es un .jpg directo), se oculta (onerror="this.style.display='none'") */
+        /* --- PREVENCIÓN DE ERROR VISUAL AL CARGAR IMÁGENES Y NUEVOS CAMPOS --- */
         function renderScheduledRoutes(list) {
             const container = document.getElementById('scheduled-routes-container');
             if (list.length === 0) {
@@ -1174,7 +1190,10 @@
                         </div>
                         <div class="card-info">
                             <p><strong>Fecha:</strong> ${formatDate(route.date)}</p>
+                            ${route.distance ? `<p><strong>Distancia:</strong> ${route.distance}</p>` : ''}
+                            ${route.elevation ? `<p><strong>Desnivel:</strong> ${route.elevation}</p>` : ''}
                             <p><strong>Encuentro:</strong> ${route.meeting}</p>
+                            ${route.weather ? `<p><strong>Tiempo previsto:</strong> ${route.weather}</p>` : ''}
                             <p><strong>Descripción:</strong> ${route.description}</p>
                             ${route.wikiloc ? `<p><strong>Wikiloc:</strong> <a href="${route.wikiloc}" target="_blank" style="color: var(--primary);">Ver track oficial</a></p>` : ''}
                         </div>
@@ -1223,7 +1242,10 @@
                         </div>
                         <div class="card-info">
                             <p><strong>Fecha:</strong> ${formatDate(route.date)}</p>
+                            ${route.distance ? `<p><strong>Distancia:</strong> ${route.distance}</p>` : ''}
+                            ${route.elevation ? `<p><strong>Desnivel:</strong> ${route.elevation}</p>` : ''}
                             <p><strong>Encuentro:</strong> ${route.meeting}</p>
+                            ${route.weather ? `<p><strong>Tiempo que hizo:</strong> ${route.weather}</p>` : ''}
                             <p><strong>Descripción:</strong> ${route.description}</p>
                             ${route.wikiloc ? `<p><strong>Wikiloc:</strong> <a href="${route.wikiloc}" target="_blank" style="color: var(--primary);">Ver track completado</a></p>` : ''}
                         </div>
@@ -1327,7 +1349,10 @@
             const title = document.getElementById('route-title').value.trim();
             const date = document.getElementById('route-date').value;
             const difficulty = document.getElementById('route-difficulty').value;
+            const distance = document.getElementById('route-distance').value.trim();
+            const elevation = document.getElementById('route-elevation').value.trim();
             const meeting = document.getElementById('route-meeting').value.trim();
+            const weather = document.getElementById('route-weather').value.trim();
             const wikiloc = document.getElementById('route-wikiloc').value.trim();
             const image = document.getElementById('route-image').value.trim();
             const description = document.getElementById('route-description').value.trim();
@@ -1343,7 +1368,10 @@
                     route.title = title;
                     route.date = date;
                     route.difficulty = difficulty;
+                    route.distance = distance;
+                    route.elevation = elevation;
                     route.meeting = meeting;
+                    route.weather = weather;
                     route.wikiloc = wikiloc;
                     route.image = image;
                     route.description = description;
@@ -1354,7 +1382,10 @@
                     title,
                     date,
                     difficulty,
+                    distance,
+                    elevation,
                     meeting,
+                    weather,
                     wikiloc,
                     image,
                     description,
@@ -1373,7 +1404,11 @@
             document.getElementById('edit-route-id').value = '';
             document.getElementById('route-title').value = '';
             document.getElementById('route-date').value = '';
+            document.getElementById('route-difficulty').value = 'Fácil';
+            document.getElementById('route-distance').value = '';
+            document.getElementById('route-elevation').value = '';
             document.getElementById('route-meeting').value = '';
+            document.getElementById('route-weather').value = '';
             document.getElementById('route-wikiloc').value = '';
             document.getElementById('route-image').value = '';
             document.getElementById('route-description').value = '';
@@ -1390,7 +1425,10 @@
                 document.getElementById('route-title').value = route.title;
                 document.getElementById('route-date').value = route.date;
                 document.getElementById('route-difficulty').value = route.difficulty;
+                document.getElementById('route-distance').value = route.distance || '';
+                document.getElementById('route-elevation').value = route.elevation || '';
                 document.getElementById('route-meeting').value = route.meeting;
+                document.getElementById('route-weather').value = route.weather || '';
                 document.getElementById('route-wikiloc').value = route.wikiloc || '';
                 document.getElementById('route-image').value = route.image || '';
                 document.getElementById('route-description').value = route.description || '';
@@ -1410,7 +1448,6 @@
             }
         }
 
-        /* VISTA DE ADMINISTRADOR: MUESTRA Y PERMITE EDITAR LOS SEGUROS DE CADA ASISTENTE */
         function renderAdminRoutesList() {
             const container = document.getElementById('admin-routes-list');
             if (routes.length === 0) {
@@ -1434,6 +1471,9 @@
                             </div>
                             <div class="card-info">
                                 <p><strong>Fecha:</strong> ${formatDate(route.date)}</p>
+                                ${route.distance ? `<span><strong>Dist:</strong> ${route.distance} </span>` : ''}
+                                ${route.elevation ? `<span> | <strong>Desnivel:</strong> ${route.elevation}</span>` : ''}
+                                ${route.weather ? `<p><strong>Tiempo:</strong> ${route.weather}</p>` : ''}
                             </div>
                         </div>
 
