@@ -43,6 +43,36 @@
             padding: 4rem 1rem;
             text-align: center;
             box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+            overflow: hidden;
+        }
+
+        /* MARCO RECTANGULAR DIFUMINADO (SIMBOLOGÍA GAY) */
+        header::after {
+            content: '';
+            position: absolute;
+            top: 15px; left: 15px; right: 15px; bottom: 15px;
+            border: 12px solid transparent;
+            border-image: linear-gradient(135deg, #FF0018, #FFA52C, #FFFF41, #008018, #0000F9, #86007D) 1;
+            filter: blur(8px);
+            opacity: 0.85;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* LÍNEA NÍTIDA INTERIOR PARA DEFINIR EL MARCO */
+        header::before {
+            content: '';
+            position: absolute;
+            top: 15px; left: 15px; right: 15px; bottom: 15px;
+            border: 2px solid rgba(255, 255, 255, 0.6);
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        /* ELEVAR EL TEXTO PARA QUE QUEDE POR ENCIMA DEL MARCO */
+        header h1, header p.friendly-desc, header p.club-info, .view-switcher {
+            position: relative;
+            z-index: 3;
         }
 
         header h1 {
@@ -60,20 +90,37 @@
             text-shadow: 0 2px 5px rgba(0,0,0,0.8);
             font-weight: bold;
             letter-spacing: 0.5px;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.2rem;
         }
 
         header p.club-info {
-            font-size: 1rem;
+            font-size: 1.15rem;
             opacity: 0.95;
             text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+            font-weight: bold;
+        }
+
+        /* BANDERA VISTOSA Y ONDULADA */
+        .pride-flag-icon {
+            display: inline-block;
+            font-size: 1.8rem; /* Un poco más grande */
+            vertical-align: middle;
+            margin-left: 6px;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.6)); /* Sombra para que sea más vistosa */
+            animation: wave-flag 2.5s ease-in-out infinite; /* Animación ondulada */
+            transform-origin: bottom center;
+        }
+
+        @keyframes wave-flag {
+            0%, 100% { transform: rotate(-8deg) skewX(5deg); }
+            50% { transform: rotate(8deg) skewX(-5deg); }
         }
 
         /* Botón flotante para alternar vista */
         .view-switcher {
             position: absolute;
-            top: 1rem;
-            right: 1rem;
+            top: 2rem;
+            right: 2rem;
             background: rgba(255, 255, 255, 0.25);
             border: 1px solid rgba(255, 255, 255, 0.5);
             color: white;
@@ -151,6 +198,10 @@
         @media (max-width: 900px) {
             .app-layout {
                 grid-template-columns: 1fr;
+            }
+            .view-switcher {
+                top: 1.5rem;
+                right: 1.5rem;
             }
         }
 
@@ -659,11 +710,6 @@
             grid-template-columns: 1fr !important;
         }
 
-        @media (max-width: 1100px) {
-            header h1 {
-                font-size: 3rem;
-            }
-        }
     </style>
 </head>
 <body id="app-body">
@@ -671,8 +717,8 @@
     <header id="main-header">
         <button class="view-switcher" id="view-switch-btn" onclick="toggleViewMode()">📱 Cambiar a Móvil</button>
         <h1>Rutas Bizkaia Gayte</h1>
-        <p class="friendly-desc">¡Únete a nuestras aventuras! Rutas de montaña, amigos y naturaleza en Bizkaia.</p>
-        <p class="club-info">• Club de Montaña • Excursiones e Inscripciones •</p>
+        <p class="friendly-desc">¡Únete a nuestras aventuras!</p>
+        <p class="club-info">Rutas de montaña, amigos y naturaleza en Bizkaia. <span class="pride-flag-icon">🏳️‍🌈</span></p>
     </header>
 
     <nav>
@@ -815,7 +861,7 @@
                         </select>
                     </div>
                     <div class="form-group" style="margin-bottom: 0.5rem;">
-                        <input type="url" id="gallery-photo-url" placeholder="URL de la imagen" style="font-size: 0.85rem; padding: 0.4rem;">
+                        <input type="url" id="gallery-photo-url" placeholder="URL de la imagen (Solo visible Admin)" style="font-size: 0.85rem; padding: 0.4rem;">
                     </div>
                     <button class="btn btn-small" style="width: 100%; font-size: 0.8rem;" onclick="addGalleryPhoto()">Publicar Foto</button>
                 </div>
@@ -1124,11 +1170,10 @@
             return new Date(dateString).toLocaleDateString('es-ES', options);
         }
 
-        /* RENDER RUTAS PROGRAMADAS (VISITANTES: SIN SEGUROS VISIBLES) */
         function renderScheduledRoutes(list) {
             const container = document.getElementById('scheduled-routes-container');
             if (list.length === 0) {
-                container.innerHTML = `<p style="color: var(--text-light);">No hay rutas programadas próximamente.</p>`;
+                container.innerHTML = `<p style="font-size: 0.9rem; color: var(--text-light);">No hay rutas programadas próximamente.</p>`;
                 return;
             }
 
@@ -1174,11 +1219,10 @@
             `).join('');
         }
 
-        /* RENDER RUTAS REALIZADAS (VISITANTES: SIN SEGUROS VISIBLES) */
         function renderCompletedRoutes(list) {
             const container = document.getElementById('completed-routes-container');
             if (list.length === 0) {
-                container.innerHTML = `<p style="color: var(--text-light);">No hay rutas en el histórico.</p>`;
+                container.innerHTML = `<p style="font-size: 0.9rem; color: var(--text-light);">No hay rutas en el histórico.</p>`;
                 return;
             }
 
@@ -1383,7 +1427,7 @@
         function renderAdminRoutesList() {
             const container = document.getElementById('admin-routes-list');
             if (routes.length === 0) {
-                container.innerHTML = `<p style="color: var(--text-light);">No hay rutas.</p>`;
+                container.innerHTML = `<p style="font-size: 0.9rem; color: var(--text-light);">No hay rutas.</p>`;
                 return;
             }
 
