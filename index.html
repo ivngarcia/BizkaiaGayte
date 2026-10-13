@@ -11,7 +11,7 @@
     <meta property="og:image" id="meta-og-image" content="https://i.imgur.com/ybDAKiY.jpg">
     <meta property="og:type" content="website">
 
-    <!-- SDKs DE FIREBASE -->
+    <!-- SDKs DE FIREBASE (COMPATIBLES) -->
     <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore-compat.js"></script>
 
@@ -985,25 +985,24 @@
             console.warn("Error conectando con Firebase. Usando almacenamiento local:", err);
         }
 
-        let routes = [
-            {
-                id: 'route-1',
-                title: 'Ruta de los Dólmenes de Oiz',
-                date: '2026-10-17T10:00',
-                difficulty: 'Media',
-                distance: '17.79',
-                elevation: '644',
-                coffee: 'Bar Uriarte (https://maps.app.goo.gl/ejemplo)',
-                meeting: 'Merendero-Undakorta (https://maps.app.goo.gl/TESfLoWCVXUwg58b6)',
-                weatherIcon: '⛅ 🌧️',
-                weatherTemp: '13',
-                wikiloc: 'https://es.wikiloc.com/rutas-senderismo/ruta-de-los-dolmenes-de-oiz-iturzurigana-zengotitagana-oiz-astokurzeteburu-ipinarrieta-65984900',
-                image: 'https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=600&q=80',
-                description: 'Magnífica ruta por los dólmenes de Oiz.',
-                participants: []
-            }
-        ];
+        const rutaInicial = {
+            id: 'route-1',
+            title: 'Ruta de los Dólmenes de Oiz',
+            date: '2026-10-17T10:00',
+            difficulty: 'Media',
+            distance: '17.79',
+            elevation: '644',
+            coffee: 'Bar Uriarte (https://maps.app.goo.gl/ejemplo)',
+            meeting: 'Merendero-Undakorta (https://maps.app.goo.gl/TESfLoWCVXUwg58b6)',
+            weatherIcon: '⛅ 🌧️',
+            weatherTemp: '13',
+            wikiloc: 'https://es.wikiloc.com/rutas-senderismo/ruta-de-los-dolmenes-de-oiz-iturzurigana-zengotitagana-oiz-astokurzeteburu-ipinarrieta-65984900',
+            image: 'https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=600&q=80',
+            description: 'Magnífica ruta por los dólmenes de Oiz.',
+            participants: []
+        };
 
+        let routes = [rutaInicial];
         let clubGallery = [];
         let isAdminLoggedIn = localStorage.getItem('admin_logged') === 'true';
         let isMobileViewForced = false;
@@ -1014,13 +1013,16 @@
             const targetRouteId = urlParams.get('route');
 
             if (useCloud) {
-                // Sincronización en tiempo real de rutas desde Firestore
+                // Escuchar rutas en tiempo real desde Firestore
                 db.collection("routes").onSnapshot((snapshot) => {
                     if (!snapshot.empty) {
                         routes = [];
                         snapshot.forEach((doc) => {
                             routes.push({ id: doc.id, ...doc.data() });
                         });
+                    } else {
+                        // Si la colección está vacía en Firebase, subimos la ruta inicial
+                        db.collection("routes").doc("route-1").set(rutaInicial);
                     }
                     renderAll();
                     renderCalendar();
@@ -1030,7 +1032,7 @@
                     cargarDesdeLocalStorage();
                 });
 
-                // Sincronización en tiempo real de fotos desde Firestore
+                // Escuchar fotos de la galería en tiempo real
                 db.collection("gallery").onSnapshot((snapshot) => {
                     clubGallery = [];
                     snapshot.forEach((doc) => {
@@ -1546,10 +1548,15 @@
             };
 
             if (useCloud) {
+                // Obtenemos la ruta actual local para asegurar que exista en Firestore
+                const currentRoute = routes.find(r => r.id === routeId) || rutaInicial;
                 const routeRef = db.collection("routes").doc(routeId);
-                routeRef.update({
+
+                // set con merge: true garantiza que crea el documento si no existía
+                routeRef.set({
+                    ...currentRoute,
                     participants: firebase.firestore.FieldValue.arrayUnion(newParticipant)
-                }).then(() => {
+                }, { merge: true }).then(() => {
                     closeRegisterModal();
                     alert('¡Inscripción enviada correctamente! Ya le aparece al organizador.');
                 }).catch(err => {
@@ -1636,7 +1643,7 @@
 
             if (useCloud) {
                 if (editId) {
-                    db.collection("routes").doc(editId).update(routeData);
+                    db.collection("routes").doc(editId).set(routeData, { merge: true });
                 } else {
                     routeData.participants = [];
                     db.collection("routes").add(routeData);
@@ -1826,9 +1833,9 @@
 
         function updateRouteParticipants(routeId, participantsList) {
             if (useCloud) {
-                db.collection("routes").doc(routeId).update({
+                db.collection("routes").doc(routeId).set({
                     participants: participantsList
-                });
+                }, { merge: true });
             } else {
                 const route = routes.find(r => r.id === routeId);
                 if (route) route.participants = participantsList;
