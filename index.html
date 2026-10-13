@@ -11,6 +11,10 @@
     <meta property="og:image" id="meta-og-image" content="https://i.imgur.com/ybDAKiY.jpg">
     <meta property="og:type" content="website">
 
+    <!-- SDKs DE FIREBASE -->
+    <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore-compat.js"></script>
+
     <style>
         :root {
             --primary: #2e7d32; --primary-dark: #1b5e20; --accent: #4caf50;
@@ -465,7 +469,6 @@
             transition: all 0.3s ease;
         }
 
-        /* ESTILO DESTACADO CUANDO SE ABRE UNA RUTA ESPECÍFICA DESDE WHATSAPP */
         .card.highlighted {
             border: 3px solid var(--primary);
             box-shadow: 0 0 20px rgba(46, 125, 50, 0.4);
@@ -560,7 +563,6 @@
             font-size: 0.8rem;
         }
 
-        /* BOTÓN DE WHATSAPP */
         .btn-whatsapp {
             background-color: var(--whatsapp);
             color: white;
@@ -622,7 +624,6 @@
             font-size: 1rem;
         }
 
-        /* ALINEACIÓN PERFECTA DE SEGUROS */
         .checkbox-label {
             display: flex;
             align-items: center;
@@ -639,7 +640,6 @@
             margin: 0;
         }
 
-        /* SELECTOR MÚLTIPLE DE TIEMPO */
         .weather-selector { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.5rem; }
         .weather-option { font-size: 1.5rem; padding: 0.3rem 0.6rem; border: 2px solid var(--border-color); border-radius: 6px; background: white; cursor: pointer; transition: all 0.2s; }
         .weather-option.selected { border-color: var(--primary); background: #e8f5e9; transform: scale(1.1); }
@@ -719,7 +719,7 @@
         <button class="view-switcher" id="view-switch-btn" onclick="toggleViewMode()">📱 Cambiar a Móvil</button>
         <h1>Rutas Bizkaia Gayte</h1>
         <p class="friendly-desc">¡Únete a nuestras aventuras!</p>
-        <p class="club-info">Rutas de montaña, amigos y naturaleza en Bizkaia.</p>
+        <p class="club-info">Grupo de Montaña Rutas Bizkaia Gayte.</p>
     </header>
 
     <nav>
@@ -799,10 +799,23 @@
                                 <label for="route-title">Título de la Ruta</label>
                                 <input type="text" id="route-title" placeholder="Ej. Ascensión al Eretza">
                             </div>
+
                             <div class="form-group">
-                                <label for="route-date">Fecha y Hora</label>
-                                <input type="datetime-local" id="route-date">
+                                <label for="route-date">Fecha de la Ruta</label>
+                                <input type="date" id="route-date">
                             </div>
+
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                                <div class="form-group">
+                                    <label for="route-coffee-time">Hora del Café Previsto</label>
+                                    <input type="time" id="route-coffee-time">
+                                </div>
+                                <div class="form-group">
+                                    <label for="route-start-time">Hora de Inicio Ruta</label>
+                                    <input type="time" id="route-start-time">
+                                </div>
+                            </div>
+
                             <div class="form-group">
                                 <label for="route-difficulty">Dificultad</label>
                                 <select id="route-difficulty">
@@ -823,12 +836,12 @@
                             </div>
 
                             <div class="form-group">
-                                <label for="route-coffee">Café previo (Enlace o lugar Maps)</label>
+                                <label for="route-coffee">Lugar del Café (Texto o Enlace Maps)</label>
                                 <input type="text" id="route-coffee" placeholder="Ej. Bar X o enlace de Google Maps">
                             </div>
 
                             <div class="form-group">
-                                <label for="route-meeting">Punto de Encuentro (Inicio de Ruta)</label>
+                                <label for="route-meeting">Punto de Encuentro de la Ruta (Texto o Enlace Maps)</label>
                                 <input type="text" id="route-meeting" placeholder="Ej. Merendero-Undakorta o enlace Maps">
                             </div>
 
@@ -960,11 +973,34 @@
     </div>
 
     <script>
-        let routes = JSON.parse(localStorage.getItem('club_routes')) || [
+        // CONFIGURACIÓN DE TU BASE DE DATOS FIREBASE (CLAVES REALES INTEGRADAS)
+        const firebaseConfig = {
+            apiKey: "AIzaSyBuJra3nB8HXUWgmVThNMACZg5zbCcwYJU",
+            authDomain: "bizkaiagayte.firebaseapp.com",
+            projectId: "bizkaiagayte",
+            storageBucket: "bizkaiagayte.firebasestorage.app",
+            messagingSenderId: "545009488497",
+            appId: "1:545009488497:web:bb056a35556beba72541d0"
+        };
+
+        let db = null;
+        let useCloud = false;
+
+        try {
+            firebase.initializeApp(firebaseConfig);
+            db = firebase.firestore();
+            useCloud = true;
+        } catch (err) {
+            console.warn("Error iniciando Firebase, usando modo local:", err);
+        }
+
+        let routes = [
             {
                 id: 'route-1',
                 title: 'Ruta de los Dólmenes de Oiz',
-                date: '2026-10-17T10:00',
+                date: '2026-10-17',
+                coffeeTime: '09:15',
+                startTime: '10:00',
                 difficulty: 'Media',
                 distance: '17.79',
                 elevation: '644',
@@ -979,8 +1015,7 @@
             }
         ];
 
-        let clubGallery = JSON.parse(localStorage.getItem('club_gallery')) || [];
-
+        let clubGallery = [];
         let isAdminLoggedIn = localStorage.getItem('admin_logged') === 'true';
         let isMobileViewForced = false;
         let currentCalendarDate = new Date();
@@ -989,22 +1024,39 @@
             const urlParams = new URLSearchParams(window.location.search);
             const targetRouteId = urlParams.get('route');
 
-            if (targetRouteId) {
-                const targetRoute = routes.find(r => r.id === targetRouteId);
-                if (targetRoute) {
-                    document.getElementById('meta-title').innerText = `${targetRoute.title} - Rutas Bizkaia Gayte`;
-                    document.getElementById('meta-og-title').setAttribute('content', targetRoute.title);
-                    document.getElementById('meta-og-desc').setAttribute('content', `Fecha: ${formatDate(targetRoute.date)} | Encuentro: ${targetRoute.meeting} | ¡Entra para apuntarte!`);
-                    if (targetRoute.image) {
-                        document.getElementById('meta-og-image').setAttribute('content', targetRoute.image);
+            if (useCloud) {
+                // Escuchar rutas en tiempo real desde Firestore
+                db.collection("routes").onSnapshot((snapshot) => {
+                    if (!snapshot.empty) {
+                        routes = [];
+                        snapshot.forEach((doc) => {
+                            routes.push({ id: doc.id, ...doc.data() });
+                        });
                     }
-                }
-            }
+                    renderAll();
+                    renderCalendar();
+                    updateRouteSelectOptions();
+                });
 
-            renderAll();
-            renderCalendar();
-            renderGallery();
-            updateRouteSelectOptions();
+                // Escuchar fotos de la galería en tiempo real
+                db.collection("gallery").onSnapshot((snapshot) => {
+                    clubGallery = [];
+                    snapshot.forEach((doc) => {
+                        clubGallery.push({ id: doc.id, ...doc.data() });
+                    });
+                    renderGallery();
+                });
+            } else {
+                const localRoutes = localStorage.getItem('club_routes');
+                if (localRoutes) routes = JSON.parse(localRoutes);
+                const localGal = localStorage.getItem('club_gallery');
+                if (localGal) clubGallery = JSON.parse(localGal);
+
+                renderAll();
+                renderCalendar();
+                renderGallery();
+                updateRouteSelectOptions();
+            }
 
             if (isAdminLoggedIn) {
                 showAdminPanelContent();
@@ -1017,7 +1069,7 @@
                         cardElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
                         cardElement.classList.add('highlighted');
                     }
-                }, 300);
+                }, 500);
             }
         });
 
@@ -1032,14 +1084,6 @@
                 body.classList.remove('force-mobile');
                 btn.innerHTML = '📱 Cambiar a Móvil';
             }
-        }
-
-        function saveData() {
-            localStorage.setItem('club_routes', JSON.stringify(routes));
-            localStorage.setItem('club_gallery', JSON.stringify(clubGallery));
-            renderCalendar();
-            renderGallery();
-            updateRouteSelectOptions();
         }
 
         function switchTab(tabId) {
@@ -1085,6 +1129,19 @@
             });
         }
 
+        function parseRouteDate(dateStr) {
+            if (!dateStr) return new Date();
+            if (dateStr.includes('T')) {
+                return new Date(dateStr);
+            } else {
+                const parts = dateStr.split('-');
+                if (parts.length === 3) {
+                    return new Date(parts[0], parts[1] - 1, parts[2]);
+                }
+                return new Date(dateStr);
+            }
+        }
+
         function formatDistance(dist) {
             if (!dist) return '';
             let d = dist.replace(/km/i, '').trim().replace('.', ',');
@@ -1120,8 +1177,7 @@
             return fieldValue;
         }
 
-        /* COMPARTIR EN WHATSAPP CON CAFÉ PREVIO */
-        function shareOnWhatsApp(routeId, title, dateStr, coffee, meeting, distance, elevation, weather, wikiloc) {
+        function shareOnWhatsApp(routeId, title, dateStr, coffeeTime, startTime, coffee, meeting, distance, elevation, weather, wikiloc) {
             let baseUrl = window.location.href.split('?')[0];
             let routeUrl = `${baseUrl}?route=${routeId}`;
 
@@ -1145,11 +1201,17 @@
                 if (meetingText.endsWith('(-') || meetingText.endsWith('(')) meetingText = meetingText.slice(0, -1).trim();
             }
 
+            let dateFormatted = '';
+            if (dateStr) {
+                let d = parseRouteDate(dateStr);
+                dateFormatted = d.toLocaleDateString('es-ES', { year:'numeric', month:'long', day:'numeric' });
+            }
+
             let text = `🌐 *Entra aquí para ver detalles y apuntarte:* ${routeUrl}\n\n` +
-                       `⛰️ *${title}* - Club Bizkaia Gayte 🏳️‍🌈\n\n` +
-                       `📅 *Fecha:* ${formatDate(dateStr)}\n` +
-                       (coffee ? `☕ *Café previo:* ${coffeeText ? coffeeText + ' ' : ''}${coffeeLink ? coffeeLink : ''}\n` : '') +
-                       `📍 *Encuentro:* ${meetingText ? meetingText + ' ' : ''}${mapsLink ? mapsLink : ''}\n` +
+                       `⛰️ *${title}* - Grupo de Montaña Rutas Bizkaia Gayte 🏳️‍🌈\n\n` +
+                       `📅 *Fecha:* ${dateFormatted}\n` +
+                       (coffee ? `☕ *Café previo (${coffeeTime || 'Por confirmar'}):* ${coffeeText ? coffeeText + ' ' : ''}${coffeeLink ? coffeeLink : ''}\n` : '') +
+                       `📍 *Inicio de ruta (${startTime || 'Por confirmar'}):* ${meetingText ? meetingText + ' ' : ''}${mapsLink ? mapsLink : ''}\n` +
                        (distance ? `📏 *Distancia:* ${formatDistance(distance)}\n` : '') +
                        (elevation ? `📈 *Desnivel:* ${formatElevation(elevation)}\n` : '') +
                        (weather ? `🌤️ *Tiempo:* ${weather}\n` : '') +
@@ -1160,9 +1222,21 @@
         }
 
         function renderAll() {
-            const now = new Date();
-            const scheduled = routes.filter(r => new Date(r.date) >= now);
-            const completed = routes.filter(r => new Date(r.date) < now);
+            const today = new Date();
+            const now = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+            
+            const scheduled = routes.filter(r => {
+                if(!r.date) return false;
+                let d = parseRouteDate(r.date);
+                d.setHours(0,0,0,0);
+                return d >= now;
+            });
+            const completed = routes.filter(r => {
+                if(!r.date) return false;
+                let d = parseRouteDate(r.date);
+                d.setHours(0,0,0,0);
+                return d < now;
+            });
 
             renderScheduledRoutes(scheduled);
             renderCompletedRoutes(completed);
@@ -1198,16 +1272,23 @@
 
             const firstDayIndex = (new Date(year, month, 1).getDay() + 6) % 7;
             const totalDays = new Date(year, month + 1, 0).getDate();
-            const now = new Date();
+            const today = new Date();
+            const now = new Date(today.getFullYear(), today.getMonth(), today.getDate());
 
             const routeMap = {};
             routes.forEach(r => {
-                const rDate = new Date(r.date);
-                const dateKey = `${rDate.getFullYear()}-${String(rDate.getMonth() + 1).padStart(2, '0')}-${String(rDate.getDate()).padStart(2, '0')}`;
+                if(!r.date) return;
+                const rDate = parseRouteDate(r.date);
+                const ry = rDate.getFullYear();
+                const rm = rDate.getMonth() + 1;
+                const rd = rDate.getDate();
+                const dateKey = `${ry}-${String(rm).padStart(2, '0')}-${String(rd).padStart(2, '0')}`;
+                
+                const checkDate = new Date(ry, rm - 1, rd);
                 routeMap[dateKey] = {
                     id: r.id,
                     title: r.title,
-                    isPast: rDate < now
+                    isPast: checkDate < now
                 };
             });
 
@@ -1289,22 +1370,35 @@
                 return;
             }
 
-            clubGallery.push({
-                id: 'photo_' + Date.now(),
+            const newPhoto = {
                 title,
                 routeId,
-                url
-            });
+                url,
+                createdAt: Date.now()
+            };
+
+            if (useCloud) {
+                db.collection("gallery").add(newPhoto);
+            } else {
+                newPhoto.id = 'photo_' + Date.now();
+                clubGallery.push(newPhoto);
+                localStorage.setItem('club_gallery', JSON.stringify(clubGallery));
+                renderGallery();
+            }
 
             document.getElementById('gallery-photo-title').value = '';
             document.getElementById('gallery-photo-url').value = '';
-            saveData();
         }
 
         function deleteGalleryPhoto(id) {
             if (confirm('¿Eliminar esta foto de la galería?')) {
-                clubGallery = clubGallery.filter(p => p.id !== id);
-                saveData();
+                if (useCloud) {
+                    db.collection("gallery").doc(id).delete();
+                } else {
+                    clubGallery = clubGallery.filter(p => p.id !== id);
+                    localStorage.setItem('club_gallery', JSON.stringify(clubGallery));
+                    renderGallery();
+                }
             }
         }
 
@@ -1315,8 +1409,10 @@
         }
 
         function formatDate(dateString) {
-            const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
-            return new Date(dateString).toLocaleDateString('es-ES', options);
+            if(!dateString) return '';
+            let d = parseRouteDate(dateString);
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            return d.toLocaleDateString('es-ES', options);
         }
 
         function renderScheduledRoutes(list) {
@@ -1336,6 +1432,13 @@
                 if (icons || tempFormatted) {
                     weatherDisplay = `${icons} ${tempFormatted}`.trim();
                 }
+                
+                let oldTime = '';
+                if(route.date && route.date.includes('T')) {
+                    oldTime = route.date.split('T')[1];
+                }
+
+                let participantsList = route.participants || [];
 
                 return `
                     <div class="card" id="card-${route.id}">
@@ -1346,27 +1449,27 @@
                                 <span class="badge ${getBadgeClass(route.difficulty)}">${route.difficulty}</span>
                             </div>
                             <div class="card-info">
-                                <p><strong>Fecha:</strong> ${formatDate(route.date)}</p>
-                                ${route.distance ? `<span><strong>Distancia:</strong> ${formatDistance(route.distance)} </span>` : ''}
-                                ${route.elevation ? `<span> | <strong>Desnivel:</strong> ${formatElevation(route.elevation)}</span>` : ''}
-                                ${coffeeHtml ? `<p style="margin-top: 0.3rem;"><strong>Café previo:</strong> ${coffeeHtml}</p>` : ''}
-                                <p style="margin-top: 0.3rem;"><strong>Encuentro:</strong> ${meetingHtml}</p>
-                                ${weatherDisplay ? `<p><strong>Tiempo previsto:</strong> ${weatherDisplay}</p>` : ''}
-                                <p><strong>Descripción:</strong> ${route.description}</p>
-                                ${route.wikiloc ? `<p><strong>Wikiloc:</strong> <a href="${route.wikiloc}" target="_blank" style="color: var(--primary);">Ver track oficial</a></p>` : ''}
+                                <p><strong>📅 Fecha:</strong> ${formatDate(route.date)}</p>
+                                ${route.distance ? `<span><strong>📏 Distancia:</strong> ${formatDistance(route.distance)} </span>` : ''}
+                                ${route.elevation ? `<span> | <strong>📈 Desnivel:</strong> ${formatElevation(route.elevation)}</span>` : ''}
+                                ${route.coffee ? `<p style="margin-top: 0.3rem;"><strong>☕ Café previo (${route.coffeeTime \vert{}\vert{} '??:??'}):</strong>${coffeeHtml}</p>` : ''}
+                                <p style="margin-top: 0.3rem;"><strong>🥾 Inicio de ruta (${route.startTime || oldTime || '??:??'}):</strong> ${meetingHtml}</p>
+                                ${weatherDisplay ? `<p><strong>🌤️ Tiempo previsto:</strong> ${weatherDisplay}</p>` : ''}
+                                <p style="margin-top: 0.5rem;"><strong>Descripción:</strong> ${route.description}</p>
+                                ${route.wikiloc ? `<p style="margin-top: 0.5rem;"><strong>🔗 Wikiloc:</strong> <a href="${route.wikiloc}" target="_blank" style="color: var(--primary);">Ver track oficial</a></p>` : ''}
                             </div>
                         </div>
 
                         <div>
                             <button class="btn" style="width: 100%; margin-bottom: 0.5rem;" onclick="openRegisterModal('${route.id}')">Inscribirse</button>
-                            <button class="btn btn-whatsapp" onclick="shareOnWhatsApp('${route.id}', '${route.title.replace(/'/g, "\\'")}', '${route.date}', '${(route.coffee || '').replace(/'/g, "\\'")}', '${route.meeting.replace(/'/g, "\\'")}', '${route.distance || ''}', '${route.elevation || ''}', '${weatherDisplay.replace(/'/g, "\\'")}', '${route.wikiloc || ''}')">
+                            <button class="btn btn-whatsapp" onclick="shareOnWhatsApp('${route.id}', '${route.title.replace(/'/g, "\\'")}', '${route.date}', '${route.coffeeTime || ''}', '${route.startTime || oldTime || ''}', '${(route.coffee || '').replace(/'/g, "\\'")}', '${route.meeting.replace(/'/g, "\\'")}', '${route.distance || ''}', '${route.elevation || ''}', '${weatherDisplay.replace(/'/g, "\\'")}', '${route.wikiloc || ''}')">
                                 💬 Compartir por WhatsApp
                             </button>
                             
                             <div class="participants-section">
-                                <h4>Asistentes inscritos (${route.participants.length})</h4>
-                                ${route.participants.length === 0 ? '<p style="font-size: 0.85rem; color: var(--text-light);">Aún sin inscripciones.</p>' : 
-                                    route.participants.map(p => {
+                                <h4>Asistentes inscritos (${participantsList.length})</h4>
+                                ${participantsList.length === 0 ? '<p style="font-size: 0.85rem; color: var(--text-light);">Aún sin inscripciones.</p>' : 
+                                    participantsList.map(p => {
                                         let statusClass = p.status === 'confirmed' ? 'confirmed' : (p.status === 'pending' ? 'pending' : 'denied');
                                         let statusText = p.status === 'confirmed' ? 'Plaza Confirmada' : (p.status === 'pending' ? 'Pendiente' : 'Denegada');
                                         
@@ -1405,6 +1508,13 @@
                     weatherDisplay = `${icons} ${tempFormatted}`.trim();
                 }
 
+                let oldTime = '';
+                if(route.date && route.date.includes('T')) {
+                    oldTime = route.date.split('T')[1];
+                }
+
+                let participantsList = route.participants || [];
+
                 return `
                     <div class="card" id="card-${route.id}" style="border-top-color: #78909c;">
                         <div>
@@ -1414,26 +1524,26 @@
                                 <span class="badge" style="background-color: #eceff1; color: #455a64;">Realizada</span>
                             </div>
                             <div class="card-info">
-                                <p><strong>Fecha:</strong> ${formatDate(route.date)}</p>
-                                ${route.distance ? `<span><strong>Distancia:</strong> ${formatDistance(route.distance)} </span>` : ''}
-                                ${route.elevation ? `<span> | <strong>Desnivel:</strong> ${formatElevation(route.elevation)}</span>` : ''}
-                                ${coffeeHtml ? `<p style="margin-top: 0.3rem;"><strong>Café previo:</strong> ${coffeeHtml}</p>` : ''}
-                                <p style="margin-top: 0.3rem;"><strong>Encuentro:</strong> ${meetingHtml}</p>
-                                ${weatherDisplay ? `<p><strong>Tiempo que hizo:</strong> ${weatherDisplay}</p>` : ''}
-                                <p><strong>Descripción:</strong> ${route.description}</p>
-                                ${route.wikiloc ? `<p><strong>Wikiloc:</strong> <a href="${route.wikiloc}" target="_blank" style="color: var(--primary);">Ver track completado</a></p>` : ''}
+                                <p><strong>📅 Fecha:</strong> ${formatDate(route.date)}</p>
+                                ${route.distance ? `<span><strong>📏 Distancia:</strong> ${formatDistance(route.distance)} </span>` : ''}
+                                ${route.elevation ? `<span> | <strong>📈 Desnivel:</strong> ${formatElevation(route.elevation)}</span>` : ''}
+                                ${route.coffee ? `<p style="margin-top: 0.3rem;"><strong>☕ Café previo (${route.coffeeTime \vert{}\vert{} '??:??'}):</strong>${coffeeHtml}</p>` : ''}
+                                <p style="margin-top: 0.3rem;"><strong>🥾 Inicio de ruta (${route.startTime || oldTime || '??:??'}):</strong> ${meetingHtml}</p>
+                                ${weatherDisplay ? `<p><strong>🌤️ Tiempo que hizo:</strong> ${weatherDisplay}</p>` : ''}
+                                <p style="margin-top: 0.5rem;"><strong>Descripción:</strong> ${route.description}</p>
+                                ${route.wikiloc ? `<p style="margin-top: 0.5rem;"><strong>🔗 Wikiloc:</strong> <a href="${route.wikiloc}" target="_blank" style="color: var(--primary);">Ver track completado</a></p>` : ''}
                             </div>
                         </div>
 
                         <div>
-                            <button class="btn btn-whatsapp" style="margin-bottom: 0.5rem;" onclick="shareOnWhatsApp('${route.id}', '${route.title.replace(/'/g, "\\'")}', '${route.date}', '${(route.coffee || '').replace(/'/g, "\\'")}', '${route.meeting.replace(/'/g, "\\'")}', '${route.distance || ''}', '${route.elevation || ''}', '${weatherDisplay.replace(/'/g, "\\'")}', '${route.wikiloc || ''}')">
+                            <button class="btn btn-whatsapp" style="margin-bottom: 0.5rem;" onclick="shareOnWhatsApp('${route.id}', '${route.title.replace(/'/g, "\\'")}', '${route.date}', '${route.coffeeTime || ''}', '${route.startTime || oldTime || ''}', '${(route.coffee || '').replace(/'/g, "\\'")}', '${route.meeting.replace(/'/g, "\\'")}', '${route.distance || ''}', '${route.elevation || ''}', '${weatherDisplay.replace(/'/g, "\\'")}', '${route.wikiloc || ''}')">
                                 💬 Compartir por WhatsApp
                             </button>
 
                             <div class="participants-section">
-                                <h4>Asistentes (${route.participants.filter(p => p.status === 'confirmed').length} confirmados)</h4>
-                                ${route.participants.length === 0 ? '<p style="font-size: 0.85rem; color: var(--text-light);">Sin registros.</p>' : 
-                                    route.participants.map(p => {
+                                <h4>Asistentes (${participantsList.filter(p => p.status === 'confirmed').length} confirmados)</h4>
+                                ${participantsList.length === 0 ? '<p style="font-size: 0.85rem; color: var(--text-light);">Sin registros.</p>' : 
+                                    participantsList.map(p => {
                                         let statusClass = p.status === 'confirmed' ? 'confirmed' : 'denied';
                                         let statusText = p.status === 'confirmed' ? 'Plaza Confirmada (Asistió)' : 'Denegada / No asistió';
                                         
@@ -1478,19 +1588,32 @@
                 return;
             }
 
-            const route = routes.find(r => r.id === routeId);
-            if (route) {
-                route.participants.push({
-                    id: 'p_' + Date.now(),
-                    name,
-                    email,
-                    status: 'pending',
-                    insurance
+            const newParticipant = {
+                id: 'p_' + Date.now(),
+                name,
+                email,
+                status: 'pending',
+                insurance
+            };
+
+            if (useCloud) {
+                const routeRef = db.collection("routes").doc(routeId);
+                routeRef.update({
+                    participants: firebase.firestore.FieldValue.arrayUnion(newParticipant)
+                }).then(() => {
+                    closeRegisterModal();
+                    alert('¡Inscripción enviada correctamente! Ya le aparece al organizador.');
                 });
-                saveData();
-                renderAll();
-                closeRegisterModal();
-                alert('¡Inscripción enviada correctamente! Queda pendiente de confirmación.');
+            } else {
+                const route = routes.find(r => r.id === routeId);
+                if (route) {
+                    if (!route.participants) route.participants = [];
+                    route.participants.push(newParticipant);
+                    localStorage.setItem('club_routes', JSON.stringify(routes));
+                    renderAll();
+                    closeRegisterModal();
+                    alert('¡Inscripción enviada correctamente!');
+                }
             }
         }
 
@@ -1529,6 +1652,8 @@
             const editId = document.getElementById('edit-route-id').value;
             const title = document.getElementById('route-title').value.trim();
             const date = document.getElementById('route-date').value;
+            const coffeeTime = document.getElementById('route-coffee-time').value;
+            const startTime = document.getElementById('route-start-time').value;
             const difficulty = document.getElementById('route-difficulty').value;
             const distance = document.getElementById('route-distance').value.trim();
             const elevation = document.getElementById('route-elevation').value.trim();
@@ -1545,45 +1670,44 @@
                 return;
             }
 
-            if (editId) {
-                const route = routes.find(r => r.id === editId);
-                if (route) {
-                    route.title = title;
-                    route.date = date;
-                    route.difficulty = difficulty;
-                    route.distance = distance;
-                    route.elevation = elevation;
-                    route.coffee = coffee;
-                    route.meeting = meeting;
-                    route.weatherIcon = weatherIcon;
-                    route.weatherTemp = weatherTemp;
-                    route.wikiloc = wikiloc;
-                    route.image = image;
-                    route.description = description;
+            const routeData = {
+                title,
+                date,
+                coffeeTime,
+                startTime,
+                difficulty,
+                distance,
+                elevation,
+                coffee,
+                meeting,
+                weatherIcon,
+                weatherTemp,
+                wikiloc,
+                image,
+                description
+            };
+
+            if (useCloud) {
+                if (editId) {
+                    db.collection("routes").doc(editId).update(routeData);
+                } else {
+                    routeData.participants = [];
+                    db.collection("routes").add(routeData);
                 }
             } else {
-                const newRoute = {
-                    id: 'route_' + Date.now(),
-                    title,
-                    date,
-                    difficulty,
-                    distance,
-                    elevation,
-                    coffee,
-                    meeting,
-                    weatherIcon,
-                    weatherTemp,
-                    wikiloc,
-                    image,
-                    description,
-                    participants: []
-                };
-                routes.push(newRoute);
+                if (editId) {
+                    const route = routes.find(r => r.id === editId);
+                    if (route) Object.assign(route, routeData);
+                } else {
+                    routeData.id = 'route_' + Date.now();
+                    routeData.participants = [];
+                    routes.push(routeData);
+                }
+                localStorage.setItem('club_routes', JSON.stringify(routes));
+                renderAll();
             }
 
-            saveData();
             resetRouteForm();
-            renderAll();
             document.getElementById('route-form-alert').innerHTML = `<div class="alert alert-success">Ruta guardada con éxito.</div>`;
         }
 
@@ -1591,6 +1715,8 @@
             document.getElementById('edit-route-id').value = '';
             document.getElementById('route-title').value = '';
             document.getElementById('route-date').value = '';
+            document.getElementById('route-coffee-time').value = '';
+            document.getElementById('route-start-time').value = '';
             document.getElementById('route-difficulty').value = 'Fácil';
             document.getElementById('route-distance').value = '';
             document.getElementById('route-elevation').value = '';
@@ -1612,7 +1738,19 @@
             if (route) {
                 document.getElementById('edit-route-id').value = route.id;
                 document.getElementById('route-title').value = route.title;
-                document.getElementById('route-date').value = route.date;
+                
+                let dVal = route.date || '';
+                if (dVal.includes('T')) dVal = dVal.split('T')[0];
+                document.getElementById('route-date').value = dVal;
+
+                document.getElementById('route-coffee-time').value = route.coffeeTime || '';
+                
+                if (route.date && route.date.includes('T') && !route.startTime) {
+                    document.getElementById('route-start-time').value = route.date.split('T')[1];
+                } else {
+                    document.getElementById('route-start-time').value = route.startTime || '';
+                }
+
                 document.getElementById('route-difficulty').value = route.difficulty;
                 document.getElementById('route-distance').value = route.distance || '';
                 document.getElementById('route-elevation').value = route.elevation || '';
@@ -1633,9 +1771,13 @@
 
         function deleteRoute(id) {
             if (confirm('¿Eliminar esta ruta?')) {
-                routes = routes.filter(r => r.id !== id);
-                saveData();
-                renderAll();
+                if (useCloud) {
+                    db.collection("routes").doc(id).delete();
+                } else {
+                    routes = routes.filter(r => r.id !== id);
+                    localStorage.setItem('club_routes', JSON.stringify(routes));
+                    renderAll();
+                }
             }
         }
 
@@ -1646,10 +1788,19 @@
                 return;
             }
 
-            const now = new Date();
+            const today = new Date();
+            const now = new Date(today.getFullYear(), today.getMonth(), today.getDate());
 
             container.innerHTML = routes.map(route => {
-                let isPast = new Date(route.date) < now;
+                let isPast = false;
+                if(route.date) {
+                    let rDate = parseRouteDate(route.date);
+                    rDate.setHours(0,0,0,0);
+                    isPast = rDate < now;
+                }
+                
+                let participantsList = route.participants || [];
+
                 return `
                     <div class="card" style="border-top-color: ${isPast ? '#78909c' : 'var(--primary)'};">
                         <div>
@@ -1674,9 +1825,9 @@
                             </div>
 
                             <div class="participants-section">
-                                <h4>Gestión de Asistentes (${route.participants.length})</h4>
-                                ${route.participants.length === 0 ? '<p style="font-size: 0.85rem; color: var(--text-light);">Sin participantes.</p>' : 
-                                    route.participants.map(p => {
+                                <h4>Gestión de Asistentes (${participantsList.length})</h4>
+                                ${participantsList.length === 0 ? '<p style="font-size: 0.85rem; color: var(--text-light);">Sin participantes.</p>' : 
+                                    participantsList.map(p => {
                                         let statusClass = p.status === 'confirmed' ? 'confirmed' : (p.status === 'pending' ? 'pending' : 'denied');
                                         let insuranceBadge = p.insurance ? 
                                             `<span class="badge badge-insurance-yes">Seguro SÍ</span>` : 
@@ -1718,11 +1869,10 @@
         function changeParticipantStatus(routeId, participantId, newStatus) {
             const route = routes.find(r => r.id === routeId);
             if (route) {
-                const part = route.participants.find(p => p.id === participantId);
+                const part = (route.participants || []).find(p => p.id === participantId);
                 if (part) {
                     part.status = newStatus;
-                    saveData();
-                    renderAll();
+                    updateRouteParticipants(routeId, route.participants);
                 }
             }
         }
@@ -1730,11 +1880,10 @@
         function toggleParticipantInsurance(routeId, participantId, hasInsurance) {
             const route = routes.find(r => r.id === routeId);
             if (route) {
-                const part = route.participants.find(p => p.id === participantId);
+                const part = (route.participants || []).find(p => p.id === participantId);
                 if (part) {
                     part.insurance = hasInsurance;
-                    saveData();
-                    renderAll();
+                    updateRouteParticipants(routeId, route.participants);
                 }
             }
         }
@@ -1743,10 +1892,22 @@
             if (confirm('¿Eliminar asistente?')) {
                 const route = routes.find(r => r.id === routeId);
                 if (route) {
-                    route.participants = route.participants.filter(p => p.id !== participantId);
-                    saveData();
-                    renderAll();
+                    const updatedList = (route.participants || []).filter(p => p.id !== participantId);
+                    updateRouteParticipants(routeId, updatedList);
                 }
+            }
+        }
+
+        function updateRouteParticipants(routeId, participantsList) {
+            if (useCloud) {
+                db.collection("routes").doc(routeId).update({
+                    participants: participantsList
+                });
+            } else {
+                const route = routes.find(r => r.id === routeId);
+                if (route) route.participants = participantsList;
+                localStorage.setItem('club_routes', JSON.stringify(routes));
+                renderAll();
             }
         }
 
@@ -1773,17 +1934,18 @@
                 return;
             }
 
+            const newParticipant = {
+                id: 'p_' + Date.now(),
+                name,
+                email: 'admin@gayte.com',
+                status,
+                insurance
+            };
+
             const route = routes.find(r => r.id === routeId);
             if (route) {
-                route.participants.push({
-                    id: 'p_' + Date.now(),
-                    name,
-                    email: 'admin@gayte.com',
-                    status,
-                    insurance
-                });
-                saveData();
-                renderAll();
+                const updatedList = [...(route.participants || []), newParticipant];
+                updateRouteParticipants(routeId, updatedList);
                 closeAdminParticipantModal();
             }
         }
