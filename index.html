@@ -24,7 +24,7 @@
             --whatsapp: #25d366; --whatsapp-dark: #128c7e;
         }
 
-        /* COMIC SANS COMO FUENTE ÚNICA EN TODA LA WEB */
+        /* COMIC SANS POR DEFECTO PARA ORDENADOR */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -183,7 +183,14 @@
             }
         }
 
+        /* TIPOGRAFÍA NATIVA / VERDANA / ARIAL PARA MÓVIL */
         @media (max-width: 900px) {
+            * {
+                font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Verdana, Arial, sans-serif !important;
+            }
+            header h1 {
+                font-size: 2.6rem;
+            }
             .app-layout {
                 grid-template-columns: 1fr;
             }
@@ -708,6 +715,10 @@
             box-shadow: 0 0 20px rgba(0,0,0,0.1);
         }
 
+        body.force-mobile, body.force-mobile * {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Verdana, Arial, sans-serif !important;
+        }
+
         body.force-mobile .app-layout {
             grid-template-columns: 1fr !important;
         }
@@ -922,8 +933,8 @@
                 <input type="text" id="participant-name" placeholder="Tu nombre completo">
             </div>
             <div class="form-group">
-                <label for="participant-email">Correo Electrónico</label>
-                <input type="email" id="participant-email" placeholder="correo@ejemplo.com">
+                <label for="participant-phone">Teléfono / WhatsApp</label>
+                <input type="tel" id="participant-phone" placeholder="Ej. 612345678">
             </div>
             <div class="form-group">
                 <label class="checkbox-label">
@@ -945,6 +956,10 @@
             <div class="form-group">
                 <label for="admin-part-name">Nombre y Apellidos</label>
                 <input type="text" id="admin-part-name" placeholder="Nombre completo">
+            </div>
+            <div class="form-group">
+                <label for="admin-part-phone">Teléfono / WhatsApp</label>
+                <input type="tel" id="admin-part-phone" placeholder="Ej. 612345678">
             </div>
             <div class="form-group">
                 <label for="admin-part-status">Estado de Plaza</label>
@@ -1164,7 +1179,7 @@
             return fieldValue;
         }
 
-        /* COMPARTIR EN WHATSAPP CON GRUPO DE MONTAÑA RUTAS BIZKAIA GAYTE */
+        /* COMPARTIR EN WHATSAPP CON FORMATO LIMPIO */
         function shareOnWhatsApp(routeId, title, dateStr, coffee, meeting, distance, elevation, weather, wikiloc) {
             let baseUrl = window.location.href.split('?')[0];
             let routeUrl = `${baseUrl}?route=${routeId}`;
@@ -1190,7 +1205,7 @@
             }
 
             let text = `🌐 *Entra aquí para ver detalles y apuntarte:* ${routeUrl}\n\n` +
-                       `⛰️ *${title}* - Club Bizkaia Gayte 🏳️‍🌈\n\n` +
+                       `⛰️ *${title}* - Rutas Bizkaia Gayte 🏳️‍🌈\n\n` +
                        `📅 *Fecha:* ${formatDate(dateStr)}\n` +
                        (coffee ? `☕ *Café previo:* ${coffeeText ? coffeeText + ' ' : ''}${coffeeLink ? coffeeLink : ''}\n` : '') +
                        `📍 *Encuentro:* ${meetingText ? meetingText + ' ' : ''}${mapsLink ? mapsLink : ''}\n` +
@@ -1518,7 +1533,7 @@
         function openRegisterModal(routeId) {
             document.getElementById('register-route-id').value = routeId;
             document.getElementById('participant-name').value = '';
-            document.getElementById('participant-email').value = '';
+            document.getElementById('participant-phone').value = '';
             document.getElementById('participant-insurance').checked = false;
             document.getElementById('modal-alert').innerHTML = '';
             document.getElementById('register-modal').classList.add('open');
@@ -1531,18 +1546,18 @@
         function submitRegistration() {
             const routeId = document.getElementById('register-route-id').value;
             const name = document.getElementById('participant-name').value.trim();
-            const email = document.getElementById('participant-email').value.trim();
+            const phone = document.getElementById('participant-phone').value.trim();
             const insurance = document.getElementById('participant-insurance').checked;
 
-            if (!name || !email) {
-                document.getElementById('modal-alert').innerHTML = `<div class="alert alert-error">Introduce nombre y correo.</div>`;
+            if (!name || !phone) {
+                document.getElementById('modal-alert').innerHTML = `<div class="alert alert-error">Introduce tu nombre y tu teléfono/WhatsApp.</div>`;
                 return;
             }
 
             const newParticipant = {
                 id: 'p_' + Date.now(),
                 name,
-                email,
+                phone,
                 status: 'pending',
                 insurance
             };
@@ -1764,12 +1779,20 @@
                                             `<span class="badge badge-insurance-yes">Seguro SÍ</span>` : 
                                             `<span class="badge badge-insurance-no">Seguro NO</span>`;
                                         
+                                        let cleanPhone = (p.phone || '').replace(/[^0-9]/g, '');
+                                        if (cleanPhone.length === 9) cleanPhone = '34' + cleanPhone;
+                                        let waBtn = cleanPhone ? `<a href="https://wa.me/${cleanPhone}" target="_blank" style="color: var(--whatsapp-dark); text-decoration: none; font-weight: bold; font-size: 0.8rem;">📱 ${p.phone}</a>` : '<span style="color:#888; font-size:0.8rem;">Sin tlf</span>';
+
                                         return `
                                             <div class="participant-item ${statusClass}" style="flex-direction: column; align-items: stretch; gap: 0.4rem; padding: 0.5rem;">
                                                 <div style="display: flex; justify-content: space-between; align-items: center;">
-                                                    <strong>${p.name}</strong>
-                                                    <div>${insuranceBadge}</div>
-                                                    <button class="btn btn-small btn-danger" style="padding: 0.1rem 0.3rem; font-size: 0.75rem;" onclick="removeParticipant('${route.id}', '${p.id}')">X</button>
+                                                    <div>
+                                                        <strong>${p.name}</strong><br>${waBtn}
+                                                    </div>
+                                                    <div style="display: flex; align-items: center; gap: 0.4rem;">
+                                                        ${insuranceBadge}
+                                                        <button class="btn btn-small btn-danger" style="padding: 0.1rem 0.3rem; font-size: 0.75rem;" onclick="removeParticipant('${route.id}', '${p.id}')">X</button>
+                                                    </div>
                                                 </div>
                                                 <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; flex-wrap: wrap; gap: 0.3rem;">
                                                     <div>
@@ -1799,8 +1822,8 @@
 
         function changeParticipantStatus(routeId, participantId, newStatus) {
             const route = routes.find(r => r.id === routeId);
-            if (route) {
-                const part = (route.participants || []).find(p => p.id === participantId);
+            if (route && route.participants) {
+                const part = route.participants.find(p => p.id === participantId);
                 if (part) {
                     part.status = newStatus;
                     updateRouteParticipants(routeId, route.participants);
@@ -1810,8 +1833,8 @@
 
         function toggleParticipantInsurance(routeId, participantId, hasInsurance) {
             const route = routes.find(r => r.id === routeId);
-            if (route) {
-                const part = (route.participants || []).find(p => p.id === participantId);
+            if (route && route.participants) {
+                const part = route.participants.find(p => p.id === participantId);
                 if (part) {
                     part.insurance = hasInsurance;
                     updateRouteParticipants(routeId, route.participants);
@@ -1822,8 +1845,8 @@
         function removeParticipant(routeId, participantId) {
             if (confirm('¿Eliminar asistente?')) {
                 const route = routes.find(r => r.id === routeId);
-                if (route) {
-                    const updatedList = (route.participants || []).filter(p => p.id !== participantId);
+                if (route && route.participants) {
+                    const updatedList = route.participants.filter(p => p.id !== participantId);
                     updateRouteParticipants(routeId, updatedList);
                 }
             }
@@ -1845,6 +1868,7 @@
         function openAdminParticipantModal(routeId) {
             document.getElementById('admin-target-route-id').value = routeId;
             document.getElementById('admin-part-name').value = '';
+            document.getElementById('admin-part-phone').value = '';
             document.getElementById('admin-part-status').value = 'confirmed';
             document.getElementById('admin-part-insurance').checked = false;
             document.getElementById('admin-add-participant-modal').classList.add('open');
@@ -1857,18 +1881,19 @@
         function adminSaveParticipant() {
             const routeId = document.getElementById('admin-target-route-id').value;
             const name = document.getElementById('admin-part-name').value.trim();
+            const phone = document.getElementById('admin-part-phone').value.trim();
             const status = document.getElementById('admin-part-status').value;
             const insurance = document.getElementById('admin-part-insurance').checked;
 
-            if (!name) {
-                alert('Introduce el nombre.');
+            if (!name || !phone) {
+                alert('Introduce el nombre y el teléfono.');
                 return;
             }
 
             const newParticipant = {
                 id: 'p_' + Date.now(),
                 name,
-                email: 'admin@gayte.com',
+                phone,
                 status,
                 insurance
             };
