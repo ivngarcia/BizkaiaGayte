@@ -11,9 +11,10 @@
     <meta property="og:image" id="meta-og-image" content="https://i.imgur.com/ybDAKiY.jpg">
     <meta property="og:type" content="website">
 
-    <!-- SDKs DE FIREBASE (COMPATIBLES) -->
+    <!-- SDKs DE FIREBASE (FIRESTORE Y AUTENTICACIÓN SEGURA) -->
     <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-auth-compat.js"></script>
 
     <style>
         :root {
@@ -789,19 +790,30 @@
                 <!-- SECCIÓN: PANEL DE ADMINISTRACIÓN -->
                 <div id="section-admin" class="section-content">
                     <div id="admin-login-wrapper" class="admin-box">
-                        <h2>Acceso Administrador</h2>
-                        <p style="margin-bottom: 1rem; color: var(--text-light);">Introduce la contraseña para gestionar las rutas y asistentes.</p>
+                        <h2>Acceso Administrador Seguro</h2>
+                        <p style="margin-bottom: 1rem; color: var(--text-light);">Introduce tu correo y contraseña registrados en Firebase.</p>
                         <div id="login-alert"></div>
                         <div class="form-group">
-                            <label for="admin-pass">Contraseña</label>
-                            <input type="password" id="admin-pass" placeholder="Contraseña de admin (admin123)">
+                            <label for="admin-email">Correo Electrónico</label>
+                            <input type="email" id="admin-email" placeholder="tu_correo@gmail.com">
                         </div>
-                        <button class="btn" style="width: 100%;" onclick="loginAdmin()">Entrar</button>
+                        <div class="form-group">
+                            <label for="admin-pass">Contraseña</label>
+                            <input type="password" id="admin-pass" placeholder="••••••••">
+                        </div>
+                        <button class="btn" style="width: 100%; margin-bottom: 0.8rem;" onclick="loginAdmin()">Entrar al Panel</button>
+                        
+                        <div style="text-align: center; margin-top: 0.5rem;">
+                            <a href="javascript:void(0)" onclick="sendPasswordReset()" style="color: var(--primary); font-size: 0.85rem; text-decoration: underline;">¿Olvidaste tu contraseña? Restablécela aquí</a>
+                        </div>
                     </div>
 
                     <div id="admin-panel-content" style="display: none;">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem; flex-wrap: wrap; gap: 0.5rem;">
-                            <h2>Panel de Control</h2>
+                            <div>
+                                <h2>Panel de Control</h2>
+                                <small id="admin-user-display" style="color: var(--text-light);"></small>
+                            </div>
                             <button class="btn btn-secondary btn-small" onclick="logoutAdmin()">Cerrar Sesión</button>
                         </div>
 
@@ -990,11 +1002,13 @@
         };
 
         let db = null;
+        let auth = null;
         let useCloud = false;
 
         try {
             firebase.initializeApp(firebaseConfig);
             db = firebase.firestore();
+            auth = firebase.auth();
             useCloud = true;
         } catch (err) {
             console.warn("Error conectando con Firebase. Usando almacenamiento local:", err);
@@ -1019,7 +1033,6 @@
 
         let routes = [rutaInicial];
         let clubGallery = [];
-        let isAdminLoggedIn = localStorage.getItem('admin_logged') === 'true';
         let isMobileViewForced = false;
         let currentCalendarDate = new Date();
 
@@ -1028,6 +1041,15 @@
             const targetRouteId = urlParams.get('route');
 
             if (useCloud) {
+                // Comprobar estado de sesión con Firebase Auth
+                auth.onAuthStateChanged((user) => {
+                    if (user) {
+                        showAdminPanelContent(user.email);
+                    } else {
+                        hideAdminPanelContent();
+                    }
+                });
+
                 // Sincronización en tiempo real de rutas desde Firestore
                 db.collection("routes").onSnapshot((snapshot) => {
                     if (!snapshot.empty) {
@@ -1036,7 +1058,6 @@
                             routes.push({ id: doc.id, ...doc.data() });
                         });
                     } else {
-                        // Si la colección está vacía en Firebase, subimos la ruta inicial
                         db.collection("routes").doc("route-1").set(rutaInicial);
                     }
                     renderAll();
@@ -1059,10 +1080,6 @@
                 });
             } else {
                 cargarDesdeLocalStorage();
-            }
-
-            if (isAdminLoggedIn) {
-                showAdminPanelContent();
             }
 
             if (targetRouteId) {
@@ -1179,7 +1196,6 @@
             return fieldValue;
         }
 
-        /* COMPARTIR EN WHATSAPP CON FORMATO LIMPIO */
         function shareOnWhatsApp(routeId, title, dateStr, coffee, meeting, distance, elevation, weather, wikiloc) {
             let baseUrl = window.location.href.split('?')[0];
             let routeUrl = `${baseUrl}?route=${routeId}`;
@@ -1225,7 +1241,7 @@
 
             renderScheduledRoutes(scheduled);
             renderCompletedRoutes(completed);
-            if (isAdminLoggedIn) {
+            if (auth && auth.currentUser) {
                 renderAdminRoutesList();
             }
         }
@@ -1323,6 +1339,8 @@
                 return;
             }
 
+            const isAdmin = auth && auth.currentUser;
+
             container.innerHTML = clubGallery.map(photo => {
                 const routeObj = routes.find(r => r.id === photo.routeId);
                 const routeName = routeObj ? routeObj.title : 'Ruta general';
@@ -1332,7 +1350,7 @@
                         <img src="${photo.url}" alt="Foto galería" onerror="this.style.display='none'" onclick="openLightbox('${photo.url}', '${photo.title} (${routeName})')">
                         <span class="gallery-route-tag">📍 ${routeName}</span>
                         <p>${photo.title}</p>
-                        ${isAdminLoggedIn ? `<button class="btn btn-small btn-danger" style="width: 100%; font-size: 0.7rem; padding: 0.2rem;" onclick="deleteGalleryPhoto('${photo.id}')">Eliminar Foto</button>` : ''}
+                        ${isAdmin ? `<button class="btn btn-small btn-danger" style="width: 100%; font-size: 0.7rem; padding: 0.2rem;" onclick="deleteGalleryPhoto('${photo.id}')">Eliminar Foto</button>` : ''}
                     </div>
                 `;
             }).join('');
@@ -1588,35 +1606,75 @@
             }
         }
 
+        /* SISTEMA SEGURO DE AUTENTICACIÓN CON FIREBASE */
         function loginAdmin() {
+            const email = document.getElementById('admin-email').value.trim();
             const pass = document.getElementById('admin-pass').value;
-            if (pass === 'admin123') {
-                isAdminLoggedIn = true;
-                localStorage.setItem('admin_logged', 'true');
-                showAdminPanelContent();
-                renderAdminRoutesList();
-                renderGallery();
+
+            if (!email || !pass) {
+                document.getElementById('login-alert').innerHTML = `<div class="alert alert-error">Introduce correo y contraseña.</div>`;
+                return;
+            }
+
+            if (useCloud && auth) {
+                auth.signInWithEmailAndPassword(email, pass)
+                    .then((userCredential) => {
+                        document.getElementById('login-alert').innerHTML = '';
+                        document.getElementById('admin-pass').value = '';
+                    })
+                    .catch((error) => {
+                        let msg = 'Error de acceso: ' + error.message;
+                        if (error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
+                            msg = 'Correo o contraseña incorrectos.';
+                        }
+                        document.getElementById('login-alert').innerHTML = `<div class="alert alert-error">${msg}</div>`;
+                    });
             } else {
-                document.getElementById('login-alert').innerHTML = `<div class="alert alert-error">Contraseña incorrecta (admin123).</div>`;
+                document.getElementById('login-alert').innerHTML = `<div class="alert alert-error">Firebase Authentication no disponible.</div>`;
             }
         }
 
         function logoutAdmin() {
-            isAdminLoggedIn = false;
-            localStorage.setItem('admin_logged', 'false');
+            if (useCloud && auth) {
+                auth.signOut().then(() => {
+                    hideAdminPanelContent();
+                });
+            }
+        }
+
+        function sendPasswordReset() {
+            const email = document.getElementById('admin-email').value.trim() || prompt("Introduce tu correo de administrador para restablecer la clave:");
+            if (!email) return;
+
+            if (useCloud && auth) {
+                auth.sendPasswordResetEmail(email)
+                    .then(() => {
+                        alert("¡Enlace enviado! Revisa tu bandeja de entrada en " + email + " para cambiar tu contraseña.");
+                    })
+                    .catch((error) => {
+                        alert("Error al enviar el correo: " + error.message);
+                    });
+            }
+        }
+
+        function showAdminPanelContent(email) {
+            document.getElementById('admin-login-wrapper').style.display = 'none';
+            document.getElementById('admin-panel-content').style.display = 'block';
+            document.getElementById('admin-gallery-controls').style.display = 'block';
+            if (document.getElementById('admin-user-display')) {
+                document.getElementById('admin-user-display').innerText = `Sesión iniciada como: ${email}`;
+            }
+            renderAll();
+            renderGallery();
+        }
+
+        function hideAdminPanelContent() {
             document.getElementById('admin-login-wrapper').style.display = 'block';
             document.getElementById('admin-panel-content').style.display = 'none';
             document.getElementById('admin-gallery-controls').style.display = 'none';
             document.getElementById('admin-pass').value = '';
             renderAll();
             renderGallery();
-        }
-
-        function showAdminPanelContent() {
-            document.getElementById('admin-login-wrapper').style.display = 'none';
-            document.getElementById('admin-panel-content').style.display = 'block';
-            document.getElementById('admin-gallery-controls').style.display = 'block';
-            renderAll();
         }
 
         function saveRoute() {
