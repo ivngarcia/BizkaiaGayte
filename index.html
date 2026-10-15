@@ -746,10 +746,6 @@
             box-shadow: 0 0 20px rgba(0,0,0,0.1);
         }
 
-        body.force-mobile, body.force-mobile * {
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Verdana, Arial, sans-serif !important;
-        }
-
         body.force-mobile .app-layout {
             grid-template-columns: 1fr !important;
         }
@@ -867,45 +863,14 @@
                                 </div>
                             </div>
 
-                            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1rem;">
-                                <div class="form-group">
-                                    <label for="route-coffee">Café previo (Lugar / Enlace Maps)</label>
-                                    <input type="text" id="route-coffee" placeholder="Ej. Bar X o enlace">
-                                </div>
-                                <div class="form-group">
-                                    <label for="route-coffee-time">Hora Café</label>
-                                    <input type="time" id="route-coffee-time">
-                                </div>
-                            </div>
-
-                            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1rem;">
-                                <div class="form-group">
-                                    <label for="route-meeting">Punto de Encuentro / Salida</label>
-                                    <input type="text" id="route-meeting" placeholder="Ej. Merendero o enlace Maps">
-                                </div>
-                                <div class="form-group">
-                                    <label for="route-meeting-time">Hora Salida</label>
-                                    <input type="time" id="route-meeting-time">
-                                </div>
+                            <div class="form-group">
+                                <label for="route-coffee">Café previo (Enlace o lugar Maps)</label>
+                                <input type="text" id="route-coffee" placeholder="Ej. Bar X o enlace de Google Maps">
                             </div>
 
                             <div class="form-group">
-                                <label for="route-difficulty">Dificultad</label>
-                                <select id="route-difficulty">
-                                    <option value="Fácil">Fácil</option>
-                                    <option value="Media">Media</option>
-                                    <option value="Difícil">Difícil</option>
-                                </select>
-                            </div>
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                                <div class="form-group">
-                                    <label for="route-distance">Distancia (Ej. 12.5)</label>
-                                    <input type="text" id="route-distance" placeholder="Solo número">
-                                </div>
-                                <div class="form-group">
-                                    <label for="route-elevation">Desnivel (Ej. 450)</label>
-                                    <input type="text" id="route-elevation" placeholder="Solo número">
-                                </div>
+                                <label for="route-meeting">Punto de Encuentro (Inicio de Ruta)</label>
+                                <input type="text" id="route-meeting" placeholder="Ej. Merendero-Undakorta o enlace Maps">
                             </div>
 
                             <!-- PREVISIÓN METEOROLÓGICA AUTOMÁTICA -->
@@ -1101,8 +1066,6 @@
             id: 'route-1',
             title: 'Ruta de los Dólmenes de Oiz',
             date: '2026-10-17',
-            coffeeTime: '09:15',
-            meetingTime: '10:00',
             maxSpots: 20,
             difficulty: 'Media',
             distance: '17.79',
@@ -1420,8 +1383,8 @@
             return d.toLocaleDateString('es-ES', options);
         }
 
-        /* COMPARTIR EN WHATSAPP CON HORA DE CAFÉ Y SALIDA SEPARADAS */
-        function shareOnWhatsApp(routeId, title, dateStr, coffee, coffeeTime, meeting, meetingTime, distance, elevation, weather, wikiloc) {
+        /* COMPARTIR EN WHATSAPP CON FORMATO LIMPIO */
+        function shareOnWhatsApp(routeId, title, dateStr, coffee, meeting, distance, elevation, weather, wikiloc) {
             let baseUrl = window.location.href.split('?')[0];
             let routeUrl = `${baseUrl}?route=${routeId}`;
 
@@ -1448,8 +1411,8 @@
             let text = `🌐 *Entra aquí para ver detalles y apuntarte:* ${routeUrl}\n\n` +
                        `⛰️ *${title}* - Rutas Bizkaia Gayte 🏳️‍🌈\n\n` +
                        `📅 *Fecha:* ${formatDate(dateStr)}\n` +
-                       (coffee ? `☕ *Café previo (${coffeeTime || 'Hora por confirmar'}):* ${coffeeText ? coffeeText + ' ' : ''}${coffeeLink ? coffeeLink : ''}\n` : '') +
-                       `📍 *Salida / Encuentro (${meetingTime || 'Hora por confirmar'}):* ${meetingText ? meetingText + ' ' : ''}${mapsLink ? mapsLink : ''}\n` +
+                       (coffee ? `☕ *Café previo:* ${coffeeText ? coffeeText + ' ' : ''}${coffeeLink ? coffeeLink : ''}\n` : '') +
+                       `📍 *Encuentro:* ${meetingText ? meetingText + ' ' : ''}${mapsLink ? mapsLink : ''}\n` +
                        (distance ? `📏 *Distancia:* ${formatDistance(distance)}\n` : '') +
                        (elevation ? `📈 *Desnivel:* ${formatElevation(elevation)}\n` : '') +
                        (weather ? `🌤️ *Tiempo:* ${weather}\n` : '') +
@@ -1687,15 +1650,15 @@
                                 <span class="badge ${getBadgeClass(route.difficulty)}">${route.difficulty}</span>
                             </div>
                             <div class="card-info">
-                                <p><strong>📅 Fecha:</strong> ${formatDate(route.date)}</p>
+                                <p><strong>Fecha:</strong> ${formatDate(route.date)}</p>
                                 ${maxSpots > 0 ? `<p><strong>Plazas:</strong> ${activeCount} / ${maxSpots}${isFull ? '<span style="color:var(--warning);font-weight:bold;">(Completa - Lista de espera abierta)</span>' : ''}</p>` : ''}
-                                ${route.distance ? `<span><strong>📏 Distancia:</strong> ${formatDistance(route.distance)} </span>` : ''}
-                                ${route.elevation ? `<span> | <strong>📈 Desnivel:</strong> ${formatElevation(route.elevation)}</span>` : ''}
-                                ${route.coffee ? `<p style="margin-top: 0.3rem;"><strong>☕ Café previo (${route.coffeeTime \vert{}\vert{} 'Hora por confirmar'}):</strong>${coffeeHtml}</p>` : ''}
-                                <p style="margin-top: 0.3rem;"><strong>📍 Salida / Encuentro (${route.meetingTime || 'Hora por confirmar'}):</strong> ${meetingHtml}</p>
-                                ${weatherDisplay ? `<p><strong>🌤️ Tiempo previsto:</strong> ${weatherDisplay}</p>` : ''}
-                                <p style="margin-top: 0.4rem;"><strong>Descripción:</strong> ${route.description}</p>
-                                ${route.wikiloc ? `<p style="margin-top: 0.4rem;"><strong>🔗 Wikiloc:</strong> <a href="${route.wikiloc}" target="_blank" style="color: var(--primary);">Ver track oficial</a></p>` : ''}
+                                ${route.distance ? `<span><strong>Distancia:</strong> ${formatDistance(route.distance)} </span>` : ''}
+                                ${route.elevation ? `<span> | <strong>Desnivel:</strong> ${formatElevation(route.elevation)}</span>` : ''}
+                                ${coffeeHtml ? `<p style="margin-top: 0.3rem;"><strong>Café previo:</strong> ${coffeeHtml}</p>` : ''}
+                                <p style="margin-top: 0.3rem;"><strong>Encuentro:</strong> ${meetingHtml}</p>
+                                ${weatherDisplay ? `<p><strong>Tiempo previsto:</strong> ${weatherDisplay}</p>` : ''}
+                                <p><strong>Descripción:</strong> ${route.description}</p>
+                                ${route.wikiloc ? `<p><strong>Wikiloc:</strong> <a href="${route.wikiloc}" target="_blank" style="color: var(--primary);">Ver track oficial</a></p>` : ''}
                             </div>
                         </div>
 
@@ -1704,7 +1667,7 @@
                             <button class="btn" style="width: 100%; margin-bottom: 0.5rem;" onclick="openRegisterModal('${route.id}')">
                                 ${isFull ? 'Apuntarse en Lista de Espera' : 'Inscribirse'}
                             </button>
-                            <button class="btn btn-whatsapp" onclick="shareOnWhatsApp('${route.id}', '${route.title.replace(/'/g, "\\'")}', '${route.date}', '${(route.coffee || '').replace(/'/g, "\\'")}', '${route.coffeeTime || ''}', '${(route.meeting || '').replace(/'/g, "\\'")}', '${route.meetingTime || ''}', '${route.distance || ''}', '${route.elevation || ''}', '${weatherDisplay.replace(/'/g, "\\'")}', '${route.wikiloc || ''}')">
+                            <button class="btn btn-whatsapp" onclick="shareOnWhatsApp('${route.id}', '${route.title.replace(/'/g, "\\'")}', '${route.date}', '${(route.coffee || '').replace(/'/g, "\\'")}', '${route.meeting.replace(/'/g, "\\'")}', '${route.distance || ''}', '${route.elevation || ''}', '${weatherDisplay.replace(/'/g, "\\'")}', '${route.wikiloc || ''}')">
                                 💬 Compartir por WhatsApp
                             </button>
                             
@@ -1762,19 +1725,19 @@
                                 <span class="badge" style="background-color: #eceff1; color: #455a64;">Realizada</span>
                             </div>
                             <div class="card-info">
-                                <p><strong>📅 Fecha:</strong> ${formatDate(route.date)}</p>
-                                ${route.distance ? `<span><strong>📏 Distancia:</strong> ${formatDistance(route.distance)} </span>` : ''}
-                                ${route.elevation ? `<span> | <strong>📈 Desnivel:</strong> ${formatElevation(route.elevation)}</span>` : ''}
-                                ${route.coffee ? `<p style="margin-top: 0.3rem;"><strong>☕ Café previo (${route.coffeeTime \vert{}\vert{} 'Hora por confirmar'}):</strong>${coffeeHtml}</p>` : ''}
-                                <p style="margin-top: 0.3rem;"><strong>📍 Salida / Encuentro (${route.meetingTime || 'Hora por confirmar'}):</strong> ${meetingHtml}</p>
-                                ${weatherDisplay ? `<p><strong>🌤️ Tiempo que hizo:</strong> ${weatherDisplay}</p>` : ''}
-                                <p style="margin-top: 0.4rem;"><strong>Descripción:</strong> ${route.description}</p>
-                                ${route.wikiloc ? `<p style="margin-top: 0.4rem;"><strong>🔗 Wikiloc:</strong> <a href="${route.wikiloc}" target="_blank" style="color: var(--primary);">Ver track completado</a></p>` : ''}
+                                <p><strong>Fecha:</strong> ${formatDate(route.date)}</p>
+                                ${route.distance ? `<span><strong>Distancia:</strong> ${formatDistance(route.distance)} </span>` : ''}
+                                ${route.elevation ? `<span> | <strong>Desnivel:</strong> ${formatElevation(route.elevation)}</span>` : ''}
+                                ${coffeeHtml ? `<p style="margin-top: 0.3rem;"><strong>Café previo:</strong> ${coffeeHtml}</p>` : ''}
+                                <p style="margin-top: 0.3rem;"><strong>Encuentro:</strong> ${meetingHtml}</p>
+                                ${weatherDisplay ? `<p><strong>Tiempo que hizo:</strong> ${weatherDisplay}</p>` : ''}
+                                <p><strong>Descripción:</strong> ${route.description}</p>
+                                ${route.wikiloc ? `<p><strong>Wikiloc:</strong> <a href="${route.wikiloc}" target="_blank" style="color: var(--primary);">Ver track completado</a></p>` : ''}
                             </div>
                         </div>
 
                         <div>
-                            <button class="btn btn-whatsapp" style="margin-bottom: 0.5rem;" onclick="shareOnWhatsApp('${route.id}', '${route.title.replace(/'/g, "\\'")}', '${route.date}', '${(route.coffee || '').replace(/'/g, "\\'")}', '${route.coffeeTime || ''}', '${(route.meeting || '').replace(/'/g, "\\'")}', '${route.meetingTime || ''}', '${route.distance || ''}', '${route.elevation || ''}', '${weatherDisplay.replace(/'/g, "\\'")}', '${route.wikiloc || ''}')">
+                            <button class="btn btn-whatsapp" style="margin-bottom: 0.5rem;" onclick="shareOnWhatsApp('${route.id}', '${route.title.replace(/'/g, "\\'")}', '${route.date}', '${(route.coffee || '').replace(/'/g, "\\'")}', '${route.meeting.replace(/'/g, "\\'")}', '${route.distance || ''}', '${route.elevation || ''}', '${weatherDisplay.replace(/'/g, "\\'")}', '${route.wikiloc || ''}')">
                                 💬 Compartir por WhatsApp
                             </button>
 
@@ -1950,8 +1913,6 @@
             const editId = document.getElementById('edit-route-id').value;
             const title = document.getElementById('route-title').value.trim();
             const date = document.getElementById('route-date').value;
-            const coffeeTime = document.getElementById('route-coffee-time').value;
-            const meetingTime = document.getElementById('route-meeting-time').value;
             const maxSpots = parseInt(document.getElementById('route-max-spots').value) || 0;
             const difficulty = document.getElementById('route-difficulty').value;
             const distance = document.getElementById('route-distance').value.trim();
@@ -1972,8 +1933,6 @@
             const routeData = {
                 title,
                 date,
-                coffeeTime,
-                meetingTime,
                 maxSpots,
                 difficulty,
                 distance,
@@ -2015,8 +1974,6 @@
             document.getElementById('edit-route-id').value = '';
             document.getElementById('route-title').value = '';
             document.getElementById('route-date').value = '';
-            document.getElementById('route-coffee-time').value = '';
-            document.getElementById('route-meeting-time').value = '';
             document.getElementById('route-max-spots').value = '0';
             document.getElementById('route-difficulty').value = 'Fácil';
             document.getElementById('route-distance').value = '';
@@ -2043,8 +2000,6 @@
                 document.getElementById('edit-route-id').value = route.id;
                 document.getElementById('route-title').value = route.title;
                 document.getElementById('route-date').value = route.date;
-                document.getElementById('route-coffee-time').value = route.coffeeTime || '';
-                document.getElementById('route-meeting-time').value = route.meetingTime || '';
                 document.getElementById('route-max-spots').value = route.maxSpots || 0;
                 document.getElementById('route-difficulty').value = route.difficulty;
                 document.getElementById('route-distance').value = route.distance || '';
