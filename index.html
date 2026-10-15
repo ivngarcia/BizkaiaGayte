@@ -11,15 +11,7 @@
     <meta property="og:image" id="meta-og-image" content="https://i.imgur.com/ybDAKiY.jpg">
     <meta property="og:type" content="website">
 
-    <!-- CONFIGURACIÓN PWA (APP INSTALABLE EN MÓVIL) -->
-    <meta name="theme-color" content="#2e7d32">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Bizkaia Gayte">
-    <link rel="apple-touch-icon" href="https://i.imgur.com/ybDAKiY.jpg">
-    <link rel="manifest" href='data:application/manifest+json,{"name":"Rutas Bizkaia Gayte","short_name":"BizkaiaGayte","start_url":".","display":"standalone","background_color":"#f4f6f5","theme_color":"#2e7d32","icons":[{"src":"https://i.imgur.com/ybDAKiY.jpg","sizes":"192x192","type":"image/jpeg"}]}'>
-
-    <!-- SDKs DE FIREBASE -->
+    <!-- SDKs DE FIREBASE (COMPATIBLES) -->
     <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore-compat.js"></script>
 
@@ -29,16 +21,15 @@
             --bg-color: #f4f6f5; --card-bg: #ffffff; --text-color: #333333;
             --text-light: #555555; --border-color: #dddddd;
             --danger: #d32f2f; --warning: #f57c00; --success: #388e3c;
-            --info: #0288d1;
             --whatsapp: #25d366; --whatsapp-dark: #128c7e;
         }
 
-        /* FUENTE ARIAL / VERDANA EN TODA LA WEB */
+        /* COMIC SANS POR DEFECTO PARA ORDENADOR */
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: Arial, Verdana, Helvetica, sans-serif !important;
+            font-family: 'Comic Sans MS', 'Chalkboard SE', 'Comic Neue', cursive, sans-serif !important;
         }
 
         body {
@@ -89,15 +80,16 @@
         }
 
         header h1 {
-            font-size: 3.5rem;
+            font-size: 4.2rem;
+            font-style: italic;
             font-weight: bold;
             margin-bottom: 0.4rem;
-            letter-spacing: 0.5px;
+            letter-spacing: 1px;
             text-shadow: 0 3px 8px rgba(0,0,0,0.8);
         }
 
         header p.friendly-desc {
-            font-size: 1.3rem;
+            font-size: 1.4rem;
             opacity: 1;
             text-shadow: 0 2px 5px rgba(0,0,0,0.8);
             font-weight: bold;
@@ -106,7 +98,7 @@
         }
 
         header p.club-info {
-            font-size: 1.1rem;
+            font-size: 1.15rem;
             opacity: 0.95;
             text-shadow: 0 1px 3px rgba(0,0,0,0.8);
             font-weight: bold;
@@ -169,22 +161,35 @@
         }
 
         main {
-            max-width: 1200px;
+            max-width: 1450px;
             margin: 1.5rem auto;
             padding: 0 1rem;
         }
 
-        /* LAYOUT DE 2 COLUMNAS (CALENDARIO + CONTENIDO) */
+        /* LAYOUT DE 3 COLUMNAS */
         .app-layout {
             display: grid;
-            grid-template-columns: 280px 1fr;
+            grid-template-columns: 280px 1fr 300px;
             gap: 1.5rem;
             align-items: start;
         }
 
+        @media (max-width: 1100px) {
+            .app-layout {
+                grid-template-columns: 280px 1fr;
+            }
+            .gallery-sidebar {
+                grid-column: 1 / -1;
+            }
+        }
+
+        /* TIPOGRAFÍA NATIVA / VERDANA / ARIAL PARA MÓVIL */
         @media (max-width: 900px) {
+            * {
+                font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Verdana, Arial, sans-serif !important;
+            }
             header h1 {
-                font-size: 2.3rem;
+                font-size: 2.6rem;
             }
             .app-layout {
                 grid-template-columns: 1fr;
@@ -324,6 +329,119 @@
             background-color: var(--primary-dark);
         }
 
+        /* GALERÍA DERECHA */
+        .gallery-sidebar {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            padding: 1.2rem;
+            border-top: 4px solid var(--accent);
+        }
+
+        .gallery-sidebar h3 {
+            font-size: 1.1rem;
+            color: var(--primary-dark);
+            margin-bottom: 0.8rem;
+        }
+
+        .gallery-item {
+            margin-bottom: 1rem;
+            background: #fafafa;
+            padding: 0.5rem;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 130px;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-bottom: 0.4rem;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .gallery-item img:hover {
+            transform: scale(1.02);
+        }
+
+        .gallery-route-tag {
+            font-size: 0.75rem;
+            background: #e8f5e9;
+            color: var(--primary-dark);
+            padding: 0.15rem 0.4rem;
+            border-radius: 4px;
+            display: inline-block;
+            margin-bottom: 0.2rem;
+            font-weight: bold;
+        }
+
+        .gallery-item p {
+            font-size: 0.85rem;
+            font-weight: bold;
+            margin-bottom: 0.3rem;
+            color: var(--text-color);
+        }
+
+        .admin-gallery-controls {
+            display: none;
+            background: #f1f8e9;
+            padding: 0.8rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            border: 1px dashed var(--primary);
+        }
+
+        /* MODAL LIGHTBOX PARA FOTOS */
+        .lightbox-modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            padding: 1.5rem;
+        }
+
+        .lightbox-modal.open {
+            display: flex;
+        }
+
+        .lightbox-content {
+            position: relative;
+            max-width: 90%;
+            max-height: 90vh;
+            text-align: center;
+        }
+
+        .lightbox-content img {
+            max-width: 100%;
+            max-height: 80vh;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            object-fit: contain;
+        }
+
+        .lightbox-caption {
+            color: white;
+            font-size: 1.1rem;
+            margin-top: 0.8rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+        }
+
+        .lightbox-close {
+            position: absolute;
+            top: -40px;
+            right: 0;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 2rem;
+            cursor: pointer;
+        }
+
         .section-content {
             display: none;
         }
@@ -342,7 +460,7 @@
 
         .grid-cards {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
             gap: 1.2rem;
         }
 
@@ -358,6 +476,7 @@
             transition: all 0.3s ease;
         }
 
+        /* ESTILO DESTACADO CUANDO SE ABRE UNA RUTA ESPECÍFICA DESDE WHATSAPP */
         .card.highlighted {
             border: 3px solid var(--primary);
             box-shadow: 0 0 20px rgba(46, 125, 50, 0.4);
@@ -371,6 +490,12 @@
             object-fit: cover;
             margin-bottom: 0.8rem;
             background: #e0e0e0;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .card-image:hover {
+            transform: scale(1.02);
         }
 
         .card h3 {
@@ -407,7 +532,6 @@
         .badge-hard { background-color: #ffebee; color: #c62828; }
         .badge-insurance-yes { background-color: #e0f2f1; color: #00695c; }
         .badge-insurance-no { background-color: #fbe9e7; color: #d84315; }
-        .badge-car { background-color: #e1f5fe; color: #0277bd; }
 
         .btn {
             background-color: var(--primary);
@@ -435,13 +559,6 @@
             background-color: #546e7a;
         }
 
-        .btn-info {
-            background-color: var(--info);
-        }
-        .btn-info:hover {
-            background-color: #01579b;
-        }
-
         .btn-danger {
             background-color: var(--danger);
         }
@@ -454,6 +571,7 @@
             font-size: 0.8rem;
         }
 
+        /* BOTÓN DE WHATSAPP */
         .btn-whatsapp {
             background-color: var(--whatsapp);
             color: white;
@@ -494,18 +612,7 @@
 
         .participant-item.confirmed { border-left-color: var(--success); }
         .participant-item.pending { border-left-color: var(--warning); }
-        .participant-item.waitlist { border-left-color: var(--info); background: #f0f8ff; }
         .participant-item.denied { border-left-color: var(--danger); }
-
-        .carpool-box {
-            background: #e1f5fe;
-            color: #01579b;
-            padding: 0.4rem 0.6rem;
-            border-radius: 4px;
-            font-size: 0.8rem;
-            margin-bottom: 0.6rem;
-            font-weight: bold;
-        }
 
         .form-group {
             margin-bottom: 1rem;
@@ -526,14 +633,7 @@
             font-size: 1rem;
         }
 
-        .gpx-import-box {
-            background: #e3f2fd;
-            border: 2px dashed var(--info);
-            padding: 0.9rem;
-            border-radius: 6px;
-            margin-bottom: 1.2rem;
-        }
-
+        /* ALINEACIÓN DE SEGUROS */
         .checkbox-label {
             display: flex;
             align-items: center;
@@ -550,6 +650,7 @@
             margin: 0;
         }
 
+        /* SELECTOR DE TIEMPO */
         .weather-selector { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.5rem; }
         .weather-option { font-size: 1.5rem; padding: 0.3rem 0.6rem; border: 2px solid var(--border-color); border-radius: 6px; background: white; cursor: pointer; transition: all 0.2s; }
         .weather-option.selected { border-color: var(--primary); background: #e8f5e9; transform: scale(1.1); }
@@ -612,6 +713,10 @@
             border-left: 1px solid #ccc;
             border-right: 1px solid #ccc;
             box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+
+        body.force-mobile, body.force-mobile * {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Verdana, Arial, sans-serif !important;
         }
 
         body.force-mobile .app-layout {
@@ -685,11 +790,11 @@
                 <div id="section-admin" class="section-content">
                     <div id="admin-login-wrapper" class="admin-box">
                         <h2>Acceso Administrador</h2>
-                        <p style="margin-bottom: 1rem; color: var(--text-light);">Introduce la contraseña de administrador para gestionar las rutas y asistentes.</p>
+                        <p style="margin-bottom: 1rem; color: var(--text-light);">Introduce la contraseña para gestionar las rutas y asistentes.</p>
                         <div id="login-alert"></div>
                         <div class="form-group">
                             <label for="admin-pass">Contraseña</label>
-                            <input type="password" id="admin-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter') loginAdmin()">
+                            <input type="password" id="admin-pass" placeholder="Contraseña de admin (admin123)">
                         </div>
                         <button class="btn" style="width: 100%;" onclick="loginAdmin()">Entrar</button>
                     </div>
@@ -697,37 +802,38 @@
                     <div id="admin-panel-content" style="display: none;">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem; flex-wrap: wrap; gap: 0.5rem;">
                             <h2>Panel de Control</h2>
-                            <div style="display: flex; gap: 0.5rem;">
-                                <button class="btn btn-info btn-small" onclick="changeAdminPassword()">🔑 Cambiar Contraseña</button>
-                                <button class="btn btn-secondary btn-small" onclick="logoutAdmin()">Cerrar Sesión</button>
-                            </div>
+                            <button class="btn btn-secondary btn-small" onclick="logoutAdmin()">Cerrar Sesión</button>
                         </div>
 
                         <div style="background: white; padding: 1.2rem; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 2rem;">
                             <h3 id="form-title" style="margin-bottom: 1rem; color: var(--primary-dark);">Programar Nueva Ruta</h3>
                             <div id="route-form-alert"></div>
                             <input type="hidden" id="edit-route-id">
-
-                            <!-- LECTOR AUTOMÁTICO DE GPX DE WIKILOC -->
-                            <div class="gpx-import-box">
-                                <label for="gpx-file-input" style="color: #01579b; font-weight: bold; display: block; margin-bottom: 0.3rem;">⚡ Autocompletar subiendo archivo .GPX de Wikiloc</label>
-                                <input type="file" id="gpx-file-input" accept=".gpx" onchange="handleGPXUpload(event)" style="font-size: 0.85rem; padding: 0.3rem; background: white;">
-                                <small id="gpx-status" style="display: block; margin-top: 0.3rem; color: #555;">Calcula distancia, desnivel y nombre automáticamente.</small>
-                            </div>
                             
                             <div class="form-group">
                                 <label for="route-title">Título de la Ruta</label>
                                 <input type="text" id="route-title" placeholder="Ej. Ascensión al Eretza">
                             </div>
-
+                            <div class="form-group">
+                                <label for="route-date">Fecha y Hora</label>
+                                <input type="datetime-local" id="route-date">
+                            </div>
+                            <div class="form-group">
+                                <label for="route-difficulty">Dificultad</label>
+                                <select id="route-difficulty">
+                                    <option value="Fácil">Fácil</option>
+                                    <option value="Media">Media</option>
+                                    <option value="Difícil">Difícil</option>
+                                </select>
+                            </div>
                             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                                 <div class="form-group">
-                                    <label for="route-date">Fecha y Hora</label>
-                                    <input type="datetime-local" id="route-date">
+                                    <label for="route-distance">Distancia (Ej. 12.5)</label>
+                                    <input type="text" id="route-distance" placeholder="Solo número">
                                 </div>
                                 <div class="form-group">
-                                    <label for="route-max-spots">Límite de Plazas (0 = sin límite)</label>
-                                    <input type="number" id="route-max-spots" placeholder="Ej. 20" min="0" value="0">
+                                    <label for="route-elevation">Desnivel (Ej. 450)</label>
+                                    <input type="text" id="route-elevation" placeholder="Solo número">
                                 </div>
                             </div>
 
@@ -741,7 +847,7 @@
                                 <input type="text" id="route-meeting" placeholder="Ej. Merendero-Undakorta o enlace Maps">
                             </div>
 
-                            <!-- PREVISIÓN METEOROLÓGICA AUTOMÁTICA -->
+                            <!-- ZONA DE METEOROLOGÍA AUTOMÁTICA AÑADIDA HOY -->
                             <div class="form-group" style="background: #f1f8e9; padding: 0.8rem; border-radius: 6px; border: 1px dashed var(--primary);">
                                 <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.6rem;">
                                     <label style="margin: 0;">🌤️ Previsión Meteorológica</label>
@@ -754,7 +860,7 @@
                                             <option value="43.346,-3.095">Zona Costa / Serantes / Muskiz</option>
                                             <option value="43.229,-2.591">Oiz / Durangaldea</option>
                                         </select>
-                                        <button type="button" class="btn btn-small btn-info" onclick="fetchAutoWeather()">🔄 Obtener tiempo automático</button>
+                                        <button type="button" class="btn btn-small btn-info" onclick="fetchAutoWeather()" style="background: #0288d1; color: white; border: none; padding: 0.3rem 0.6rem; border-radius: 4px; cursor: pointer; font-weight: bold;">🔄 Obtener tiempo automático</button>
                                     </div>
                                 </div>
                                 <div class="weather-selector">
@@ -791,8 +897,41 @@
                     </div>
                 </div>
             </section>
+
+            <!-- COLUMNA DERECHA: GALERÍA DE FOTOS -->
+            <aside class="gallery-sidebar">
+                <h3>📸 Galería de Fotos</h3>
+                <p style="font-size: 0.8rem; color: var(--text-light); margin-bottom: 0.8rem;">Momentos en nuestras excursiones por Bizkaia.</p>
+                
+                <div id="admin-gallery-controls" class="admin-gallery-controls">
+                    <p style="font-size: 0.8rem; font-weight: bold; color: var(--primary-dark); margin-bottom: 0.4rem;">Panel Admin: Añadir Foto</p>
+                    <div class="form-group" style="margin-bottom: 0.5rem;">
+                        <input type="text" id="gallery-photo-title" placeholder="Título de la foto" style="font-size: 0.85rem; padding: 0.4rem;">
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0.5rem;">
+                        <select id="gallery-route-select" style="font-size: 0.85rem; padding: 0.4rem;">
+                            <option value="">-- Seleccionar Ruta Asociada --</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0.5rem;">
+                        <input type="url" id="gallery-photo-url" placeholder="URL de la imagen (.jpg)" style="font-size: 0.85rem; padding: 0.4rem;">
+                    </div>
+                    <button class="btn btn-small" style="width: 100%; font-size: 0.8rem;" onclick="addGalleryPhoto()">Publicar Foto</button>
+                </div>
+
+                <div id="public-gallery-list"></div>
+            </aside>
         </div>
     </main>
+
+    <!-- MODAL LIGHTBOX -->
+    <div id="lightbox-modal" class="lightbox-modal" onclick="closeLightbox()">
+        <div class="lightbox-content" onclick="event.stopPropagation()">
+            <button class="lightbox-close" onclick="closeLightbox()">&times;</button>
+            <img id="lightbox-img" src="" alt="Foto ampliada">
+            <div id="lightbox-caption" class="lightbox-caption"></div>
+        </div>
+    </div>
 
     <!-- MODAL DE INSCRIPCIÓN -->
     <div id="register-modal" class="modal">
@@ -808,30 +947,13 @@
                 <input type="text" id="participant-name" placeholder="Tu nombre completo">
             </div>
             <div class="form-group">
-                <label for="participant-phone">Teléfono / WhatsApp (Privado para el organizador)</label>
+                <label for="participant-phone">Teléfono / WhatsApp</label>
                 <input type="tel" id="participant-phone" placeholder="Ej. 612345678">
             </div>
             <div class="form-group">
                 <label class="checkbox-label">
                     <input type="checkbox" id="participant-insurance"> ¿Dispone de seguro de montaña?
                 </label>
-            </div>
-            <div class="form-group" style="background: #f0f8ff; padding: 0.7rem; border-radius: 6px; border: 1px solid #b3e5fc;">
-                <label class="checkbox-label">
-                    <input type="checkbox" id="participant-has-car" onchange="document.getElementById('carpool-extra').style.display = this.checked ? 'block' : 'none'"> 🚗 Llevo coche y ofrezco plazas
-                </label>
-                <div id="carpool-extra" style="display: none; margin-top: 0.6rem;">
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
-                        <div>
-                            <label for="participant-car-seats" style="font-size: 0.8rem;">Plazas libres</label>
-                            <input type="number" id="participant-car-seats" min="1" max="8" value="3" style="padding: 0.4rem;">
-                        </div>
-                        <div>
-                            <label for="participant-car-zone" style="font-size: 0.8rem;">Salgo desde</label>
-                            <input type="text" id="participant-car-zone" placeholder="Ej. Bilbao, Sestao..." style="padding: 0.4rem;">
-                        </div>
-                    </div>
-                </div>
             </div>
             <button class="btn" style="width: 100%;" onclick="submitRegistration()">Enviar Inscripción</button>
         </div>
@@ -858,7 +980,6 @@
                 <select id="admin-part-status">
                     <option value="confirmed">Confirmada</option>
                     <option value="pending">Pendiente</option>
-                    <option value="waitlist">En Reserva (Lista espera)</option>
                     <option value="denied">Denegada</option>
                 </select>
             </div>
@@ -884,10 +1005,6 @@
 
         let db = null;
         let useCloud = false;
-        let lastGpxCoords = null;
-
-        const DEFAULT_PASS_HASH = "240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9";
-        let currentPassHash = DEFAULT_PASS_HASH;
 
         try {
             firebase.initializeApp(firebaseConfig);
@@ -901,7 +1018,6 @@
             id: 'route-1',
             title: 'Ruta de los Dólmenes de Oiz',
             date: '2026-10-17T10:00',
-            maxSpots: 20,
             difficulty: 'Media',
             distance: '17.79',
             elevation: '644',
@@ -916,146 +1032,22 @@
         };
 
         let routes = [rutaInicial];
+        let clubGallery = [];
         let isAdminLoggedIn = localStorage.getItem('admin_logged') === 'true';
         let isMobileViewForced = false;
         let currentCalendarDate = new Date();
 
-        async function sha256(text) {
-            const msgBuffer = new TextEncoder().encode(text);
-            const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-            const hashArray = Array.from(new Uint8Array(hashBuffer));
-            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-        }
-
-        window.addEventListener('DOMContentLoaded', () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            const targetRouteId = urlParams.get('route');
-
-            if (useCloud) {
-                db.collection("settings").doc("admin").onSnapshot((doc) => {
-                    if (doc.exists && doc.data().passHash) {
-                        currentPassHash = doc.data().passHash;
-                    } else {
-                        db.collection("settings").doc("admin").set({ passHash: DEFAULT_PASS_HASH }, { merge: true });
-                    }
-                });
-
-                db.collection("routes").onSnapshot((snapshot) => {
-                    if (!snapshot.empty) {
-                        routes = [];
-                        snapshot.forEach((doc) => {
-                            routes.push({ id: doc.id, ...doc.data() });
-                        });
-                    } else {
-                        db.collection("routes").doc("route-1").set(rutaInicial);
-                    }
-                    renderAll();
-                    renderCalendar();
-                }, (error) => {
-                    console.error("Error leyendo rutas de Firebase:", error);
-                    cargarDesdeLocalStorage();
-                });
-            } else {
-                cargarDesdeLocalStorage();
-            }
-
-            if (isAdminLoggedIn) {
-                showAdminPanelContent();
-            }
-
-            if (targetRouteId) {
-                setTimeout(() => {
-                    const cardElement = document.getElementById(`card-${targetRouteId}`);
-                    if (cardElement) {
-                        cardElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                        cardElement.classList.add('highlighted');
-                    }
-                }, 500);
-            }
-        });
-
-        function handleGPXUpload(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const xmlText = e.target.result;
-                const parser = new DOMParser();
-                const xmlDoc = parser.parseFromString(xmlText, "text/xml");
-
-                const nameNode = xmlDoc.querySelector("trk > name") || xmlDoc.querySelector("metadata > name");
-                if (nameNode && nameNode.textContent) {
-                    document.getElementById('route-title').value = nameNode.textContent.trim();
-                }
-
-                const trkpts = xmlDoc.querySelectorAll("trkpt");
-                let totalDistKm = 0;
-                let totalElevGain = 0;
-                let prevLat = null, prevLon = null, prevEle = null;
-
-                trkpts.forEach((pt, index) => {
-                    const lat = parseFloat(pt.getAttribute("lat"));
-                    const lon = parseFloat(pt.getAttribute("lon"));
-                    const eleNode = pt.querySelector("ele");
-                    const ele = eleNode ? parseFloat(eleNode.textContent) : null;
-
-                    if (index === 0 && !isNaN(lat) && !isNaN(lon)) {
-                        lastGpxCoords = { lat, lon };
-                    }
-
-                    if (prevLat !== null && prevLon !== null) {
-                        totalDistKm += calcHaversineKm(prevLat, prevLon, lat, lon);
-                    }
-                    if (prevEle !== null && ele !== null) {
-                        const diff = ele - prevEle;
-                        if (diff > 0.5) totalElevGain += diff;
-                    }
-
-                    prevLat = lat;
-                    prevLon = lon;
-                    if (ele !== null) prevEle = ele;
-                });
-
-                if (totalDistKm > 0) {
-                    document.getElementById('route-distance').value = totalDistKm.toFixed(2);
-                }
-                if (totalElevGain > 0) {
-                    document.getElementById('route-elevation').value = Math.round(totalElevGain);
-                }
-
-                document.getElementById('gpx-status').innerHTML = `<strong style="color:var(--success);">✅ GPX leído: ${totalDistKm.toFixed(2)} km y +${Math.round(totalElevGain)} m detectados.</strong>`;
-            };
-            reader.readAsText(file);
-        }
-
-        function calcHaversineKm(lat1, lon1, lat2, lon2) {
-            const R = 6371;
-            const dLat = (lat2 - lat1) * Math.PI / 180;
-            const dLon = (lon2 - lon1) * Math.PI / 180;
-            const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-                      Math.sin(dLon / 2) * Math.sin(dLon / 2);
-            return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        }
-
+        // FUNCIÓN DE METEOROLOGÍA AUTOMÁTICA (AÑADIDA HOY)
         async function fetchAutoWeather() {
             const dateVal = document.getElementById('route-date').value;
             if (!dateVal) {
-                alert("Selecciona primero la Fecha y Hora de la ruta para consultar la previsión.");
+                alert("Selecciona primero la Fecha y Hora de la ruta para consultar el tiempo.");
                 return;
             }
-
             const targetDate = dateVal.split('T')[0];
-            let lat, lon;
-            if (lastGpxCoords) {
-                lat = lastGpxCoords.lat;
-                lon = lastGpxCoords.lon;
-            } else {
-                const coords = document.getElementById('weather-zone-select').value.split(',');
-                lat = coords[0];
-                lon = coords[1];
-            }
+            const coords = document.getElementById('weather-zone-select').value.split(',');
+            const lat = coords[0];
+            const lon = coords[1];
 
             try {
                 const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=weathercode,temperature_2m_max,temperature_2m_min&timezone=Europe%2FMadrid&start_date=${targetDate}&end_date=${targetDate}`;
@@ -1077,18 +1069,76 @@
                     setWeatherIconsFromString(icon);
                     document.getElementById('route-weather-temp').value = `${tMin} a ${tMax}`;
                 } else {
-                    alert("Aún no hay previsión disponible para esa fecha.");
+                    alert("Aún no hay previsión disponible para esa fecha (Open-Meteo ofrece hasta 16 días vista).");
                 }
             } catch (e) {
                 alert("No se pudo conectar con el servicio meteorológico.");
             }
         }
 
+        window.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const targetRouteId = urlParams.get('route');
+
+            if (useCloud) {
+                // Sincronización en tiempo real de rutas desde Firestore
+                db.collection("routes").onSnapshot((snapshot) => {
+                    if (!snapshot.empty) {
+                        routes = [];
+                        snapshot.forEach((doc) => {
+                            routes.push({ id: doc.id, ...doc.data() });
+                        });
+                    } else {
+                        // Si la colección está vacía en Firebase, subimos la ruta inicial
+                        db.collection("routes").doc("route-1").set(rutaInicial);
+                    }
+                    renderAll();
+                    renderCalendar();
+                    updateRouteSelectOptions();
+                }, (error) => {
+                    console.error("Error leyendo rutas de Firebase:", error);
+                    cargarDesdeLocalStorage();
+                });
+
+                // Sincronización en tiempo real de fotos desde Firestore
+                db.collection("gallery").onSnapshot((snapshot) => {
+                    clubGallery = [];
+                    snapshot.forEach((doc) => {
+                        clubGallery.push({ id: doc.id, ...doc.data() });
+                    });
+                    renderGallery();
+                }, (error) => {
+                    console.error("Error leyendo galería de Firebase:", error);
+                });
+            } else {
+                cargarDesdeLocalStorage();
+            }
+
+            if (isAdminLoggedIn) {
+                showAdminPanelContent();
+            }
+
+            if (targetRouteId) {
+                setTimeout(() => {
+                    const cardElement = document.getElementById(`card-${targetRouteId}`);
+                    if (cardElement) {
+                        cardElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        cardElement.classList.add('highlighted');
+                    }
+                }, 500);
+            }
+        });
+
         function cargarDesdeLocalStorage() {
             const localRoutes = localStorage.getItem('club_routes');
             if (localRoutes) routes = JSON.parse(localRoutes);
+            const localGal = localStorage.getItem('club_gallery');
+            if (localGal) clubGallery = JSON.parse(localGal);
+
             renderAll();
             renderCalendar();
+            renderGallery();
+            updateRouteSelectOptions();
         }
 
         function toggleViewMode() {
@@ -1149,19 +1199,19 @@
 
         function formatDistance(dist) {
             if (!dist) return '';
-            let d = String(dist).replace(/km/i, '').trim().replace('.', ',');
+            let d = dist.replace(/km/i, '').trim().replace('.', ',');
             return d + ' km';
         }
 
         function formatElevation(elev) {
             if (!elev) return '';
-            let e = String(elev).replace(/\+/g, '').replace(/m/i, '').trim();
+            let e = elev.replace(/\+/g, '').replace(/m/i, '').trim();
             return '+' + e + ' m';
         }
 
         function formatTemperature(temp) {
             if (!temp) return '';
-            let t = String(temp).trim();
+            let t = temp.trim();
             if (!t.toLowerCase().includes('c')) {
                 t += ' ºC';
             }
@@ -1182,11 +1232,7 @@
             return fieldValue;
         }
 
-        function formatDate(dateString) {
-            const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
-            return new Date(dateString).toLocaleDateString('es-ES', options);
-        }
-
+        /* COMPARTIR EN WHATSAPP CON FORMATO LIMPIO */
         function shareOnWhatsApp(routeId, title, dateStr, coffee, meeting, distance, elevation, weather, wikiloc) {
             let baseUrl = window.location.href.split('?')[0];
             let routeUrl = `${baseUrl}?route=${routeId}`;
@@ -1235,6 +1281,16 @@
             if (isAdminLoggedIn) {
                 renderAdminRoutesList();
             }
+        }
+
+        function openLightbox(url, caption) {
+            document.getElementById('lightbox-img').src = url;
+            document.getElementById('lightbox-caption').innerText = caption;
+            document.getElementById('lightbox-modal').classList.add('open');
+        }
+
+        function closeLightbox() {
+            document.getElementById('lightbox-modal').classList.remove('open');
         }
 
         function changeMonth(direction) {
@@ -1304,7 +1360,78 @@
             }
         }
 
-        function updateRouteSelectOptions() {}
+        function updateRouteSelectOptions() {
+            const select = document.getElementById('gallery-route-select');
+            if (!select) return;
+            select.innerHTML = `<option value="">-- Seleccionar Ruta Asociada --</option>` + 
+                routes.map(r => `<option value="${r.id}">${r.title}</option>`).join('');
+        }
+
+        function renderGallery() {
+            const container = document.getElementById('public-gallery-list');
+            if (!container) return;
+
+            if (clubGallery.length === 0) {
+                container.innerHTML = `<p style="font-size: 0.8rem; color: var(--text-light);">No hay fotos publicadas todavía.</p>`;
+                return;
+            }
+
+            container.innerHTML = clubGallery.map(photo => {
+                const routeObj = routes.find(r => r.id === photo.routeId);
+                const routeName = routeObj ? routeObj.title : 'Ruta general';
+
+                return `
+                    <div class="gallery-item">
+                        <img src="${photo.url}" alt="Foto galería" onerror="this.style.display='none'" onclick="openLightbox('${photo.url}', '${photo.title} (${routeName})')">
+                        <span class="gallery-route-tag">📍 ${routeName}</span>
+                        <p>${photo.title}</p>
+                        ${isAdminLoggedIn ? `<button class="btn btn-small btn-danger" style="width: 100%; font-size: 0.7rem; padding: 0.2rem;" onclick="deleteGalleryPhoto('${photo.id}')">Eliminar Foto</button>` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function addGalleryPhoto() {
+            const title = document.getElementById('gallery-photo-title').value.trim();
+            const routeId = document.getElementById('gallery-route-select').value;
+            const url = document.getElementById('gallery-photo-url').value.trim();
+
+            if (!title || !url) {
+                alert('Introduce el título y la URL de la foto.');
+                return;
+            }
+
+            const newPhoto = {
+                title,
+                routeId,
+                url,
+                createdAt: Date.now()
+            };
+
+            if (useCloud) {
+                db.collection("gallery").add(newPhoto);
+            } else {
+                newPhoto.id = 'photo_' + Date.now();
+                clubGallery.push(newPhoto);
+                localStorage.setItem('club_gallery', JSON.stringify(clubGallery));
+                renderGallery();
+            }
+
+            document.getElementById('gallery-photo-title').value = '';
+            document.getElementById('gallery-photo-url').value = '';
+        }
+
+        function deleteGalleryPhoto(id) {
+            if (confirm('¿Eliminar esta foto de la galería?')) {
+                if (useCloud) {
+                    db.collection("gallery").doc(id).delete();
+                } else {
+                    clubGallery = clubGallery.filter(p => p.id !== id);
+                    localStorage.setItem('club_gallery', JSON.stringify(clubGallery));
+                    renderGallery();
+                }
+            }
+        }
 
         function getBadgeClass(diff) {
             if (diff === 'Fácil') return 'badge-easy';
@@ -1312,11 +1439,9 @@
             return 'badge-hard';
         }
 
-        function getParticipantStatusLabel(status) {
-            if (status === 'confirmed') return 'Plaza Confirmada';
-            if (status === 'waitlist') return 'En Reserva (Lista espera)';
-            if (status === 'pending') return 'Pendiente';
-            return 'Denegada';
+        function formatDate(dateString) {
+            const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+            return new Date(dateString).toLocaleDateString('es-ES', options);
         }
 
         function renderScheduledRoutes(list) {
@@ -1338,23 +1463,17 @@
                 }
 
                 let participantsList = route.participants || [];
-                let activeCount = participantsList.filter(p => p.status === 'confirmed' || p.status === 'pending').length;
-                let maxSpots = parseInt(route.maxSpots) || 0;
-                let isFull = maxSpots > 0 && activeCount >= maxSpots;
-
-                let totalCarSeats = participantsList.reduce((acc, p) => acc + (p.hasCar && p.status !== 'denied' ? (parseInt(p.carSeats) || 0) : 0), 0);
 
                 return `
                     <div class="card" id="card-${route.id}">
                         <div>
-                            ${route.image ? `<img src="${route.image}" class="card-image" alt="Foto de ruta" onerror="this.style.display='none'">` : ''}
+                            ${route.image ? `<img src="${route.image}" class="card-image" alt="Foto de ruta" onerror="this.style.display='none'" onclick="openLightbox('${route.image}', '${route.title}')">` : ''}
                             <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem; gap: 0.5rem;">
                                 <h3>${route.title}</h3>
                                 <span class="badge ${getBadgeClass(route.difficulty)}">${route.difficulty}</span>
                             </div>
                             <div class="card-info">
                                 <p><strong>Fecha:</strong> ${formatDate(route.date)}</p>
-                                ${maxSpots > 0 ? `<p><strong>Plazas:</strong> ${activeCount} / ${maxSpots}${isFull ? '<span style="color:var(--warning);font-weight:bold;">(Completa - Lista de espera abierta)</span>' : ''}</p>` : ''}
                                 ${route.distance ? `<span><strong>Distancia:</strong> ${formatDistance(route.distance)} </span>` : ''}
                                 ${route.elevation ? `<span> | <strong>Desnivel:</strong> ${formatElevation(route.elevation)}</span>` : ''}
                                 ${coffeeHtml ? `<p style="margin-top: 0.3rem;"><strong>Café previo:</strong> ${coffeeHtml}</p>` : ''}
@@ -1366,10 +1485,7 @@
                         </div>
 
                         <div>
-                            ${totalCarSeats > 0 ? `<div class="carpool-box">🚗 Coches del grupo: ${totalCarSeats} plazas libres ofrecidas</div>` : ''}
-                            <button class="btn" style="width: 100%; margin-bottom: 0.5rem;" onclick="openRegisterModal('${route.id}')">
-                                ${isFull ? 'Apuntarse en Lista de Espera' : 'Inscribirse'}
-                            </button>
+                            <button class="btn" style="width: 100%; margin-bottom: 0.5rem;" onclick="openRegisterModal('${route.id}')">Inscribirse</button>
                             <button class="btn btn-whatsapp" onclick="shareOnWhatsApp('${route.id}', '${route.title.replace(/'/g, "\\'")}', '${route.date}', '${(route.coffee || '').replace(/'/g, "\\'")}', '${route.meeting.replace(/'/g, "\\'")}', '${route.distance || ''}', '${route.elevation || ''}', '${weatherDisplay.replace(/'/g, "\\'")}', '${route.wikiloc || ''}')">
                                 💬 Compartir por WhatsApp
                             </button>
@@ -1378,14 +1494,13 @@
                                 <h4>Asistentes inscritos (${participantsList.length})</h4>
                                 ${participantsList.length === 0 ? '<p style="font-size: 0.85rem; color: var(--text-light);">Aún sin inscripciones.</p>' : 
                                     participantsList.map(p => {
-                                        let statusClass = p.status || 'pending';
-                                        let statusText = getParticipantStatusLabel(statusClass);
-                                        let carBadge = p.hasCar ? `<span class="badge badge-car">🚗 +${p.carSeats} (${p.carZone || 'Zona no ind.'})</span>` : '';
+                                        let statusClass = p.status === 'confirmed' ? 'confirmed' : (p.status === 'pending' ? 'pending' : 'denied');
+                                        let statusText = p.status === 'confirmed' ? 'Plaza Confirmada' : (p.status === 'pending' ? 'Pendiente' : 'Denegada');
                                         
                                         return `
                                             <div class="participant-item ${statusClass}">
                                                 <div>
-                                                    <strong>${p.name}</strong>${carBadge}<br>
+                                                    <strong>${p.name}</strong><br>
                                                     <small style="color: var(--text-light);">${statusText}</small>
                                                 </div>
                                             </div>
@@ -1422,7 +1537,7 @@
                 return `
                     <div class="card" id="card-${route.id}" style="border-top-color: #78909c;">
                         <div>
-                            ${route.image ? `<img src="${route.image}" class="card-image" alt="Foto de ruta" onerror="this.style.display='none'">` : ''}
+                            ${route.image ? `<img src="${route.image}" class="card-image" alt="Foto de ruta" onerror="this.style.display='none'" onclick="openLightbox('${route.image}', '${route.title}')">` : ''}
                             <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem; gap: 0.5rem;">
                                 <h3>${route.title}</h3>
                                 <span class="badge" style="background-color: #eceff1; color: #455a64;">Realizada</span>
@@ -1449,7 +1564,7 @@
                                 ${participantsList.length === 0 ? '<p style="font-size: 0.85rem; color: var(--text-light);">Sin registros.</p>' : 
                                     participantsList.map(p => {
                                         let statusClass = p.status === 'confirmed' ? 'confirmed' : 'denied';
-                                        let statusText = p.status === 'confirmed' ? 'Plaza Confirmada (Asistió)' : 'No asistió';
+                                        let statusText = p.status === 'confirmed' ? 'Plaza Confirmada (Asistió)' : 'Denegada / No asistió';
                                         
                                         return `
                                             <div class="participant-item ${statusClass}">
@@ -1470,16 +1585,9 @@
 
         function openRegisterModal(routeId) {
             document.getElementById('register-route-id').value = routeId;
-            
-            const savedProfile = JSON.parse(localStorage.getItem('gayte_user_profile') || '{}');
-            document.getElementById('participant-name').value = savedProfile.name || '';
-            document.getElementById('participant-phone').value = savedProfile.phone || '';
-            document.getElementById('participant-insurance').checked = !!savedProfile.insurance;
-            document.getElementById('participant-has-car').checked = !!savedProfile.hasCar;
-            document.getElementById('participant-car-seats').value = savedProfile.carSeats || 3;
-            document.getElementById('participant-car-zone').value = savedProfile.carZone || '';
-            document.getElementById('carpool-extra').style.display = savedProfile.hasCar ? 'block' : 'none';
-
+            document.getElementById('participant-name').value = '';
+            document.getElementById('participant-phone').value = '';
+            document.getElementById('participant-insurance').checked = false;
             document.getElementById('modal-alert').innerHTML = '';
             document.getElementById('register-modal').classList.add('open');
         }
@@ -1493,103 +1601,56 @@
             const name = document.getElementById('participant-name').value.trim();
             const phone = document.getElementById('participant-phone').value.trim();
             const insurance = document.getElementById('participant-insurance').checked;
-            const hasCar = document.getElementById('participant-has-car').checked;
-            const carSeats = hasCar ? (parseInt(document.getElementById('participant-car-seats').value) || 0) : 0;
-            const carZone = hasCar ? document.getElementById('participant-car-zone').value.trim() : '';
 
             if (!name || !phone) {
                 document.getElementById('modal-alert').innerHTML = `<div class="alert alert-error">Introduce tu nombre y tu teléfono/WhatsApp.</div>`;
                 return;
             }
 
-            localStorage.setItem('gayte_user_profile', JSON.stringify({
-                name, phone, insurance, hasCar, carSeats, carZone
-            }));
-
-            const currentRoute = routes.find(r => r.id === routeId) || rutaInicial;
-            const participantsList = currentRoute.participants || [];
-            const activeCount = participantsList.filter(p => p.status === 'confirmed' || p.status === 'pending').length;
-            const maxSpots = parseInt(currentRoute.maxSpots) || 0;
-            const initialStatus = (maxSpots > 0 && activeCount >= maxSpots) ? 'waitlist' : 'pending';
-
             const newParticipant = {
                 id: 'p_' + Date.now(),
                 name,
                 phone,
-                status: initialStatus,
-                insurance,
-                hasCar,
-                carSeats,
-                carZone
+                status: 'pending',
+                insurance
             };
 
             if (useCloud) {
+                const currentRoute = routes.find(r => r.id === routeId) || rutaInicial;
                 const routeRef = db.collection("routes").doc(routeId);
+
                 routeRef.set({
                     ...currentRoute,
                     participants: firebase.firestore.FieldValue.arrayUnion(newParticipant)
                 }, { merge: true }).then(() => {
                     closeRegisterModal();
-                    if (initialStatus === 'waitlist') {
-                        alert('¡Ruta completa! Te hemos registrado en la Lista de Espera.');
-                    } else {
-                        alert('¡Inscripción enviada correctamente! Ya le aparece al organizador.');
-                    }
+                    alert('¡Inscripción enviada correctamente! Ya le aparece al organizador.');
                 }).catch(err => {
                     alert('Error enviando inscripción: ' + err.message);
                 });
             } else {
-                if (!currentRoute.participants) currentRoute.participants = [];
-                currentRoute.participants.push(newParticipant);
-                localStorage.setItem('club_routes', JSON.stringify(routes));
-                renderAll();
-                closeRegisterModal();
-                alert('¡Inscripción enviada correctamente!');
+                const route = routes.find(r => r.id === routeId);
+                if (route) {
+                    if (!route.participants) route.participants = [];
+                    route.participants.push(newParticipant);
+                    localStorage.setItem('club_routes', JSON.stringify(routes));
+                    renderAll();
+                    closeRegisterModal();
+                    alert('¡Inscripción enviada correctamente!');
+                }
             }
         }
 
-        async function loginAdmin() {
+        function loginAdmin() {
             const pass = document.getElementById('admin-pass').value;
-            if (!pass) {
-                document.getElementById('login-alert').innerHTML = `<div class="alert alert-error">Introduce la contraseña.</div>`;
-                return;
-            }
-
-            const inputHash = await sha256(pass);
-
-            if (inputHash === currentPassHash) {
+            if (pass === 'admin123') {
                 isAdminLoggedIn = true;
                 localStorage.setItem('admin_logged', 'true');
-                document.getElementById('login-alert').innerHTML = '';
-                document.getElementById('admin-pass').value = '';
                 showAdminPanelContent();
+                renderAdminRoutesList();
+                renderGallery();
             } else {
-                document.getElementById('login-alert').innerHTML = `<div class="alert alert-error">Contraseña incorrecta.</div>`;
-            }
-        }
-
-        async function changeAdminPassword() {
-            const newPass = prompt("Introduce la nueva contraseña de administrador que quieras usar:");
-            if (!newPass) return;
-
-            if (newPass.trim().length < 4) {
-                alert("La contraseña debe tener al menos 4 caracteres.");
-                return;
-            }
-
-            const newHash = await sha256(newPass.trim());
-            currentPassHash = newHash;
-
-            if (useCloud) {
-                db.collection("settings").doc("admin").set({ passHash: newHash }, { merge: true })
-                    .then(() => {
-                        alert("✅ ¡Contraseña cambiada y encriptada con éxito!");
-                    })
-                    .catch(err => {
-                        alert("Error guardando la nueva clave: " + err.message);
-                    });
-            } else {
-                alert("✅ Contraseña cambiada en modo local.");
+                document.getElementById('login-alert').innerHTML = `<div class="alert alert-error">Contraseña incorrecta (admin123).</div>`;
             }
         }
 
@@ -1598,12 +1659,16 @@
             localStorage.setItem('admin_logged', 'false');
             document.getElementById('admin-login-wrapper').style.display = 'block';
             document.getElementById('admin-panel-content').style.display = 'none';
+            document.getElementById('admin-gallery-controls').style.display = 'none';
+            document.getElementById('admin-pass').value = '';
             renderAll();
+            renderGallery();
         }
 
         function showAdminPanelContent() {
             document.getElementById('admin-login-wrapper').style.display = 'none';
             document.getElementById('admin-panel-content').style.display = 'block';
+            document.getElementById('admin-gallery-controls').style.display = 'block';
             renderAll();
         }
 
@@ -1611,7 +1676,6 @@
             const editId = document.getElementById('edit-route-id').value;
             const title = document.getElementById('route-title').value.trim();
             const date = document.getElementById('route-date').value;
-            const maxSpots = parseInt(document.getElementById('route-max-spots').value) || 0;
             const difficulty = document.getElementById('route-difficulty').value;
             const distance = document.getElementById('route-distance').value.trim();
             const elevation = document.getElementById('route-elevation').value.trim();
@@ -1631,7 +1695,6 @@
             const routeData = {
                 title,
                 date,
-                maxSpots,
                 difficulty,
                 distance,
                 elevation,
@@ -1672,7 +1735,6 @@
             document.getElementById('edit-route-id').value = '';
             document.getElementById('route-title').value = '';
             document.getElementById('route-date').value = '';
-            document.getElementById('route-max-spots').value = '0';
             document.getElementById('route-difficulty').value = 'Fácil';
             document.getElementById('route-distance').value = '';
             document.getElementById('route-elevation').value = '';
@@ -1683,9 +1745,6 @@
             document.getElementById('route-wikiloc').value = '';
             document.getElementById('route-image').value = '';
             document.getElementById('route-description').value = '';
-            document.getElementById('gpx-file-input').value = '';
-            document.getElementById('gpx-status').innerText = 'Calcula distancia, desnivel y nombre automáticamente.';
-            lastGpxCoords = null;
             document.getElementById('form-title').innerText = 'Programar Nueva Ruta';
             document.getElementById('save-route-btn').innerText = 'Guardar Ruta';
             document.getElementById('cancel-edit-btn').style.display = 'none';
@@ -1698,7 +1757,6 @@
                 document.getElementById('edit-route-id').value = route.id;
                 document.getElementById('route-title').value = route.title;
                 document.getElementById('route-date').value = route.date;
-                document.getElementById('route-max-spots').value = route.maxSpots || 0;
                 document.getElementById('route-difficulty').value = route.difficulty;
                 document.getElementById('route-distance').value = route.distance || '';
                 document.getElementById('route-elevation').value = route.elevation || '';
@@ -1729,22 +1787,6 @@
             }
         }
 
-        function notifyParticipantWhatsApp(phone, name, routeTitle, routeDate, status) {
-            let cleanPhone = (phone || '').replace(/[^0-9]/g, '');
-            if (!cleanPhone) {
-                alert("Este participante no tiene teléfono registrado.");
-                return;
-            }
-            if (cleanPhone.length === 9) cleanPhone = '34' + cleanPhone;
-
-            let statusMsg = `tu plaza para la ruta *${routeTitle}* (${formatDate(routeDate)}) está *CONFIRMADA* ✅.`;
-            if (status === 'waitlist') statusMsg = `estás en *LISTA DE ESPERA* para la ruta *${routeTitle}* (${formatDate(routeDate)}). Te avisaremos en cuanto quede una plaza libre.`;
-            else if (status === 'denied') statusMsg = `no ha sido posible confirmar tu plaza para la ruta *${routeTitle}*.`;
-
-            const text = `¡Hola ${name}! Te escribimos de *Rutas Bizkaia Gayte* 🏳️‍🌈⛰️ para informarte de que ${statusMsg}`;
-            window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(text)}`, '_blank');
-        }
-
         function renderAdminRoutesList() {
             const container = document.getElementById('admin-routes-list');
             if (routes.length === 0) {
@@ -1761,7 +1803,7 @@
                 return `
                     <div class="card" style="border-top-color: ${isPast ? '#78909c' : 'var(--primary)'};">
                         <div>
-                            ${route.image ? `<img src="${route.image}" class="card-image" alt="Foto de ruta" onerror="this.style.display='none'">` : ''}
+                            ${route.image ? `<img src="${route.image}" class="card-image" alt="Foto de ruta" onerror="this.style.display='none'" onclick="openLightbox('${route.image}', '${route.title}')">` : ''}
                             <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem; gap: 0.5rem;">
                                 <h3>${route.title}</h3>
                                 <span class="badge ${isPast ? '' : getBadgeClass(route.difficulty)}" style="${isPast ? 'background:#eceff1;color:#455a64;' : ''}">
@@ -1770,7 +1812,7 @@
                             </div>
                             <div class="card-info">
                                 <p><strong>Fecha:</strong> ${formatDate(route.date)}</p>
-                                <span style="font-size:0.8rem; color:#555;">Dist: ${formatDistance(route.distance)} | Desn: ${formatElevation(route.elevation)} | Cupo: ${route.maxSpots || 'Sin límite'}</span>
+                                <span style="font-size:0.8rem; color:#555;">Dist: ${formatDistance(route.distance)} | Desn: ${formatElevation(route.elevation)}</span>
                             </div>
                         </div>
 
@@ -1785,7 +1827,7 @@
                                 <h4>Gestión de Asistentes (${participantsList.length})</h4>
                                 ${participantsList.length === 0 ? '<p style="font-size: 0.85rem; color: var(--text-light);">Sin participantes.</p>' : 
                                     participantsList.map(p => {
-                                        let statusClass = p.status || 'pending';
+                                        let statusClass = p.status === 'confirmed' ? 'confirmed' : (p.status === 'pending' ? 'pending' : 'denied');
                                         let insuranceBadge = p.insurance ? 
                                             `<span class="badge badge-insurance-yes">Seguro SÍ</span>` : 
                                             `<span class="badge badge-insurance-no">Seguro NO</span>`;
@@ -1798,13 +1840,11 @@
                                             <div class="participant-item ${statusClass}" style="flex-direction: column; align-items: stretch; gap: 0.4rem; padding: 0.5rem;">
                                                 <div style="display: flex; justify-content: space-between; align-items: center;">
                                                     <div>
-                                                        <strong>${p.name}</strong>${p.hasCar ? `<span class="badge badge-car">🚗 +${p.carSeats} (${p.carZone || ''})</span>` : ''}<br>
-                                                        ${waBtn}
+                                                        <strong>${p.name}</strong><br>${waBtn}
                                                     </div>
-                                                    <div style="display: flex; align-items: center; gap: 0.3rem;">
+                                                    <div style="display: flex; align-items: center; gap: 0.4rem;">
                                                         ${insuranceBadge}
-                                                        <button class="btn btn-small" style="background:var(--whatsapp); padding: 0.15rem 0.4rem; font-size: 0.75rem;" title="Enviar confirmación por WhatsApp" onclick="notifyParticipantWhatsApp('${p.phone || ''}', '${p.name.replace(/'/g, "\\'")}', '${route.title.replace(/'/g, "\\'")}', '${route.date}', '${p.status}')">📲 Avisar</button>
-                                                        <button class="btn btn-small btn-danger" style="padding: 0.15rem 0.35rem; font-size: 0.75rem;" onclick="removeParticipant('${route.id}', '${p.id}')">X</button>
+                                                        <button class="btn btn-small btn-danger" style="padding: 0.1rem 0.3rem; font-size: 0.75rem;" onclick="removeParticipant('${route.id}', '${p.id}')">X</button>
                                                     </div>
                                                 </div>
                                                 <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; flex-wrap: wrap; gap: 0.3rem;">
@@ -1813,7 +1853,6 @@
                                                         <select onchange="changeParticipantStatus('${route.id}', '${p.id}', this.value)" style="padding: 0.2rem; font-size: 0.8rem;">
                                                             <option value="confirmed" ${p.status === 'confirmed' ? 'selected' : ''}>Confirmada</option>
                                                             <option value="pending" ${p.status === 'pending' ? 'selected' : ''}>Pendiente</option>
-                                                            <option value="waitlist" ${p.status === 'waitlist' ? 'selected' : ''}>En Reserva</option>
                                                             <option value="denied" ${p.status === 'denied' ? 'selected' : ''}>Denegada</option>
                                                         </select>
                                                     </div>
