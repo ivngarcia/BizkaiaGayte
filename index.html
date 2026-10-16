@@ -798,15 +798,17 @@
         </div>
     </main>
 
-    <!-- MODAL DE INSCRIPCIÓN -->
+    <!-- MODAL DE INSCRIPCIÓN / AUTOGESTIÓN -->
     <div id="register-modal" class="modal">
         <div class="modal-content">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                <h3>Inscribirse a la Ruta</h3>
+                <h3 id="modal-main-title">Inscribirse a la Ruta</h3>
                 <button class="close-btn" onclick="closeRegisterModal()">&times;</button>
             </div>
             <div id="modal-alert"></div>
             <input type="hidden" id="register-route-id">
+            <input type="hidden" id="existing-participant-id">
+            
             <div class="form-group">
                 <label for="participant-name">Nombre y Apellidos</label>
                 <input type="text" id="participant-name" placeholder="Tu nombre completo">
@@ -840,7 +842,11 @@
                     </div>
                 </div>
             </div>
-            <button class="btn" style="width: 100%; margin-top: 0.5rem;" onclick="submitRegistration()">Enviar Inscripción</button>
+
+            <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
+                <button class="btn" id="submit-reg-btn" style="flex: 1;" onclick="submitRegistration()">Guardar Inscripción</button>
+                <button class="btn btn-danger" id="cancel-reg-btn" style="display: none; width: auto;" onclick="cancelMyRegistration()">🗑️ Darse de baja</button>
+            </div>
         </div>
     </div>
 
@@ -1333,6 +1339,8 @@
                 return;
             }
 
+            const myRegistrations = JSON.parse(localStorage.getItem('gayte_my_registrations') || '{}');
+
             container.innerHTML = list.map(route => {
                 let coffeeHtml = formatMapField(route.coffee);
                 let meetingHtml = formatMapField(route.meeting);
@@ -1350,6 +1358,10 @@
                 let isFull = maxSpots > 0 && activeCount >= maxSpots;
 
                 let totalCarSeats = participantsList.reduce((acc, p) => acc + (p.hasCar && p.status !== 'denied' ? (parseInt(p.carSeats) || 0) : 0), 0);
+
+                let myRegId = myRegistrations[route.id];
+                let userAlreadyRegistered = myRegId && participantsList.some(p => p.id === myRegId);
+                let regButtonText = userAlreadyRegistered ? '⚙️ Gestionar / Editar mi inscripción' : (isFull ? 'Apuntarse en Lista de Espera' : 'Inscribirse');
 
                 return `
                     <div class="card" id="card-${route.id}">
@@ -1374,8 +1386,8 @@
 
                         <div>
                             ${totalCarSeats > 0 ? `<div class="carpool-box">🚗 Coches del grupo: ${totalCarSeats} plazas libres ofrecidas</div>` : ''}
-                            <button class="btn" style="width: 100%; margin-bottom: 0.5rem;" onclick="openRegisterModal('${route.id}')">
-                                ${isFull ? 'Apuntarse en Lista de Espera' : 'Inscribirse'}
+                            <button class="btn" style="width: 100%; margin-bottom: 0.5rem; ${userAlreadyRegistered ? 'background-color: var(--info);' : ''}" onclick="openRegisterModal('${route.id}')">
+                                ${regButtonText}
                             </button>
                             <button class="btn btn-whatsapp" onclick="shareOnWhatsApp('${route.id}', '${route.title.replace(/'/g, "\\'")}', '${route.date}', '${(route.coffee || '').replace(/'/g, "\\'")}', '${route.meeting.replace(/'/g, "\\'")}', '${route.distance || ''}', '${route.elevation || ''}', '${weatherDisplay.replace(/'/g, "\\'")}', '${route.wikiloc || ''}')">
                                 💬 Compartir por WhatsApp
@@ -1478,14 +1490,39 @@
         function openRegisterModal(routeId) {
             document.getElementById('register-route-id').value = routeId;
             
-            const savedProfile = JSON.parse(localStorage.getItem('gayte_user_profile') || '{}');
-            document.getElementById('participant-name').value = savedProfile.name || '';
-            document.getElementById('participant-phone').value = savedProfile.phone || '';
-            document.getElementById('participant-insurance').checked = !!savedProfile.insurance;
-            document.getElementById('participant-has-car').checked = !!savedProfile.hasCar;
-            document.getElementById('participant-car-seats').value = savedProfile.carSeats || 3;
-            document.getElementById('participant-car-zone').value = savedProfile.carZone || '';
-            document.getElementById('carpool-extra').style.display = savedProfile.hasCar ? 'block' : 'none';
+            const route = routes.find(r => r.id === routeId);
+            const myRegistrations = JSON.parse(localStorage.getItem('gayte_my_registrations') || '{}');
+            const myRegId = myRegistrations[routeId];
+            const existingParticipant = route && route.participants ? route.participants.find(p => p.id === myRegId) : null;
+
+            if (existingParticipant) {
+                // Modo Edición / Autogestión
+                document.getElementById('modal-main-title').innerText = 'Gestionar mi Inscripción';
+                document.getElementById('existing-participant-id').value = existingParticipant.id;
+                document.getElementById('participant-name').value = existingParticipant.name || '';
+                document.getElementById('participant-phone').value = existingParticipant.phone || '';
+                document.getElementById('participant-insurance').checked = !!existingParticipant.insurance;
+                document.getElementById('participant-has-car').checked = !!existingParticipant.hasCar;
+                document.getElementById('participant-car-seats').value = existingParticipant.carSeats || 3;
+                document.getElementById('participant-car-zone').value = existingParticipant.carZone || '';
+                document.getElementById('carpool-extra').style.display = existingParticipant.hasCar ? 'block' : 'none';
+                document.getElementById('submit-reg-btn').innerText = 'Actualizar Mis Datos';
+                document.getElementById('cancel-reg-btn').style.display = 'block';
+            } else {
+                // Modo Nueva Inscripción
+                document.getElementById('modal-main-title').innerText = 'Inscribirse a la Ruta';
+                document.getElementById('existing-participant-id').value = '';
+                const savedProfile = JSON.parse(localStorage.getItem('gayte_user_profile') || '{}');
+                document.getElementById('participant-name').value = savedProfile.name || '';
+                document.getElementById('participant-phone').value = savedProfile.phone || '';
+                document.getElementById('participant-insurance').checked = !!savedProfile.insurance;
+                document.getElementById('participant-has-car').checked = !!savedProfile.hasCar;
+                document.getElementById('participant-car-seats').value = savedProfile.carSeats || 3;
+                document.getElementById('participant-car-zone').value = savedProfile.carZone || '';
+                document.getElementById('carpool-extra').style.display = savedProfile.hasCar ? 'block' : 'none';
+                document.getElementById('submit-reg-btn').innerText = 'Enviar Inscripción';
+                document.getElementById('cancel-reg-btn').style.display = 'none';
+            }
 
             document.getElementById('modal-alert').innerHTML = '';
             document.getElementById('register-modal').classList.add('open');
@@ -1497,6 +1534,7 @@
 
         function submitRegistration() {
             const routeId = document.getElementById('register-route-id').value;
+            const existingId = document.getElementById('existing-participant-id').value;
             const name = document.getElementById('participant-name').value.trim();
             const phone = document.getElementById('participant-phone').value.trim();
             const insurance = document.getElementById('participant-insurance').checked;
@@ -1514,55 +1552,102 @@
             }));
 
             const currentRoute = routes.find(r => r.id === routeId) || rutaInicial;
-            const participantsList = currentRoute.participants || [];
-            const activeCount = participantsList.filter(p => p.status === 'confirmed' || p.status === 'pending').length;
-            const maxSpots = parseInt(currentRoute.maxSpots) || 0;
+            let participantsList = currentRoute.participants || [];
             
-            let initialStatus = 'pending';
+            let status = 'pending';
             if (insurance) {
-                initialStatus = (maxSpots > 0 && activeCount >= maxSpots) ? 'waitlist' : 'confirmed';
+                const activeCount = participantsList.filter(p => (p.status === 'confirmed' || p.status === 'pending') && p.id !== existingId).length;
+                const maxSpots = parseInt(currentRoute.maxSpots) || 0;
+                status = (maxSpots > 0 && activeCount >= maxSpots) ? 'waitlist' : 'confirmed';
             } else {
-                initialStatus = 'pending'; // Si no tiene seguro, queda pendiente / aviso de falta de seguro
+                status = 'pending'; // Sin seguro queda pendiente
             }
 
-            const newParticipant = {
-                id: 'p_' + Date.now(),
-                name,
-                phone,
-                status: initialStatus,
-                insurance,
-                hasCar,
-                carSeats,
-                carZone
-            };
+            let participantObj;
+            if (existingId) {
+                // Actualizar existente
+                participantsList = participantsList.map(p => {
+                    if (p.id === existingId) {
+                        participantObj = { ...p, name, phone, insurance, hasCar, carSeats, carZone, status };
+                        return participantObj;
+                    }
+                    return p;
+                });
+            } else {
+                // Crear nuevo
+                participantObj = {
+                    id: 'p_' + Date.now(),
+                    name,
+                    phone,
+                    status,
+                    insurance,
+                    hasCar,
+                    carSeats,
+                    carZone
+                };
+                participantsList.push(participantObj);
+                
+                let myRegistrations = JSON.parse(localStorage.getItem('gayte_my_registrations') || '{}');
+                myRegistrations[routeId] = participantObj.id;
+                localStorage.setItem('gayte_my_registrations', JSON.stringify(myRegistrations));
+            }
 
             if (useCloud) {
-                const routeRef = db.collection("routes").doc(routeId);
-                routeRef.set({
+                db.collection("routes").doc(routeId).set({
                     ...currentRoute,
-                    participants: firebase.firestore.FieldValue.arrayUnion(newParticipant)
+                    participants: participantsList
                 }, { merge: true }).then(() => {
                     closeRegisterModal();
                     if (!insurance) {
                         alert('⚠️ Te has inscrito, pero al NO marcar el seguro, tu plaza ha quedado PENDIENTE. Recuerda que sin seguro no se puede confirmar la plaza.');
-                    } else if (initialStatus === 'waitlist') {
-                        alert('¡Ruta completa! Te hemos registrado en la Lista de Espera.');
                     } else {
-                        alert('¡Inscripción y plaza confirmada correctamente!');
+                        alert('¡Inscripción actualizada correctamente!');
                     }
                 }).catch(err => {
-                    alert('Error enviando inscripción: ' + err.message);
+                    alert('Error guardando inscripción: ' + err.message);
                 });
             } else {
-                if (!currentRoute.participants) currentRoute.participants = [];
-                currentRoute.participants.push(newParticipant);
+                currentRoute.participants = participantsList;
                 localStorage.setItem('club_routes', JSON.stringify(routes));
                 renderAll();
                 closeRegisterModal();
                 if (!insurance) {
                     alert('⚠️ Te has inscrito, pero al NO marcar el seguro, tu plaza ha quedado PENDIENTE. Recuerda que sin seguro no se puede confirmar la plaza.');
                 } else {
-                    alert('¡Inscripción y plaza confirmada correctamente!');
+                    alert('¡Inscripción actualizada correctamente!');
+                }
+            }
+        }
+
+        function cancelMyRegistration() {
+            const routeId = document.getElementById('register-route-id').value;
+            const existingId = document.getElementById('existing-participant-id').value;
+
+            if (!confirm('¿Estás seguro de que deseas darte de baja de esta ruta?')) return;
+
+            const currentRoute = routes.find(r => r.id === routeId);
+            if (currentRoute && currentRoute.participants) {
+                const updatedList = currentRoute.participants.filter(p => p.id !== existingId);
+
+                let myRegistrations = JSON.parse(localStorage.getItem('gayte_my_registrations') || '{}');
+                delete myRegistrations[routeId];
+                localStorage.setItem('gayte_my_registrations', JSON.stringify(myRegistrations));
+
+                if (useCloud) {
+                    db.collection("routes").doc(routeId).set({
+                        participants: updatedList
+                    }, { merge: true }).then(() => {
+                        closeRegisterModal();
+                        alert('Te has dado de baja de la ruta correctamente.');
+                    }).catch(err => {
+                        alert('Error al dar de baja: ' + err.message);
+                    });
+                } else {
+                    currentRoute.participants = updatedList;
+                    localStorage.setItem('club_routes', JSON.stringify(routes));
+                    renderAll();
+                    closeRegisterModal();
+                    alert('Te has dado de baja de la ruta correctamente.');
                 }
             }
         }
