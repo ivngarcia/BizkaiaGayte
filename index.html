@@ -998,18 +998,18 @@
         const rutaInicial = {
             id: 'route-1',
             title: 'Ruta de los Dólmenes de Oiz',
-            date: '2026-10-17T10:00',
+            date: '2026-10-18T10:00',
             maxSpots: 20,
             difficulty: 'Media',
             distance: '17.79',
             elevation: '644',
             coffee: 'Bar Uriarte (https://maps.app.goo.gl/ejemplo)',
             meeting: 'Merendero-Undakorta (https://maps.app.goo.gl/TESfLoWCVXUwg58b6)',
-            weatherIcon: '⛅ 🌧️',
-            weatherTemp: '13',
+            weatherIcon: '⛅',
+            weatherTemp: '13 a 16',
             wikiloc: 'https://es.wikiloc.com/rutas-senderismo/ruta-de-los-dolmenes-de-oiz-iturzurigana-zengotitagana-oiz-astokurzeteburu-ipinarrieta-65984900',
-            image: 'https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=600&q=80',
-            description: 'Magnífica ruta por los dólmenes de Oiz.',
+            image: 'https://i.imgur.com/ybDAKiY.jpg',
+            description: 'Ruta de los Dólmenes del Oiz.',
             participants: []
         };
 
@@ -1940,21 +1940,16 @@
                 return;
             }
 
-            const now = new Date();
-
             container.innerHTML = routes.map(route => {
-                let isPast = new Date(route.date) < now;
                 let participantsList = route.participants || [];
 
                 return `
-                    <div class="card" style="border-top-color: ${isPast ? '#78909c' : 'var(--primary)'};">
+                    <div class="card" style="border-top-color: var(--primary);">
                         <div>
                             ${route.image ? `<img src="${route.image}" class="card-image" alt="Foto de ruta" onerror="this.style.display='none'">` : ''}
                             <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem; gap: 0.5rem;">
                                 <h3>${route.title}</h3>
-                                <span class="badge ${isPast ? '' : getBadgeClass(route.difficulty)}" style="${isPast ? 'background:#eceff1;color:#455a64;' : ''}">
-                                    ${isPast ? 'Realizada' : route.difficulty}
-                                </span>
+                                <span class="badge badge-medium">Gestión Admin</span>
                             </div>
                             <div class="card-info">
                                 <p><strong>Fecha:</strong> ${formatDate(route.date)}</p>
