@@ -1833,10 +1833,18 @@
 
             if (useCloud) {
                 if (editId) {
-                    db.collection("routes").doc(editId).set(routeData, { merge: true });
+                    db.collection("routes").doc(editId).set(routeData, { merge: true }).then(() => {
+                        alert("✅ Ruta actualizada correctamente.");
+                    }).catch(err => {
+                        alert("Error al actualizar: " + err.message);
+                    });
                 } else {
                     routeData.participants = [];
-                    db.collection("routes").add(routeData);
+                    db.collection("routes").add(routeData).then(() => {
+                        alert("✅ Ruta creada correctamente.");
+                    }).catch(err => {
+                        alert("Error al crear: " + err.message);
+                    });
                 }
             } else {
                 if (editId) {
@@ -1852,7 +1860,6 @@
             }
 
             resetRouteForm();
-            document.getElementById('route-form-alert').innerHTML = `<div class="alert alert-success">Ruta guardada con éxito.</div>`;
         }
 
         function resetRouteForm() {
@@ -1905,13 +1912,18 @@
         }
 
         function deleteRoute(id) {
-            if (confirm('¿Eliminar esta ruta?')) {
+            if (confirm('¿Estás seguro de que deseas eliminar esta ruta por completo?')) {
                 if (useCloud) {
-                    db.collection("routes").doc(id).delete();
+                    db.collection("routes").doc(id).delete().then(() => {
+                        alert("✅ Ruta eliminada correctamente de Firebase.");
+                    }).catch(err => {
+                        alert("Error al eliminar la ruta: " + err.message);
+                    });
                 } else {
                     routes = routes.filter(r => r.id !== id);
                     localStorage.setItem('club_routes', JSON.stringify(routes));
                     renderAll();
+                    alert("✅ Ruta eliminada correctamente.");
                 }
             }
         }
