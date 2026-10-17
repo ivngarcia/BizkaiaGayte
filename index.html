@@ -11,6 +11,14 @@
     <meta property="og:image" id="meta-og-image" content="https://i.imgur.com/ybDAKiY.jpg">
     <meta property="og:type" content="website">
 
+    <!-- CONFIGURACIÓN PWA (APP INSTALABLE EN MÓVIL) -->
+    <meta name="theme-color" content="#2e7d32">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Bizkaia Gayte">
+    <link rel="apple-touch-icon" href="https://i.imgur.com/ybDAKiY.jpg">
+    <link rel="manifest" href="manifest.json">
+
     <!-- SDKs DE FIREBASE (COMPATIBLES) -->
     <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore-compat.js"></script>
@@ -21,21 +29,28 @@
             --bg-color: #f4f6f5; --card-bg: #ffffff; --text-color: #333333;
             --text-light: #555555; --border-color: #dddddd;
             --danger: #d32f2f; --warning: #f57c00; --success: #388e3c;
+            --info: #0288d1;
             --whatsapp: #25d366; --whatsapp-dark: #128c7e;
+            --instagram: #e1306c; --instagram-dark: #c13584;
         }
 
-        /* COMIC SANS POR DEFECTO PARA ORDENADOR */
+        /* COMIC SANS POR DEFECTO PARA ORDENADOR Y AJUSTE FLUIDO */
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
             font-family: 'Comic Sans MS', 'Chalkboard SE', 'Comic Neue', cursive, sans-serif !important;
+            max-width: 100%;
         }
 
         body {
             background-color: var(--bg-color);
             color: var(--text-color);
             line-height: 1.6;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
         }
 
         /* CABECERA CON IMAGEN DE FONDO */
@@ -45,7 +60,7 @@
                         url('https://i.imgur.com/ybDAKiY.jpg') no-repeat center center;
             background-size: cover;
             color: white;
-            padding: 4rem 1rem;
+            padding: 3.5rem 1rem;
             text-align: center;
             box-shadow: 0 4px 10px rgba(0,0,0,0.25);
             overflow: hidden;
@@ -55,8 +70,8 @@
         header::after {
             content: '';
             position: absolute;
-            top: 15px; left: 15px; right: 15px; bottom: 15px;
-            border: 12px solid transparent;
+            top: 12px; left: 12px; right: 12px; bottom: 12px;
+            border: 10px solid transparent;
             border-image: linear-gradient(135deg, #FF0018, #FFA52C, #FFFF41, #008018, #0000F9, #86007D) 1;
             filter: blur(8px);
             opacity: 0.85;
@@ -68,24 +83,25 @@
         header::before {
             content: '';
             position: absolute;
-            top: 15px; left: 15px; right: 15px; bottom: 15px;
+            top: 12px; left: 12px; right: 12px; bottom: 12px;
             border: 2px solid rgba(255, 255, 255, 0.6);
             pointer-events: none;
             z-index: 2;
         }
 
-        header h1, header p.friendly-desc, header p.club-info, .view-switcher {
+        header h1, header p.friendly-desc, header p.club-info {
             position: relative;
             z-index: 3;
         }
 
         header h1 {
-            font-size: 4.2rem;
+            font-size: 4rem;
             font-style: italic;
             font-weight: bold;
             margin-bottom: 0.4rem;
             letter-spacing: 1px;
             text-shadow: 0 3px 8px rgba(0,0,0,0.8);
+            word-break: break-word;
         }
 
         header p.friendly-desc {
@@ -104,29 +120,7 @@
             font-weight: bold;
         }
 
-        /* Botón flotante para alternar vista */
-        .view-switcher {
-            position: absolute;
-            top: 2rem;
-            right: 2rem;
-            background: rgba(255, 255, 255, 0.25);
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            color: white;
-            padding: 0.4rem 0.8rem;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 0.4rem;
-            transition: background 0.2s;
-            backdrop-filter: blur(4px);
-        }
-
-        .view-switcher:hover {
-            background: rgba(255, 255, 255, 0.4);
-        }
-
+        /* BARRA DE NAVEGACIÓN 100% ADAPTATIVA SIN SALIRSE DE LA PANTALLA */
         nav {
             background-color: white;
             display: flex;
@@ -135,25 +129,28 @@
             position: sticky;
             top: 0;
             z-index: 100;
-            overflow-x: auto;
+            width: 100%;
+            flex-wrap: wrap;
         }
 
         nav button {
             background: none;
             border: none;
-            padding: 0.9rem 1.2rem;
+            padding: 0.85rem 0.5rem;
             font-size: 0.95rem;
             font-weight: bold;
             cursor: pointer;
             color: var(--text-light);
             border-bottom: 3px solid transparent;
             transition: all 0.3s ease;
-            white-space: nowrap;
+            flex: 1 1 auto;
+            text-align: center;
         }
 
         nav button.active {
             color: var(--primary);
             border-bottom-color: var(--primary);
+            background-color: #f9fbf9;
         }
 
         nav button:hover {
@@ -164,9 +161,11 @@
             max-width: 1450px;
             margin: 1.5rem auto;
             padding: 0 1rem;
+            flex: 1;
+            width: 100%;
         }
 
-        /* LAYOUT DE 3 COLUMNAS */
+        /* LAYOUT DE 3 COLUMNAS ADAPTATIVO */
         .app-layout {
             display: grid;
             grid-template-columns: 280px 1fr 300px;
@@ -183,20 +182,37 @@
             }
         }
 
-        /* TIPOGRAFÍA NATIVA / VERDANA / ARIAL PARA MÓVIL */
+        /* ADAPTACIÓN AUTOMÁTICA A MÓVILES Y TABLETS */
         @media (max-width: 900px) {
             * {
                 font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Verdana, Arial, sans-serif !important;
             }
+            header {
+                padding: 2.5rem 0.8rem;
+            }
             header h1 {
-                font-size: 2.6rem;
+                font-size: 2.2rem;
+            }
+            header p.friendly-desc {
+                font-size: 1.15rem;
+            }
+            header p.club-info {
+                font-size: 0.95rem;
+            }
+            nav button {
+                font-size: 0.82rem;
+                padding: 0.75rem 0.3rem;
+            }
+            main {
+                margin: 1rem auto;
+                padding: 0 0.6rem;
             }
             .app-layout {
                 grid-template-columns: 1fr;
+                gap: 1.2rem;
             }
-            .view-switcher {
-                top: 1.5rem;
-                right: 1.5rem;
+            .grid-cards {
+                grid-template-columns: 1fr !important;
             }
         }
 
@@ -444,6 +460,7 @@
 
         .section-content {
             display: none;
+            width: 100%;
         }
 
         .section-content.active {
@@ -462,6 +479,7 @@
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
             gap: 1.2rem;
+            width: 100%;
         }
 
         .card {
@@ -474,6 +492,7 @@
             justify-content: space-between;
             border-top: 4px solid var(--primary);
             transition: all 0.3s ease;
+            width: 100%;
         }
 
         /* ESTILO DESTACADO CUANDO SE ABRE UNA RUTA ESPECÍFICA DESDE WHATSAPP */
@@ -502,12 +521,14 @@
             font-size: 1.2rem;
             margin-bottom: 0.4rem;
             color: var(--primary-dark);
+            word-break: break-word;
         }
 
         .card-info {
             margin-bottom: 1rem;
             font-size: 0.9rem;
             color: var(--text-light);
+            word-break: break-word;
         }
 
         .card-info p {
@@ -532,6 +553,7 @@
         .badge-hard { background-color: #ffebee; color: #c62828; }
         .badge-insurance-yes { background-color: #e0f2f1; color: #00695c; }
         .badge-insurance-no { background-color: #fbe9e7; color: #d84315; }
+        .badge-car { background-color: #e1f5fe; color: #0277bd; }
 
         .btn {
             background-color: var(--primary);
@@ -557,6 +579,13 @@
         }
         .btn-secondary:hover {
             background-color: #546e7a;
+        }
+
+        .btn-info {
+            background-color: var(--info);
+        }
+        .btn-info:hover {
+            background-color: #01579b;
         }
 
         .btn-danger {
@@ -586,6 +615,16 @@
             background-color: var(--whatsapp-dark);
         }
 
+        .carpool-box {
+            background: #e1f5fe;
+            color: #01579b;
+            padding: 0.4rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.82rem;
+            margin-bottom: 0.6rem;
+            font-weight: bold;
+        }
+
         .participants-section {
             margin-top: 1rem;
             border-top: 1px solid var(--border-color);
@@ -608,11 +647,12 @@
             border-radius: 4px;
             margin-bottom: 0.3rem;
             border-left: 3px solid var(--border-color);
+            word-break: break-word;
         }
 
         .participant-item.confirmed { border-left-color: var(--success); }
-        .participant-item.pending { border-left-color: var(--warning); }
-        .participant-item.denied { border-left-color: var(--danger); }
+        .participant-item.pending { border-left-color: var(--warning); background: #fff8e1; }
+        .participant-item.denied { border-left-color: var(--danger); background: #ffebee; }
 
         .form-group {
             margin-bottom: 1rem;
@@ -707,31 +747,61 @@
         .alert-error { background-color: #ffebee; color: var(--danger); border: 1px solid #ffcdd2; }
         .alert-success { background-color: #e8f5e9; color: var(--success); border: 1px solid #c8e6c9; }
 
-        body.force-mobile {
-            max-width: 480px;
-            margin: 0 auto;
-            border-left: 1px solid #ccc;
-            border-right: 1px solid #ccc;
-            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        /* PIE DE PÁGINA */
+        footer {
+            background-color: #ffffff;
+            border-top: 1px solid var(--border-color);
+            text-align: center;
+            padding: 1.5rem 1rem;
+            margin-top: 2rem;
+            color: var(--text-light);
+            font-size: 0.9rem;
         }
 
-        body.force-mobile, body.force-mobile * {
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Verdana, Arial, sans-serif !important;
+        .footer-social-links {
+            display: flex;
+            justify-content: center;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+            margin-top: 0.6rem;
         }
 
-        body.force-mobile .app-layout {
-            grid-template-columns: 1fr !important;
+        .footer-whatsapp-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            background-color: var(--whatsapp);
+            color: white;
+            padding: 0.6rem 1.2rem;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background 0.2s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
+        .footer-whatsapp-link:hover { background-color: var(--whatsapp-dark); }
 
-        body.force-mobile .grid-cards {
-            grid-template-columns: 1fr !important;
+        .footer-instagram-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            background-color: var(--instagram);
+            color: white;
+            padding: 0.6rem 1.2rem;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background 0.2s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
+        .footer-instagram-link:hover { background-color: var(--instagram-dark); }
     </style>
 </head>
 <body id="app-body">
 
     <header id="main-header">
-        <button class="view-switcher" id="view-switch-btn" onclick="toggleViewMode()">📱 Cambiar a Móvil</button>
         <h1>Rutas Bizkaia Gayte</h1>
         <p class="friendly-desc">¡Únete a nuestras aventuras!</p>
         <p class="club-info">Rutas de montaña, amigos y naturaleza en Bizkaia.</p>
@@ -765,9 +835,9 @@
                     <div class="calendar-grid" id="calendar-days-container"></div>
                 </div>
 
-                <div class="insurance-info-card">
+                <div class="insurance-info-card" id="insurance-card-box">
                     <h3>🛡️ Importancia del Seguro</h3>
-                    <p>Recomendamos contar con seguro de aventura: <strong>Modalidad A</strong> o <strong>Anual</strong>. La Responsabilidad Civil es a elección personal.</p>
+                    <p>Es obligatorio contar con seguro de aventura: <strong>Modalidad A (Diario)</strong> o <strong>Anual</strong>. La Responsabilidad Civil es a elección personal.</p>
                     <a href="https://seguros.rocalbsub.com/contratar/aventura" target="_blank" class="insurance-link-btn">🔗 Contratar Seguro Rocalsub</a>
                 </div>
             </aside>
@@ -794,7 +864,7 @@
                         <div id="login-alert"></div>
                         <div class="form-group">
                             <label for="admin-pass">Contraseña</label>
-                            <input type="password" id="admin-pass" placeholder="Contraseña de admin (admin123)">
+                            <input type="password" id="admin-pass" placeholder="Contraseña de admin" onkeydown="if(event.key==='Enter') loginAdmin()">
                         </div>
                         <button class="btn" style="width: 100%;" onclick="loginAdmin()">Entrar</button>
                     </div>
@@ -802,7 +872,10 @@
                     <div id="admin-panel-content" style="display: none;">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem; flex-wrap: wrap; gap: 0.5rem;">
                             <h2>Panel de Control</h2>
-                            <button class="btn btn-secondary btn-small" onclick="logoutAdmin()">Cerrar Sesión</button>
+                            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                                <button class="btn btn-danger btn-small" onclick="clearAllRoutes()">🧹 Vaciar Rutas</button>
+                                <button class="btn btn-secondary btn-small" onclick="logoutAdmin()">Cerrar Sesión</button>
+                            </div>
                         </div>
 
                         <div style="background: white; padding: 1.2rem; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 2rem;">
@@ -812,7 +885,7 @@
                             
                             <div class="form-group">
                                 <label for="route-title">Título de la Ruta</label>
-                                <input type="text" id="route-title" placeholder="Ej. Ascensión al Eretza">
+                                <input type="text" id="route-title" placeholder="Ej. Los Dólmenes del Oiz">
                             </div>
                             <div class="form-group">
                                 <label for="route-date">Fecha y Hora</label>
@@ -822,7 +895,7 @@
                                 <label for="route-difficulty">Dificultad</label>
                                 <select id="route-difficulty">
                                     <option value="Fácil">Fácil</option>
-                                    <option value="Media">Media</option>
+                                    <option value="Media" selected>Media</option>
                                     <option value="Difícil">Difícil</option>
                                 </select>
                             </div>
@@ -859,7 +932,7 @@
                                 </div>
                                 <input type="hidden" id="route-weather-icon" value="">
                                 <label style="margin-top: 0.5rem;" for="route-weather-temp">Temperatura (Añadirá ºC automáticamente)</label>
-                                <input type="text" id="route-weather-temp" placeholder="Ej. 22 o 15 a 22">
+                                <input type="text" id="route-weather-temp" placeholder="Ej. 13 a 16">
                             </div>
 
                             <div class="form-group">
@@ -875,7 +948,7 @@
                                 <textarea id="route-description" rows="3" placeholder="Detalles de la ruta..."></textarea>
                             </div>
                             <button class="btn" id="save-route-btn" style="width: 100%; margin-bottom: 0.5rem;" onclick="saveRoute()">Guardar Ruta</button>
-                            <button class="btn btn-secondary" id="cancel-edit-btn" style="width: 100%; display:none;" onclick="resetRouteForm()">Cancelar</button>
+                            <button class="btn btn-secondary" id="cancel-edit-btn" style="width: 100%; display:none;" onclick="resetRouteForm()">Cancelar Edición</button>
                         </div>
 
                         <h3 style="margin-bottom: 1rem; color: var(--primary-dark);">Gestión Completa de Rutas</h3>
@@ -910,6 +983,19 @@
         </div>
     </main>
 
+    <!-- PIE DE PÁGINA CON ENLACES A WHATSAPP E INSTAGRAM -->
+    <footer>
+        <p><strong>Rutas Bizkaia Gayte</strong> — Naturaleza, amistad y montaña en Bizkaia 🏳️‍🌈⛰️</p>
+        <div class="footer-social-links">
+            <a href="https://chat.whatsapp.com/CDIKlxboOjl9Kfs38hf0r0" target="_blank" class="footer-whatsapp-link">
+                💬 Grupo de WhatsApp
+            </a>
+            <a href="https://www.instagram.com/bizkaia.gayte" target="_blank" class="footer-instagram-link">
+                📸 Instagram
+            </a>
+        </div>
+    </footer>
+
     <!-- MODAL LIGHTBOX -->
     <div id="lightbox-modal" class="lightbox-modal" onclick="closeLightbox()">
         <div class="lightbox-content" onclick="event.stopPropagation()">
@@ -919,29 +1005,60 @@
         </div>
     </div>
 
-    <!-- MODAL DE INSCRIPCIÓN -->
+    <!-- MODAL DE INSCRIPCIÓN Y AUTOGESTIÓN -->
     <div id="register-modal" class="modal">
         <div class="modal-content">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                <h3>Inscribirse a la Ruta</h3>
+                <h3 id="modal-main-title">Inscribirse a la Ruta</h3>
                 <button class="close-btn" onclick="closeRegisterModal()">&times;</button>
             </div>
             <div id="modal-alert"></div>
             <input type="hidden" id="register-route-id">
+            <input type="hidden" id="existing-participant-id">
+            
             <div class="form-group">
                 <label for="participant-name">Nombre y Apellidos</label>
                 <input type="text" id="participant-name" placeholder="Tu nombre completo">
             </div>
             <div class="form-group">
-                <label for="participant-phone">Teléfono / WhatsApp</label>
+                <label for="participant-phone">Teléfono / WhatsApp (Privado para organizador)</label>
                 <input type="tel" id="participant-phone" placeholder="Ej. 612345678">
             </div>
-            <div class="form-group">
-                <label class="checkbox-label">
+
+            <!-- BLOQUE DE SEGURO OBLIGATORIO PARA CONFIRMAR PLAZA -->
+            <div class="form-group" style="background: #e8f5e9; padding: 0.8rem; border-radius: 6px; border: 1px solid #a5d6a7;">
+                <label class="checkbox-label" style="color: var(--primary-dark);">
                     <input type="checkbox" id="participant-insurance"> ¿Dispone de seguro de montaña?
                 </label>
+                <small style="display: block; margin-top: 0.4rem; color: #2e7d32; font-size: 0.8rem; line-height: 1.35;">
+                    * <strong>Importante:</strong> Si marcas que tienes seguro, tu plaza quedará <strong>Confirmada automáticamente</strong>.<br>
+                    Si no lo marcas, tu plaza quedará como <strong>No Confirmada</strong> (es obligatorio contratar el seguro diario Modalidad A o Anual en el enlace de la parte superior).
+                </small>
             </div>
-            <button class="btn" style="width: 100%;" onclick="submitRegistration()">Enviar Inscripción</button>
+
+            <!-- BLOQUE DE GESTIÓN DE COCHES -->
+            <div class="form-group" style="background: #f0f8ff; padding: 0.8rem; border-radius: 6px; border: 1px solid #b3e5fc;">
+                <label class="checkbox-label" style="color: #01579b;">
+                    <input type="checkbox" id="participant-has-car" onchange="document.getElementById('carpool-extra').style.display = this.checked ? 'block' : 'none'"> 🚗 Llevo coche y ofrezco plazas libres
+                </label>
+                <div id="carpool-extra" style="display: none; margin-top: 0.6rem;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+                        <div>
+                            <label for="participant-car-seats" style="font-size: 0.8rem;">Plazas libres</label>
+                            <input type="number" id="participant-car-seats" min="1" max="8" value="3" style="padding: 0.4rem;">
+                        </div>
+                        <div>
+                            <label for="participant-car-zone" style="font-size: 0.8rem;"> ¿De dónde sales?</label>
+                            <input type="text" id="participant-car-zone" placeholder="Ej. Bilbao, Sestao..." style="padding: 0.4rem;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem; flex-wrap: wrap;">
+                <button class="btn" id="submit-reg-btn" style="flex: 1; min-width: 140px;" onclick="submitRegistration()">Enviar Inscripción</button>
+                <button class="btn btn-danger" id="cancel-reg-btn" style="display: none; width: auto;" onclick="cancelMyRegistration()">🗑️ Darse de baja</button>
+            </div>
         </div>
     </div>
 
@@ -965,13 +1082,13 @@
                 <label for="admin-part-status">Estado de Plaza</label>
                 <select id="admin-part-status">
                     <option value="confirmed">Confirmada</option>
-                    <option value="pending">Pendiente</option>
-                    <option value="denied">Denegada</option>
+                    <option value="pending">No Confirmada (Sin seguro)</option>
+                    <option value="denied">Denegada / Cancelada</option>
                 </select>
             </div>
             <div class="form-group">
                 <label class="checkbox-label">
-                    <input type="checkbox" id="admin-part-insurance"> Tiene seguro de montaña
+                    <input type="checkbox" id="admin-part-insurance" checked> Tiene seguro de montaña
                 </label>
             </div>
             <button class="btn" style="width: 100%;" onclick="adminSaveParticipant()">Guardar Participante</button>
@@ -979,6 +1096,13 @@
     </div>
 
     <script>
+        // REGISTRO DE SERVICE WORKER PARA INSTALAR APP EN MÓVIL (PWA)
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js').catch(() => {});
+            });
+        }
+
         // CONFIGURACIÓN DE FIREBASE DIRECTA
         const firebaseConfig = {
             apiKey: "AIzaSyBuJra3nB8HXUWgmVThNMACZg5zbCcwYJU",
@@ -1000,45 +1124,30 @@
             console.warn("Error conectando con Firebase. Usando almacenamiento local:", err);
         }
 
-        const rutaInicial = {
-            id: 'route-1',
-            title: 'Ruta de los Dólmenes de Oiz',
-            date: '2026-10-17T10:00',
-            difficulty: 'Media',
-            distance: '17.79',
-            elevation: '644',
-            coffee: 'Bar Uriarte (https://maps.app.goo.gl/ejemplo)',
-            meeting: 'Merendero-Undakorta (https://maps.app.goo.gl/TESfLoWCVXUwg58b6)',
-            weatherIcon: '⛅ 🌧️',
-            weatherTemp: '13',
-            wikiloc: 'https://es.wikiloc.com/rutas-senderismo/ruta-de-los-dolmenes-de-oiz-iturzurigana-zengotitagana-oiz-astokurzeteburu-ipinarrieta-65984900',
-            image: 'https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=600&q=80',
-            description: 'Magnífica ruta por los dólmenes de Oiz.',
-            participants: []
-        };
-
-        let routes = [rutaInicial];
+        // INICIAMOS SIN NINGUNA RUTA PRECARGADA PARA EVITAR RUTAS FANTASMA
+        let routes = [];
         let clubGallery = [];
         let isAdminLoggedIn = localStorage.getItem('admin_logged') === 'true';
-        let isMobileViewForced = false;
         let currentCalendarDate = new Date();
 
         window.addEventListener('DOMContentLoaded', () => {
+            // Limpiamos la clave antigua local para que no interfiera con Firebase
+            localStorage.removeItem('club_routes');
+
             const urlParams = new URLSearchParams(window.location.search);
             const targetRouteId = urlParams.get('route');
 
             if (useCloud) {
                 // Sincronización en tiempo real de rutas desde Firestore
                 db.collection("routes").onSnapshot((snapshot) => {
-                    if (!snapshot.empty) {
-                        routes = [];
-                        snapshot.forEach((doc) => {
-                            routes.push({ id: doc.id, ...doc.data() });
-                        });
-                    } else {
-                        // Si la colección está vacía en Firebase, subimos la ruta inicial
-                        db.collection("routes").doc("route-1").set(rutaInicial);
-                    }
+                    routes = [];
+                    snapshot.forEach((doc) => {
+                        const data = doc.data();
+                        // Eliminamos cualquier campo 'id' antiguo guardado dentro de los datos para usar siempre el ID real de Firebase
+                        delete data.id;
+                        routes.push({ id: doc.id, ...data });
+                    });
+                    routes.sort((a, b) => new Date(a.date) - new Date(b.date));
                     renderAll();
                     renderCalendar();
                     updateRouteSelectOptions();
@@ -1051,7 +1160,9 @@
                 db.collection("gallery").onSnapshot((snapshot) => {
                     clubGallery = [];
                     snapshot.forEach((doc) => {
-                        clubGallery.push({ id: doc.id, ...doc.data() });
+                        const data = doc.data();
+                        delete data.id;
+                        clubGallery.push({ id: doc.id, ...data });
                     });
                     renderGallery();
                 }, (error) => {
@@ -1072,7 +1183,7 @@
                         cardElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
                         cardElement.classList.add('highlighted');
                     }
-                }, 500);
+                }, 600);
             }
         });
 
@@ -1086,19 +1197,6 @@
             renderCalendar();
             renderGallery();
             updateRouteSelectOptions();
-        }
-
-        function toggleViewMode() {
-            isMobileViewForced = !isMobileViewForced;
-            const body = document.getElementById('app-body');
-            const btn = document.getElementById('view-switch-btn');
-            if (isMobileViewForced) {
-                body.classList.add('force-mobile');
-                btn.innerHTML = '💻 Cambiar a Ordenador';
-            } else {
-                body.classList.remove('force-mobile');
-                btn.innerHTML = '📱 Cambiar a Móvil';
-            }
         }
 
         function switchTab(tabId) {
@@ -1146,19 +1244,19 @@
 
         function formatDistance(dist) {
             if (!dist) return '';
-            let d = dist.replace(/km/i, '').trim().replace('.', ',');
+            let d = String(dist).replace(/km/i, '').trim().replace('.', ',');
             return d + ' km';
         }
 
         function formatElevation(elev) {
             if (!elev) return '';
-            let e = elev.replace(/\+/g, '').replace(/m/i, '').trim();
+            let e = String(elev).replace(/\+/g, '').replace(/m/i, '').trim();
             return '+' + e + ' m';
         }
 
         function formatTemperature(temp) {
             if (!temp) return '';
-            let t = temp.trim();
+            let t = String(temp).trim();
             if (!t.toLowerCase().includes('c')) {
                 t += ' ºC';
             }
@@ -1262,12 +1360,14 @@
             const routeMap = {};
             routes.forEach(r => {
                 const rDate = new Date(r.date);
-                const dateKey = `${rDate.getFullYear()}-${String(rDate.getMonth() + 1).padStart(2, '0')}-${String(rDate.getDate()).padStart(2, '0')}`;
-                routeMap[dateKey] = {
-                    id: r.id,
-                    title: r.title,
-                    isPast: rDate < now
-                };
+                if (!isNaN(rDate.getTime())) {
+                    const dateKey = `${rDate.getFullYear()}-${String(rDate.getMonth() + 1).padStart(2, '0')}-${String(rDate.getDate()).padStart(2, '0')}`;
+                    routeMap[dateKey] = {
+                        id: r.id,
+                        title: r.title,
+                        isPast: rDate < now
+                    };
+                }
             });
 
             for (let i = 0; i < firstDayIndex; i++) {
@@ -1387,8 +1487,17 @@
         }
 
         function formatDate(dateString) {
+            if (!dateString) return 'Fecha por definir';
+            const d = new Date(dateString);
+            if (isNaN(d.getTime())) return dateString;
             const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
-            return new Date(dateString).toLocaleDateString('es-ES', options);
+            return d.toLocaleDateString('es-ES', options);
+        }
+
+        function getParticipantStatusLabel(status) {
+            if (status === 'confirmed') return '✅ Plaza Confirmada';
+            if (status === 'pending') return '⚠️ Plaza NO Confirmada (Falta contratar seguro)';
+            return '❌ Plaza Cancelada / No asiste';
         }
 
         function renderScheduledRoutes(list) {
@@ -1397,6 +1506,8 @@
                 container.innerHTML = `<p style="font-size: 0.9rem; color: var(--text-light);">No hay rutas programadas próximamente.</p>`;
                 return;
             }
+
+            const myRegistrations = JSON.parse(localStorage.getItem('gayte_my_registrations') || '{}');
 
             container.innerHTML = list.map(route => {
                 let coffeeHtml = formatMapField(route.coffee);
@@ -1410,6 +1521,11 @@
                 }
 
                 let participantsList = route.participants || [];
+                let totalCarSeats = participantsList.reduce((acc, p) => acc + (p.hasCar && p.status !== 'denied' ? (parseInt(p.carSeats) || 0) : 0), 0);
+
+                let myRegId = myRegistrations[route.id];
+                let userAlreadyRegistered = myRegId && participantsList.some(p => p.id === myRegId);
+                let regButtonText = userAlreadyRegistered ? '⚙️ Editar mi inscripción / Darse de baja' : 'Inscribirse';
 
                 return `
                     <div class="card" id="card-${route.id}">
@@ -1432,8 +1548,11 @@
                         </div>
 
                         <div>
-                            <button class="btn" style="width: 100%; margin-bottom: 0.5rem;" onclick="openRegisterModal('${route.id}')">Inscribirse</button>
-                            <button class="btn btn-whatsapp" onclick="shareOnWhatsApp('${route.id}', '${route.title.replace(/'/g, "\\'")}', '${route.date}', '${(route.coffee || '').replace(/'/g, "\\'")}', '${route.meeting.replace(/'/g, "\\'")}', '${route.distance || ''}', '${route.elevation || ''}', '${weatherDisplay.replace(/'/g, "\\'")}', '${route.wikiloc || ''}')">
+                            ${totalCarSeats > 0 ? `<div class="carpool-box">🚗 Coches disponibles: ${totalCarSeats} plazas libres ofrecidas</div>` : ''}
+                            <button class="btn" style="width: 100%; margin-bottom: 0.5rem; ${userAlreadyRegistered ? 'background-color: var(--info);' : ''}" onclick="openRegisterModal('${route.id}')">
+                                ${regButtonText}
+                            </button>
+                            <button class="btn btn-whatsapp" onclick="shareOnWhatsApp('${route.id}', '${(route.title || '').replace(/'/g, "\\'")}', '${route.date}', '${(route.coffee || '').replace(/'/g, "\\'")}', '${(route.meeting || '').replace(/'/g, "\\'")}', '${route.distance || ''}', '${route.elevation || ''}', '${weatherDisplay.replace(/'/g, "\\'")}', '${route.wikiloc || ''}')">
                                 💬 Compartir por WhatsApp
                             </button>
                             
@@ -1442,12 +1561,13 @@
                                 ${participantsList.length === 0 ? '<p style="font-size: 0.85rem; color: var(--text-light);">Aún sin inscripciones.</p>' : 
                                     participantsList.map(p => {
                                         let statusClass = p.status === 'confirmed' ? 'confirmed' : (p.status === 'pending' ? 'pending' : 'denied');
-                                        let statusText = p.status === 'confirmed' ? 'Plaza Confirmada' : (p.status === 'pending' ? 'Pendiente' : 'Denegada');
+                                        let statusText = getParticipantStatusLabel(statusClass);
+                                        let carBadge = p.hasCar ? `<span class="badge badge-car">🚗 +${p.carSeats} (${p.carZone || 'Zona no ind.'})</span>` : '';
                                         
                                         return `
                                             <div class="participant-item ${statusClass}">
                                                 <div>
-                                                    <strong>${p.name}</strong><br>
+                                                    <strong>${p.name}</strong>${carBadge}<br>
                                                     <small style="color: var(--text-light);">${statusText}</small>
                                                 </div>
                                             </div>
@@ -1502,7 +1622,7 @@
                         </div>
 
                         <div>
-                            <button class="btn btn-whatsapp" style="margin-bottom: 0.5rem;" onclick="shareOnWhatsApp('${route.id}', '${route.title.replace(/'/g, "\\'")}', '${route.date}', '${(route.coffee || '').replace(/'/g, "\\'")}', '${route.meeting.replace(/'/g, "\\'")}', '${route.distance || ''}', '${route.elevation || ''}', '${weatherDisplay.replace(/'/g, "\\'")}', '${route.wikiloc || ''}')">
+                            <button class="btn btn-whatsapp" style="margin-bottom: 0.5rem;" onclick="shareOnWhatsApp('${route.id}', '${(route.title || '').replace(/'/g, "\\'")}', '${route.date}', '${(route.coffee || '').replace(/'/g, "\\'")}', '${(route.meeting || '').replace(/'/g, "\\'")}', '${route.distance || ''}', '${route.elevation || ''}', '${weatherDisplay.replace(/'/g, "\\'")}', '${route.wikiloc || ''}')">
                                 💬 Compartir por WhatsApp
                             </button>
 
@@ -1511,7 +1631,7 @@
                                 ${participantsList.length === 0 ? '<p style="font-size: 0.85rem; color: var(--text-light);">Sin registros.</p>' : 
                                     participantsList.map(p => {
                                         let statusClass = p.status === 'confirmed' ? 'confirmed' : 'denied';
-                                        let statusText = p.status === 'confirmed' ? 'Plaza Confirmada (Asistió)' : 'Denegada / No asistió';
+                                        let statusText = p.status === 'confirmed' ? 'Plaza Confirmada (Asistió)' : 'No Confirmada / No asistió';
                                         
                                         return `
                                             <div class="participant-item ${statusClass}">
@@ -1532,9 +1652,39 @@
 
         function openRegisterModal(routeId) {
             document.getElementById('register-route-id').value = routeId;
-            document.getElementById('participant-name').value = '';
-            document.getElementById('participant-phone').value = '';
-            document.getElementById('participant-insurance').checked = false;
+            
+            const route = routes.find(r => r.id === routeId);
+            const myRegistrations = JSON.parse(localStorage.getItem('gayte_my_registrations') || '{}');
+            const myRegId = myRegistrations[routeId];
+            const existingParticipant = route && route.participants ? route.participants.find(p => p.id === myRegId) : null;
+
+            if (existingParticipant) {
+                document.getElementById('modal-main-title').innerText = 'Gestionar mi Inscripción';
+                document.getElementById('existing-participant-id').value = existingParticipant.id;
+                document.getElementById('participant-name').value = existingParticipant.name || '';
+                document.getElementById('participant-phone').value = existingParticipant.phone || '';
+                document.getElementById('participant-insurance').checked = !!existingParticipant.insurance;
+                document.getElementById('participant-has-car').checked = !!existingParticipant.hasCar;
+                document.getElementById('participant-car-seats').value = existingParticipant.carSeats || 3;
+                document.getElementById('participant-car-zone').value = existingParticipant.carZone || '';
+                document.getElementById('carpool-extra').style.display = existingParticipant.hasCar ? 'block' : 'none';
+                document.getElementById('submit-reg-btn').innerText = 'Actualizar Mis Datos';
+                document.getElementById('cancel-reg-btn').style.display = 'inline-block';
+            } else {
+                document.getElementById('modal-main-title').innerText = 'Inscribirse a la Ruta';
+                document.getElementById('existing-participant-id').value = '';
+                const savedProfile = JSON.parse(localStorage.getItem('gayte_user_profile') || '{}');
+                document.getElementById('participant-name').value = savedProfile.name || '';
+                document.getElementById('participant-phone').value = savedProfile.phone || '';
+                document.getElementById('participant-insurance').checked = !!savedProfile.insurance;
+                document.getElementById('participant-has-car').checked = !!savedProfile.hasCar;
+                document.getElementById('participant-car-seats').value = savedProfile.carSeats || 3;
+                document.getElementById('participant-car-zone').value = savedProfile.carZone || '';
+                document.getElementById('carpool-extra').style.display = savedProfile.hasCar ? 'block' : 'none';
+                document.getElementById('submit-reg-btn').innerText = 'Enviar Inscripción';
+                document.getElementById('cancel-reg-btn').style.display = 'none';
+            }
+
             document.getElementById('modal-alert').innerHTML = '';
             document.getElementById('register-modal').classList.add('open');
         }
@@ -1545,45 +1695,110 @@
 
         function submitRegistration() {
             const routeId = document.getElementById('register-route-id').value;
+            const existingId = document.getElementById('existing-participant-id').value;
             const name = document.getElementById('participant-name').value.trim();
             const phone = document.getElementById('participant-phone').value.trim();
             const insurance = document.getElementById('participant-insurance').checked;
+            const hasCar = document.getElementById('participant-has-car').checked;
+            const carSeats = hasCar ? (parseInt(document.getElementById('participant-car-seats').value) || 0) : 0;
+            const carZone = hasCar ? document.getElementById('participant-car-zone').value.trim() : '';
 
             if (!name || !phone) {
                 document.getElementById('modal-alert').innerHTML = `<div class="alert alert-error">Introduce tu nombre y tu teléfono/WhatsApp.</div>`;
                 return;
             }
 
-            const newParticipant = {
-                id: 'p_' + Date.now(),
-                name,
-                phone,
-                status: 'pending',
-                insurance
+            localStorage.setItem('gayte_user_profile', JSON.stringify({
+                name, phone, insurance, hasCar, carSeats, carZone
+            }));
+
+            const currentRoute = routes.find(r => r.id === routeId);
+            if (!currentRoute) return;
+
+            let participantsList = [...(currentRoute.participants || [])];
+            
+            // Confirmación automática SI marca seguro; si NO marca seguro, queda como No Confirmada ('pending')
+            const autoStatus = insurance ? 'confirmed' : 'pending';
+
+            let participantObj;
+            if (existingId) {
+                participantsList = participantsList.map(p => {
+                    if (p.id === existingId) {
+                        participantObj = { ...p, name, phone, insurance, hasCar, carSeats, carZone, status: autoStatus };
+                        return participantObj;
+                    }
+                    return p;
+                });
+            } else {
+                participantObj = {
+                    id: 'p_' + Date.now(),
+                    name,
+                    phone,
+                    status: autoStatus,
+                    insurance,
+                    hasCar,
+                    carSeats,
+                    carZone
+                };
+                participantsList.push(participantObj);
+
+                let myRegistrations = JSON.parse(localStorage.getItem('gayte_my_registrations') || '{}');
+                myRegistrations[routeId] = participantObj.id;
+                localStorage.setItem('gayte_my_registrations', JSON.stringify(myRegistrations));
+            }
+
+            const showFinalAlert = () => {
+                closeRegisterModal();
+                if (insurance) {
+                    alert('✅ ¡Inscripción registrada! Al disponer de seguro, tu PLAZA queda CONFIRMADA automáticamente.');
+                } else {
+                    alert('⚠️ AVISO IMPORTANTE: Tu inscripción se ha registrado como PLAZA NO CONFIRMADA porque no has marcado la casilla del seguro.\n\nRecuerda que es obligatorio contratar el seguro diario Modalidad A o Anual en el enlace de la parte superior ("Contratar Seguro Rocalsub") para poder asistir y confirmar tu plaza.');
+                }
             };
 
             if (useCloud) {
-                const currentRoute = routes.find(r => r.id === routeId) || rutaInicial;
-                const routeRef = db.collection("routes").doc(routeId);
-
-                routeRef.set({
-                    ...currentRoute,
-                    participants: firebase.firestore.FieldValue.arrayUnion(newParticipant)
-                }, { merge: true }).then(() => {
-                    closeRegisterModal();
-                    alert('¡Inscripción enviada correctamente! Ya le aparece al organizador.');
-                }).catch(err => {
+                db.collection("routes").doc(routeId).update({
+                    participants: participantsList
+                }).then(showFinalAlert).catch(err => {
                     alert('Error enviando inscripción: ' + err.message);
                 });
             } else {
-                const route = routes.find(r => r.id === routeId);
-                if (route) {
-                    if (!route.participants) route.participants = [];
-                    route.participants.push(newParticipant);
+                currentRoute.participants = participantsList;
+                localStorage.setItem('club_routes', JSON.stringify(routes));
+                renderAll();
+                showFinalAlert();
+            }
+        }
+
+        function cancelMyRegistration() {
+            const routeId = document.getElementById('register-route-id').value;
+            const existingId = document.getElementById('existing-participant-id').value;
+
+            if (!confirm('¿Estás seguro de que quieres cancelar tu asistencia y darte de baja de la ruta?')) return;
+
+            const currentRoute = routes.find(r => r.id === routeId);
+            if (currentRoute && currentRoute.participants) {
+                const updatedList = currentRoute.participants.filter(p => p.id !== existingId);
+
+                let myRegistrations = JSON.parse(localStorage.getItem('gayte_my_registrations') || '{}');
+                delete myRegistrations[routeId];
+                localStorage.setItem('gayte_my_registrations', JSON.stringify(myRegistrations));
+
+                if (useCloud) {
+                    db.collection("routes").doc(routeId).update({
+                        participants: updatedList
+                    }).then(() => {
+                        closeRegisterModal();
+                        alert('Has cancelado tu asistencia y te has dado de baja correctamente.');
+                    }).catch(err => {
+                        alert('Error al dar de baja: ' + err.message);
+                    });
+                } else {
+                    currentRoute.participants = updatedList;
                     localStorage.setItem('club_routes', JSON.stringify(routes));
                     renderAll();
                     closeRegisterModal();
-                    alert('¡Inscripción enviada correctamente!');
+                    alert('Has cancelado tu asistencia correctamente.');
                 }
             }
         }
@@ -1593,6 +1808,7 @@
             if (pass === 'admin123') {
                 isAdminLoggedIn = true;
                 localStorage.setItem('admin_logged', 'true');
+                document.getElementById('login-alert').innerHTML = '';
                 showAdminPanelContent();
                 renderAdminRoutesList();
                 renderGallery();
@@ -1656,10 +1872,20 @@
 
             if (useCloud) {
                 if (editId) {
-                    db.collection("routes").doc(editId).set(routeData, { merge: true });
+                    db.collection("routes").doc(editId).set(routeData, { merge: true }).then(() => {
+                        resetRouteForm();
+                        document.getElementById('route-form-alert').innerHTML = `<div class="alert alert-success">✅ Ruta actualizada con éxito.</div>`;
+                    }).catch(err => {
+                        alert("Error al actualizar la ruta: " + err.message);
+                    });
                 } else {
                     routeData.participants = [];
-                    db.collection("routes").add(routeData);
+                    db.collection("routes").add(routeData).then(() => {
+                        resetRouteForm();
+                        document.getElementById('route-form-alert').innerHTML = `<div class="alert alert-success">✅ Ruta creada y guardada con éxito.</div>`;
+                    }).catch(err => {
+                        alert("Error al guardar la ruta: " + err.message);
+                    });
                 }
             } else {
                 if (editId) {
@@ -1671,18 +1897,17 @@
                     routes.push(routeData);
                 }
                 localStorage.setItem('club_routes', JSON.stringify(routes));
+                resetRouteForm();
+                document.getElementById('route-form-alert').innerHTML = `<div class="alert alert-success">✅ Ruta guardada con éxito.</div>`;
                 renderAll();
             }
-
-            resetRouteForm();
-            document.getElementById('route-form-alert').innerHTML = `<div class="alert alert-success">Ruta guardada con éxito.</div>`;
         }
 
         function resetRouteForm() {
             document.getElementById('edit-route-id').value = '';
             document.getElementById('route-title').value = '';
             document.getElementById('route-date').value = '';
-            document.getElementById('route-difficulty').value = 'Fácil';
+            document.getElementById('route-difficulty').value = 'Media';
             document.getElementById('route-distance').value = '';
             document.getElementById('route-elevation').value = '';
             document.getElementById('route-coffee').value = '';
@@ -1702,42 +1927,66 @@
             const route = routes.find(r => r.id === id);
             if (route) {
                 document.getElementById('edit-route-id').value = route.id;
-                document.getElementById('route-title').value = route.title;
-                document.getElementById('route-date').value = route.date;
-                document.getElementById('route-difficulty').value = route.difficulty;
+                document.getElementById('route-title').value = route.title || '';
+                document.getElementById('route-date').value = route.date || '';
+                document.getElementById('route-difficulty').value = route.difficulty || 'Media';
                 document.getElementById('route-distance').value = route.distance || '';
                 document.getElementById('route-elevation').value = route.elevation || '';
                 document.getElementById('route-coffee').value = route.coffee || '';
-                document.getElementById('route-meeting').value = route.meeting;
+                document.getElementById('route-meeting').value = route.meeting || '';
                 setWeatherIconsFromString(route.weatherIcon || '');
                 document.getElementById('route-weather-temp').value = route.weatherTemp || '';
                 document.getElementById('route-wikiloc').value = route.wikiloc || '';
                 document.getElementById('route-image').value = route.image || '';
                 document.getElementById('route-description').value = route.description || '';
                 
-                document.getElementById('form-title').innerText = 'Editar Ruta';
+                document.getElementById('form-title').innerText = '✏️ Editar Ruta: ' + route.title;
                 document.getElementById('save-route-btn').innerText = 'Actualizar Ruta';
                 document.getElementById('cancel-edit-btn').style.display = 'block';
-                window.scrollTo({ top: 200, behavior: 'smooth' });
+                document.getElementById('route-form-alert').innerHTML = '';
+                document.getElementById('form-title').scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
         }
 
-        function deleteRoute(id) {
-            if (confirm('¿Eliminar esta ruta?')) {
+        async function deleteRoute(id) {
+            if (!confirm('¿Estás seguro de que quieres eliminar esta ruta definitivamente?')) return;
+            try {
                 if (useCloud) {
-                    db.collection("routes").doc(id).delete();
-                } else {
-                    routes = routes.filter(r => r.id !== id);
-                    localStorage.setItem('club_routes', JSON.stringify(routes));
-                    renderAll();
+                    await db.collection("routes").doc(id).delete();
                 }
+                routes = routes.filter(r => r.id !== id);
+                localStorage.removeItem('club_routes');
+                renderAll();
+                renderCalendar();
+            } catch (err) {
+                alert("Error al eliminar la ruta: " + err.message);
+            }
+        }
+
+        async function clearAllRoutes() {
+            if (!confirm('⚠️ ¿Estás seguro de que quieres BORRAR TODAS LAS RUTAS y dejar la web completamente limpia desde cero?')) return;
+            try {
+                if (useCloud) {
+                    const snapshot = await db.collection("routes").get();
+                    const batch = db.batch();
+                    snapshot.docs.forEach(doc => batch.delete(doc.ref));
+                    await batch.commit();
+                }
+                localStorage.removeItem('club_routes');
+                localStorage.removeItem('gayte_my_registrations');
+                routes = [];
+                renderAll();
+                renderCalendar();
+                alert("✅ Todas las rutas se han eliminado correctamente.");
+            } catch (err) {
+                alert("Error al vaciar las rutas: " + err.message);
             }
         }
 
         function renderAdminRoutesList() {
             const container = document.getElementById('admin-routes-list');
             if (routes.length === 0) {
-                container.innerHTML = `<p style="font-size: 0.9rem; color: var(--text-light);">No hay rutas.</p>`;
+                container.innerHTML = `<p style="font-size: 0.9rem; color: var(--text-light);">No hay rutas creadas.</p>`;
                 return;
             }
 
@@ -1759,14 +2008,14 @@
                             </div>
                             <div class="card-info">
                                 <p><strong>Fecha:</strong> ${formatDate(route.date)}</p>
-                                <span style="font-size:0.8rem; color:#555;">Dist: ${formatDistance(route.distance)} | Desn: ${formatElevation(route.elevation)}</span>
+                                <span style="font-size:0.8rem; color:#555;">Dist: ${formatDistance(route.distance) || '-'} | Desn: ${formatElevation(route.elevation) || '-'}</span>
                             </div>
                         </div>
 
                         <div>
                             <div style="display: flex; gap: 0.4rem; margin-bottom: 1rem; flex-wrap: wrap;">
-                                <button class="btn btn-small" onclick="editRoute('${route.id}')">Editar</button>
-                                <button class="btn btn-small btn-danger" onclick="deleteRoute('${route.id}')">Eliminar</button>
+                                <button class="btn btn-small" onclick="editRoute('${route.id}')">✏️ Editar</button>
+                                <button class="btn btn-small btn-danger" onclick="deleteRoute('${route.id}')">🗑️ Eliminar</button>
                                 <button class="btn btn-small btn-secondary" onclick="openAdminParticipantModal('${route.id}')">+ Asistente</button>
                             </div>
 
@@ -1787,7 +2036,7 @@
                                             <div class="participant-item ${statusClass}" style="flex-direction: column; align-items: stretch; gap: 0.4rem; padding: 0.5rem;">
                                                 <div style="display: flex; justify-content: space-between; align-items: center;">
                                                     <div>
-                                                        <strong>${p.name}</strong><br>${waBtn}
+                                                        <strong>${p.name}</strong>${p.hasCar ? `<span class="badge badge-car">🚗 +${p.carSeats} (${p.carZone || ''})</span>` : ''}<br>${waBtn}
                                                     </div>
                                                     <div style="display: flex; align-items: center; gap: 0.4rem;">
                                                         ${insuranceBadge}
@@ -1799,8 +2048,8 @@
                                                         Plaza: 
                                                         <select onchange="changeParticipantStatus('${route.id}', '${p.id}', this.value)" style="padding: 0.2rem; font-size: 0.8rem;">
                                                             <option value="confirmed" ${p.status === 'confirmed' ? 'selected' : ''}>Confirmada</option>
-                                                            <option value="pending" ${p.status === 'pending' ? 'selected' : ''}>Pendiente</option>
-                                                            <option value="denied" ${p.status === 'denied' ? 'selected' : ''}>Denegada</option>
+                                                            <option value="pending" ${p.status === 'pending' ? 'selected' : ''}>No Confirmada (Sin seguro)</option>
+                                                            <option value="denied" ${p.status === 'denied' ? 'selected' : ''}>Denegada / Cancelada</option>
                                                         </select>
                                                     </div>
                                                     <div>
@@ -1837,6 +2086,7 @@
                 const part = route.participants.find(p => p.id === participantId);
                 if (part) {
                     part.insurance = hasInsurance;
+                    part.status = hasInsurance ? 'confirmed' : 'pending';
                     updateRouteParticipants(routeId, route.participants);
                 }
             }
@@ -1870,7 +2120,7 @@
             document.getElementById('admin-part-name').value = '';
             document.getElementById('admin-part-phone').value = '';
             document.getElementById('admin-part-status').value = 'confirmed';
-            document.getElementById('admin-part-insurance').checked = false;
+            document.getElementById('admin-part-insurance').checked = true;
             document.getElementById('admin-add-participant-modal').classList.add('open');
         }
 
@@ -1895,7 +2145,10 @@
                 name,
                 phone,
                 status,
-                insurance
+                insurance,
+                hasCar: false,
+                carSeats: 0,
+                carZone: ''
             };
 
             const route = routes.find(r => r.id === routeId);
@@ -1908,4 +2161,3 @@
     </script>
 </body>
 </html>
-
