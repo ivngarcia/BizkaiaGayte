@@ -94,7 +94,7 @@
         }
 
         header h1 {
-            font-size: 2.8rem;
+            font-size: 2.6rem;
             font-weight: bold;
             margin-bottom: 0.4rem;
             letter-spacing: 0.5px;
@@ -140,11 +140,11 @@
             background: rgba(255, 255, 255, 0.4);
         }
 
-        /* BARRA DE NAVEGACIÓN ADAPTATIVA */
+        /* BARRA DE NAVEGACIÓN ADAPTATIVA (SIN DESBORDAMIENTO) */
         nav {
             background-color: white;
             display: flex;
-            justify-content: center;
+            justify-content: space-around;
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
             position: sticky;
             top: 0;
@@ -156,15 +156,14 @@
         nav button {
             background: none;
             border: none;
-            padding: 0.8rem 0.6rem;
-            font-size: 0.9rem;
+            padding: 0.8rem 0.4rem;
+            font-size: 0.88rem;
             font-weight: bold;
             cursor: pointer;
             color: var(--text-light);
             border-bottom: 3px solid transparent;
             transition: all 0.3s ease;
-            flex: 1;
-            min-width: 110px;
+            flex: 1 1 auto;
             text-align: center;
         }
 
@@ -253,7 +252,7 @@
 
         @media (max-width: 900px) {
             header h1 {
-                font-size: 2rem;
+                font-size: 1.9rem;
             }
             .app-layout {
                 grid-template-columns: 1fr;
@@ -438,7 +437,7 @@
 
         .card-image {
             width: 100%;
-            height: 150px;
+            height: 160px;
             border-radius: 6px;
             object-fit: cover;
             margin-bottom: 0.8rem;
@@ -568,9 +567,9 @@
         }
 
         .participant-item.confirmed { border-left-color: var(--success); }
-        .participant-item.pending { border-left-color: var(--warning); }
+        .participant-item.pending { border-left-color: var(--warning); background: #fff8e1; }
         .participant-item.waitlist { border-left-color: var(--info); background: #f0f8ff; }
-        .participant-item.denied { border-left-color: var(--danger); }
+        .participant-item.denied { border-left-color: var(--danger); background: #ffebee; }
 
         .carpool-box {
             background: #e1f5fe;
@@ -982,7 +981,7 @@
             </div>
             <div class="form-group">
                 <label class="checkbox-label">
-                    <input type="checkbox" id="admin-part-insurance"> Tiene seguro de montaña
+                    <input type="checkbox" id="admin-part-insurance" checked> Tiene seguro de montaña
                 </label>
             </div>
             <button class="btn" style="width: 100%;" onclick="adminSaveParticipant()">Guardar Participante</button>
@@ -1019,10 +1018,10 @@
             db = firebase.firestore();
             useCloud = true;
         } catch (err) {
-            console.warn("Error conectando con Firebase. Usando almacenamiento local:", err);
+            console.warn("Error conectando con Firebase:", err);
         }
 
-        // LISTA DE RUTAS TOTALMENTE VACÍA POR DEFECTO (SIN RUTAS FANTASMA)
+        // ARRAY DE RUTAS TOTALMENTE VACÍO POR DEFECTO
         let routes = [];
         let isAdminLoggedIn = localStorage.getItem('admin_logged') === 'true';
         let isMobileViewForced = false;
@@ -1036,7 +1035,7 @@
         }
 
         window.addEventListener('DOMContentLoaded', () => {
-            // Limpiamos cualquier resto antiguo en memoria local para evitar conflictos con Firebase
+            // Limpiamos cualquier resto antiguo en memoria local
             localStorage.removeItem('club_routes');
 
             const urlParams = new URLSearchParams(window.location.search);
@@ -1051,16 +1050,15 @@
                     }
                 });
 
-                // Escucha en tiempo real de Firebase Firestore (sin recrear nada si está vacío)
+                // Escucha en tiempo real de Firebase Firestore
                 db.collection("routes").onSnapshot((snapshot) => {
                     routes = [];
                     snapshot.forEach((doc) => {
                         const data = doc.data();
-                        // Ignoramos cualquier campo "id" viejo guardado dentro del objeto y usamos siempre el doc.id real de Firebase
+                        // Eliminamos cualquier campo 'id' interno antiguo para que prevalezca siempre el doc.id real de Firebase
                         delete data.id;
                         routes.push({ id: doc.id, ...data });
                     });
-                    // Ordenar rutas por fecha
                     routes.sort((a, b) => new Date(a.date) - new Date(b.date));
                     renderAll();
                     renderCalendar();
@@ -1643,7 +1641,7 @@
 
             let participantsList = [...(currentRoute.participants || [])];
             
-            // Lógica estricta de seguro: solo confirma si marca seguro
+            // Regla de Seguro: solo se confirma plaza si tiene seguro marcado
             let status = 'pending';
             if (insurance) {
                 const confirmedCount = participantsList.filter(p => p.status === 'confirmed' && p.id !== existingId).length;
